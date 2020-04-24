@@ -40,7 +40,8 @@
 # *.ipr
 
 # CMake
-cmake-build-*/
+cmake-build-debug/
+CMakeLists.txt
 
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
@@ -89,7 +90,7 @@ fabric.properties
 # Markdown Navigator plugin
 .idea/**/markdown-navigator.xml
 .idea/**/markdown-navigator/
-
+.idea/
 ### Linux ###
 *~
 
