@@ -1,3 +1,0 @@
-/home/sirze/Área de Trabalho/Universidade/PROG/Projeto2/Scrabble_Junior_Game/ScrabbleJunior/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/sirze/Área de Trabalho/Universidade/PROG/Projeto2/Scrabble_Junior_Game/ScrabbleJunior/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/sirze/Área de Trabalho/Universidade/PROG/Projeto2/Scrabble_Junior_Game/ScrabbleJunior/cmake-build-debug/CMakeFiles/ScrabbleJunior.dir
