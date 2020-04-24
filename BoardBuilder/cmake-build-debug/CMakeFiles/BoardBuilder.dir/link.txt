@@ -1,1 +1,0 @@
-/usr/bin/c++  -g   CMakeFiles/BoardBuilder.dir/main.cpp.o  -o BoardBuilder 

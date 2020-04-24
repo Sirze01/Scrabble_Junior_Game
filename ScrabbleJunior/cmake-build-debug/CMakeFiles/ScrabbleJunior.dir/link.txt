@@ -1,1 +1,0 @@
-/usr/bin/c++  -g   CMakeFiles/ScrabbleJunior.dir/main.cpp.o  -o ScrabbleJunior 
