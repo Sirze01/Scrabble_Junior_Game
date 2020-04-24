@@ -1,0 +1,12 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/sirze/Área de Trabalho/Universidade/PROG/Projeto2/Scrabble_Junior_Game/ScrabbleJunior/main.cpp
+iostream
+-
+
