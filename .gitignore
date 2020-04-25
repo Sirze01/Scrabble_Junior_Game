@@ -561,4 +561,8 @@ MigrationBackup/
 
 # Start of VS2019 project files
 
+*.sln
+*.vcxproj
+*.vcxproj.filters
+
 #End of VS2019 project files
