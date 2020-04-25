@@ -561,8 +561,11 @@ MigrationBackup/
 
 # Start of VS2019 project files
 
-*.sln
-*.vcxproj
-*.vcxproj.filters
+/ScrabbleJunior/ScrabbleJunior.sln
+/ScrabbleJunior/ScrabbleJunior.vcxproj
+/ScrabbleJunior/ScrabbleJunior.vcxproj.filters
+/BoardBuilder/BoardBuilder.sln
+/BoardBuilder/BoardBuilder.vcxproj
+/BoardBuilder/BoardBuilder.vcxproj.filters
 
 #End of VS2019 project files
