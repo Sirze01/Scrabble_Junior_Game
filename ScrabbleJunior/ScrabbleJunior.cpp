@@ -2,7 +2,5 @@
 
 int main()
 {
-    std::cout << "This replaces the original main by José. May cause issues.\n";
-    std::cout << "Boom.\n";
-    std::cout << "SJ version.\n";
+    std::cout << "Hello world!\n";
 }
