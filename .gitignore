@@ -548,9 +548,17 @@ MigrationBackup/
 
 # End of https://www.gitignore.io/api/c,c++,linux,windows,clion+all,visualstudio
 
+# Start of Clion project files
+
 /ScrabbleJunior/.idea
 /ScrabbleJunior/CMakeLists.txt
 /ScrabbleJunior/cmake-build-debug
 /BoardBuilder/.idea
 /BoardBuilder/CMakeLists.txt
 /BoardBuilder/cmake-build-debug
+
+# End of Clion project files
+
+# Start of VS2019 project files
+
+#End of VS2019 project files
