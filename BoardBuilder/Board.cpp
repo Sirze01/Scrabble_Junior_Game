@@ -75,14 +75,15 @@ Board::Board(std::string filename)  {
 void Board::show() const {                              //Prototype function (needs styling)
     std::cout << ' ';
     for(size_t i = 0; i < _hDimension; i++){
-        std::cout << alphabet.at(i);
+        std::cout << ' ' << alphabet.at(i);
     }
     std::cout << std::endl;
     for(size_t i = 0; i< _vDimension; i++){
         std::string line;
         line += toupper(alphabet.at(i));
         for(size_t j = 0; j < _hDimension; j++){
-            line += _letters[i][j]; //why the end of the world happens if i concatenate " " also?
+            line += ' ';
+            line += _letters[i][j];//why the end of the world happens if i concatenate " " also?
         }
         line += '\n';
         std::cout << line;
