@@ -5,16 +5,6 @@
 #include "Player.h"
 #include "PlayBoard.h"
 
-void showPool(Pool pool) {
-    std::map<char, int> my_letters = pool.getAllLetters();
-    int count = 0;
-    for (auto it = my_letters.cbegin(); it != my_letters.cend(); ++it) {
-        std::cout << it->first << ": " << it->second << "\n";
-        count += it->second;
-    }
-    std::cout << "\ntotal letters: " << count << "\n\n";
-}
-
 int main()
 {
     srand(time(NULL)); //letter randomize
@@ -24,7 +14,16 @@ int main()
     std::vector<char> alphabet(englishAlphabet.begin(), englishAlphabet.end());
 
     Pool my_pool(alphabet);
-    showPool(my_pool);
-    my_pool.exchange('Z', 'K');
-    showPool(my_pool);
+    //my_pool.show();
+    my_pool.show();
+
+    Player p1(my_pool, "Alfredo Martins");
+    p1.showHand();
+    p1.takeRandom(my_pool, 4);
+    std::cout << "took letter 4 from pool.\n";
+    p1.showHand();
+    std::cout << "exchanged first two with pool.\n";
+    p1.exchange(0, 1, my_pool);
+    p1.showHand();
+    my_pool.show();
 }

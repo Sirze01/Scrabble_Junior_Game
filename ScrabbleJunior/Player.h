@@ -8,15 +8,17 @@
 
 class Player {
 public:
-	Player(Pool pool);
+	Player(Pool pool, std::string name);
+	int getScore() const;
+	std::string getName() const;
+	void showHand() const;
 	void addScore(int score);
-	int getScore();
-	void updateHand(Pool pool);
-	std::string getName();
+	bool exchange(int pos1, int pos2, Pool &pool);
+	bool takeRandom(Pool &pool, int handPosition);
 private:
 	std::string _name;
 	int _score;
 	bool _turn;
-	char _hand[7];
+	std::vector<char> _hand;
 };
 
