@@ -29,19 +29,19 @@ Board::Board(std::string filename)  {
     file.open(filename, std::ios::in);
     if(file.is_open()){
         getline(file, line);
-        _vDimension = std::stoi(line.substr(0, 1));
+        _vDimension = std::stoi(line.substr(0, 2));
         _hDimension= std::stoi(line.substr(5));
         _letters.resize(_vDimension);
-        for (auto & _letter : _letters){
-            _letter.resize(_hDimension);
-            for(char & j : _letter){
-                j = ' ';
+        for (auto & _line : _letters){
+            _line.resize(_hDimension);
+            for(char & _letter : _line){
+                _letter = ' ';
             }
         }
         while(getline(file, line)){
             _words.push_back(line);
             coord index{};
-            index = Board::getIndex(line.substr(0, 1));
+            index = Board::getIndex(line.substr(0, 2));
             std::string word = line.substr(5);
 
             switch(line.at(3)){
@@ -67,18 +67,21 @@ Board::Board(std::string filename)  {
 
 
 void Board::show() const {                              //Prototype function (needs styling)
-    std::cout << ' ' << std::endl;
+    std::cout << ' ';
     for(size_t i = 0; i < _hDimension; i++){
         std::cout << alphabet.at(i);
     }
     std::cout << std::endl;
     for(size_t i = 0; i< _vDimension; i++){
-        std::cout << toupper(alphabet.at(i));
+        std::string line;
+        line += toupper(alphabet.at(i));
         for(size_t j = 0; j < _hDimension; j++){
-            std::cout << _letters[i][j];
+            line += _letters[i][j];
         }
-        std::cout << std::endl;
+        line += '\n';
+        std::cout << line;
     }
+
 }
 
 
