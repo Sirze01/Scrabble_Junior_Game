@@ -30,5 +30,6 @@ private:
     std::vector<std::vector<char>> _letters;
     unsigned _vDimension;
     unsigned _hDimension;
+    std::vector<std::string> _words;
 };
 
