@@ -19,9 +19,6 @@ public:
     void show() const;
 	coord getIndex(std::string position) const;
 	void fileExport(std::string filename) const;
-	void show() const;
-	int getIndex(std::string position) const;
-    void fileExport(std::string filename) const;
     //Board();
     //Board(std::vector<std::vector<char>> letters);
 

@@ -26,7 +26,7 @@ Board::Board(int nLines, int nCollumns) {
 Board::Board(std::string filename)  {
     std::string line;
     std::ifstream file;
-    file.open(filename);
+    file.open(filename, std::ios::in);
     if(file.is_open()){
         getline(file, line);
         _vDimension = std::stoi(line.substr(0, 1));
