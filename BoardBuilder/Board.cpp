@@ -52,6 +52,7 @@ Board::Board(std::string filename)  {
                     for(int w = 0; w < word.size(); w++){
                         _letters[index.vLine + w][index.hCollumn] = word.at(w);
                     }
+                    break;
             };
         }
         file.close();
@@ -85,6 +86,14 @@ coord Board::getIndex(std::string position) const {
     coordinates.vLine = alphabet.find(tolower(position.at(0)));
     coordinates.hCollumn = alphabet.find(position.at(1));
     return coordinates;
+}
+
+
+
+void Board::fileExport(std::string filename) const {
+    std::string line;
+
+
 }
 
 
