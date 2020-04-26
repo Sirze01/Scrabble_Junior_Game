@@ -48,10 +48,15 @@ void Player::addScore(int score) {
 
 bool Player::exchange(int pos1, int pos2, Pool &pool) {
     if (pool.getCurrentSize() < 2) return false;
-    pool.include(_hand.at(pos1));
-    pool.include(_hand.at(pos2));
-    takeRandom(pool, pos1);
-    takeRandom(pool, pos2);
+    char include1 = _hand.at(pos1);
+    char include2 = _hand.at(pos2);
+    if (!takeRandom(pool, pos1)) return false;
+    if (!takeRandom(pool, pos2)) {
+        pool.include(_hand.at(pos1)); //undo previous take
+        return false;
+    }
+    pool.include(include1);
+    pool.include(include2);
     return true;
 }
 
