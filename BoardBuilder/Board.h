@@ -16,19 +16,15 @@ public:
 	//Board();
 	Board(int nLines, int nCollumns);
 	Board(std::vector<std::vector<char>> letters);
-<<<<<<< HEAD
     Board(std::string filename);
     void show() const;
 	coord getIndex(std::string position) const;
 	void fileExport(std::string filename) const;
-
-
-=======
 	void show() const;
 	int getIndex(std::string position) const;
-    void fileExport(std::string filename) const;
-	void fileImport(std::string filename);
->>>>>>> master
+    //void fileExport(std::string filename) const;
+	//void fileImport(std::string filename);
+
 private:
 
     std::vector<std::vector<char>> _letters;
