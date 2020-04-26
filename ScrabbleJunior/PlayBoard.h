@@ -1,5 +1,5 @@
 #pragma once
-#include "../BoardBuilder/BuildBoard.h"
+#include "../BoardBuilder/Board.h"
 #include "Player.h"
 
 class PlayBoard : public Board {
