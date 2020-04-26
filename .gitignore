@@ -569,3 +569,4 @@ MigrationBackup/
 /BoardBuilder/BoardBuilder.vcxproj.filters
 
 #End of VS2019 project files
+/BoardBuilder/test_out.txt

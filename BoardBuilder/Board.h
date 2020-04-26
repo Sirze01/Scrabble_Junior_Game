@@ -18,7 +18,7 @@ public:
     Board(std::string filename);
     void show() const;
 	coord getIndex(std::string position) const;
-	void fileExport(std::string filename) const;
+	bool fileExport(std::string filename) const;
     //Board();
     //Board(std::vector<std::vector<char>> letters);
 
@@ -27,6 +27,6 @@ private:
     std::vector<std::vector<char>> _letters;
     unsigned _vDimension;
     unsigned _hDimension;
-    std::vector<std::string> _words;
+    std::vector<std::string> _words; //needs reworking
 };
 
