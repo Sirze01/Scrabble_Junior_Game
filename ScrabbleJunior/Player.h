@@ -3,6 +3,7 @@
 #include "Pool.h"
 
 #include <vector>
+#include <string>
 
 
 class Player {
