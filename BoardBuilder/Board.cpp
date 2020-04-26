@@ -9,18 +9,6 @@ const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 // Public methods Definitions
 
-/*Board::Board() {
-    _letters.resize(_vDimension);
-    for (size_t i = 0; i < _letters.size(); i++){
-        _letters[i].resize(_hDimension);
-        for(size_t j = 0; j < _letters[i].size(); j++){
-            _letters[i][j] = ' ';
-        }
-    }
-}*/
-
-
-
 Board::Board(int nLines, int nCollumns) {
     _vDimension = nLines;
     _hDimension = nCollumns;
@@ -31,14 +19,6 @@ Board::Board(int nLines, int nCollumns) {
             _letters[i][j] = ' ';
         }
     }
-}
-
-
-
-Board::Board(std::vector<std::vector<char>> letters) {
-    _vDimension = letters.size();
-    _hDimension = letters[0].size();
-    _letters = letters;
 }
 
 
@@ -73,8 +53,8 @@ Board::Board(std::string filename)  {
                         _letters[index.vLine + w][index.hCollumn] = word.at(w);
                     }
             };
-            file.close();
         }
+        file.close();
     }
     else{
         std::cerr << "Cannot open file!" << std::endl;
@@ -102,7 +82,27 @@ void Board::show() const {                              //Prototype function (ne
 
 coord Board::getIndex(std::string position) const {
     coord coordinates;
-    coordinates.vLine = alphabet.find(tolower(position.at(1)));
-    coordinates.hCollumn = alphabet.find(position.at(2));
+    coordinates.vLine = alphabet.find(tolower(position.at(0)));
+    coordinates.hCollumn = alphabet.find(position.at(1));
     return coordinates;
 }
+
+
+
+/*Board::Board() {
+    _letters.resize(_vDimension);
+    for (size_t i = 0; i < _letters.size(); i++){
+        _letters[i].resize(_hDimension);
+        for(size_t j = 0; j < _letters[i].size(); j++){
+            _letters[i][j] = ' ';
+        }
+    }
+}*/
+
+
+
+/*Board::Board(std::vector<std::vector<char>> letters) {
+    _vDimension = letters.size();
+    _hDimension = letters[0].size();
+    _letters = letters;
+}*/
