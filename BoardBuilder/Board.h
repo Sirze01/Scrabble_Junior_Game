@@ -13,7 +13,7 @@ struct coord{
 
 class Board {
 public:
-
+    Board(); //needs default constructor if others are created
 	Board(int nLines, int nCollumns);
     Board(std::string filename);
     void show() const;
@@ -22,7 +22,7 @@ public:
     //Board();
     //Board(std::vector<std::vector<char>> letters);
 
-private:
+protected:
 
     std::vector<std::vector<char>> _letters;
     unsigned _vDimension;

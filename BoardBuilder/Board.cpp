@@ -73,15 +73,16 @@ Board::Board(std::string filename)  {
 
 
 void Board::show() const {                              //Prototype function (needs styling)
-    std::cout << ' ';
-    for(size_t i = 0; i < _hDimension; i++){
-        std::cout << alphabet.at(i);
+    std::cout << " ";
+    for (size_t i = 0; i < _hDimension; i++){
+        std::cout << " " << alphabet.at(i);
     }
     std::cout << std::endl;
-    for(size_t i = 0; i< _vDimension; i++){
+    for (size_t i = 0; i< _vDimension; i++){
         std::string line;
         line += toupper(alphabet.at(i));
         for(size_t j = 0; j < _hDimension; j++){
+            line += " ";
             line += _letters[i][j]; //why the end of the world happens if i concatenate " " also?
         }
         line += '\n';
@@ -102,6 +103,7 @@ coord Board::getIndex(std::string position) const {
 
 
 bool Board::fileExport(std::string filename) const {
+    /*OLD IMPLEMENTATION
     std::string line;
     std::ifstream file(filename);
     if (!file) {
@@ -120,10 +122,8 @@ bool Board::fileExport(std::string filename) const {
         std::cerr << "The file already exists!" << std::endl;
         return false;
     }
+    */
 
-
-    /*
-    //SUGGESTED CHANGE - OVERWRITES IF ALREADY EXISTS
     std::string line;
     std::ofstream file (filename);
     if (file.is_open()){
@@ -135,12 +135,11 @@ bool Board::fileExport(std::string filename) const {
     }
     std::cerr << "Could not write to file." << std::endl;
     return false;
-    */
 }
 
 
 
-/*Board::Board() {
+Board::Board() {
     _letters.resize(_vDimension);
     for (size_t i = 0; i < _letters.size(); i++){
         _letters[i].resize(_hDimension);
@@ -148,7 +147,7 @@ bool Board::fileExport(std::string filename) const {
             _letters[i][j] = ' ';
         }
     }
-}*/
+}
 
 
 

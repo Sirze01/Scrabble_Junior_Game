@@ -5,7 +5,6 @@
 #include <vector>
 #include <string>
 
-
 class Player {
 public:
 	Player(Pool pool, std::string name);
@@ -14,6 +13,7 @@ public:
 	void showHand() const;
 	void addScore(int score);
 	bool exchange(int pos1, int pos2, Pool &pool);
+	bool exchange(int pos1, Pool& pool);
 	bool takeRandom(Pool &pool, int handPosition);
 private:
 	std::string _name;

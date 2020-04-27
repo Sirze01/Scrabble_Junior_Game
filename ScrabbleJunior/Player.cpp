@@ -1,22 +1,6 @@
 #include "Player.h"
 #include <iostream>
-
-std::string stripSpaces(std::string name) {
-    for (size_t i = 0; i < name.length(); i++) {
-        if (name.at(i) == ' ') {
-            if (i == name.length() - 1) {
-                name.erase(i, 1);
-                break;
-            }
-            else if (i == 0 || name.at(i + 1) == ' ') {
-                name.erase(i, 1);
-                i--;
-            }
-        }
-        return name;
-
-    }
-}
+#include "stringProcess.h"
 
 Player::Player(Pool pool, std::string name) {
     int handSize = 7;
@@ -60,9 +44,17 @@ bool Player::exchange(int pos1, int pos2, Pool &pool) {
     return true;
 }
 
+bool Player::exchange(int pos1, Pool& pool) {
+    if (pool.getCurrentSize() < 1) return false;
+    char include = _hand.at(pos1);
+    if (!takeRandom(pool, pos1)) return false;
+    pool.include(include);
+    return true;
+}
+
 bool Player::takeRandom(Pool &pool, int handPosition) {
     if (!pool.getCurrentSize()) return false;
-    if (handPosition > _hand.size()-1) return false;
+    if (handPosition > (int) _hand.size()-1) return false;
 
     char random;
     do {

@@ -7,7 +7,7 @@
 
 int main()
 {
-    srand(time(NULL)); //letter randomize
+    srand((unsigned int) time(NULL)); //letter randomize
 
     //english alphabet 
     std::string englishAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
