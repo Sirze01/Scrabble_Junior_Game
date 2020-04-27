@@ -1,5 +1,5 @@
-
 #include "Board.h"
+#include "../ScrabbleJunior/Command.h"
 
 const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
@@ -68,11 +68,21 @@ Board::Board(std::string filename)  {
         _hDimension = defaultSize;
         _vDimension = defaultSize;
     }
+
+    std::vector<std::vector<bool>> binaries;
+    for (int i = 0; i < (int)_vDimension; ++i) {
+        std::vector<bool> binary;
+        for (int j = 0; j < (int)_hDimension; ++j) {
+            binary.push_back(0);
+        }
+        binaries.push_back(binary);
+    }
+    _highlights = binaries;
 }
 
 
 
-void Board::show() const {                              //Prototype function (needs styling)
+void Board::show() const { //Prototype function (needs styling)
     std::cout << " ";
     for (size_t i = 0; i < _hDimension; i++){
         std::cout << " " << alphabet.at(i);
@@ -83,12 +93,11 @@ void Board::show() const {                              //Prototype function (ne
         line += toupper(alphabet.at(i));
         for(size_t j = 0; j < _hDimension; j++){
             line += " ";
-            line += _letters[i][j]; //why the end of the world happens if i concatenate " " also?
+            line += _letters[i][j];
         }
         line += '\n';
         std::cout << line;
     }
-
 }
 
 
@@ -140,6 +149,8 @@ bool Board::fileExport(std::string filename) const {
 
 
 Board::Board() {
+    _hDimension = 20;
+    _vDimension = 20;
     _letters.resize(_vDimension);
     for (size_t i = 0; i < _letters.size(); i++){
         _letters[i].resize(_hDimension);
@@ -149,10 +160,28 @@ Board::Board() {
     }
 }
 
+bool Board::move(Command command) {
+    if (!(command.isMove())) return false;
 
+    int vIndex = getIndex(command.getMove().at(0)).vLine;
+    int hIndex = getIndex(command.getMove().at(0)).hCollumn;
+    char letter = command.getMove().at(1).at(0);
 
-/*Board::Board(std::vector<std::vector<char>> letters) {
-    _vDimension = letters.size();
-    _hDimension = letters[0].size();
-    _letters = letters;
-}*/
+    if (_letters.at(vIndex).at(hIndex) != letter) return false;
+    if (_highlights.at(vIndex).at(hIndex) == 1) return false;
+
+    //start or continue word
+    if (hIndex > 0) {
+        if (_letters.at(vIndex).at(hIndex - 1) != ' ') { //letter before at the line
+            if (_highlights.at(vIndex).at(hIndex - 1) == 0) return false;
+        }
+    }
+    if (vIndex > 0) {
+        if (_letters.at(vIndex - 1).at(hIndex) != ' ') { //letter before at the collumn
+            if (_highlights.at(vIndex - 1).at(hIndex) == 0) return false;
+        }
+    }
+
+    _highlights.at(vIndex).at(hIndex) = 1;
+    return true;
+}
