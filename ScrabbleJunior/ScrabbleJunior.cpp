@@ -10,6 +10,9 @@
 
 int main()
 {
+#ifdef _WIN32
+    SetupConsole();
+#endif
     srand((unsigned int) time(NULL)); //letter randomize
 
     //english alphabet 

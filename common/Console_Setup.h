@@ -5,12 +5,14 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <wincon.h>
+#endif
 
 //define UNICODE
 #ifndef UNICODE
 #define UNICODE
 #endif
 
+#ifdef _WIN32
 // Fix compilatin on MinGW
 #ifndef DISABLE_NEWLINE_AUTO_RETURN
 #define DISABLE_NEWLINE_AUTO_RETURN 0x0008
@@ -24,7 +26,10 @@
 #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
 
+#endif
+
 bool SetupConsole() {
+#ifdef _WIN32
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
     // Set output mode to handle virtual terminal sequences
@@ -57,9 +62,9 @@ bool SetupConsole() {
             return false;
         }
     }
+#endif
     return true;
 }
-#endif //_WIN32
 
 /**Clears the console*/
 void clearConsole(){
