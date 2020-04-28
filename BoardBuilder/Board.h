@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../ScrabbleJunior/Command.h"
-
 #include <vector>
 #include <string>
 #include <fstream>
@@ -20,7 +18,9 @@ public:
     void show() const;
 	coord getIndex(std::string position) const;
 	bool fileExport(std::string filename) const;
-    bool move(Command command);
+    bool highlight(int vIndex, int hIndex);
+    std::vector<std::vector<char>> getLetters() const;
+    std::vector<std::vector<bool>> getHighlights() const;
 private:
     std::vector<std::vector<bool>> _highlights;
     std::vector<std::vector<char>> _letters;

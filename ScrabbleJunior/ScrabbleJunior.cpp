@@ -3,7 +3,7 @@
 
 #include "Pool.h"
 #include "Player.h"
-#include "../BoardBuilder/Board.h"
+#include "Board.h"
 
 int main()
 {

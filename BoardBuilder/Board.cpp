@@ -1,13 +1,6 @@
 #include "Board.h"
-#include "../ScrabbleJunior/Command.h"
 
 const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
-
-// Private methods Definitions
-
-
-
-// Public methods Definitions
 
 Board::Board(int nLines, int nCollumns) {
     _vDimension = nLines;
@@ -20,8 +13,6 @@ Board::Board(int nLines, int nCollumns) {
         }
     }
 }
-
-
 
 Board::Board(std::string filename)  {
     std::string line;
@@ -69,6 +60,7 @@ Board::Board(std::string filename)  {
         _vDimension = defaultSize;
     }
 
+    //fill highlights with 0
     std::vector<std::vector<bool>> binaries;
     for (int i = 0; i < (int)_vDimension; ++i) {
         std::vector<bool> binary;
@@ -78,9 +70,9 @@ Board::Board(std::string filename)  {
         binaries.push_back(binary);
     }
     _highlights = binaries;
+
+    //MISSING HIGHLIGHTS
 }
-
-
 
 void Board::show() const { //Prototype function (needs styling)
     std::cout << " ";
@@ -100,8 +92,6 @@ void Board::show() const { //Prototype function (needs styling)
     }
 }
 
-
-
 coord Board::getIndex(std::string position) const {
     coord coordinates{};
     coordinates.vLine = alphabet.find(tolower(position.at(0)));
@@ -109,30 +99,7 @@ coord Board::getIndex(std::string position) const {
     return coordinates;
 }
 
-
-
 bool Board::fileExport(std::string filename) const {
-    /*OLD IMPLEMENTATION
-    std::string line;
-    std::ifstream file(filename);
-    if (!file) {
-        file.close();
-        std::ofstream file(filename);
-        if (file.is_open()) {
-            file << _hDimension << 'x' << _vDimension << '\n';
-            for (auto line : _words) {
-                file << line << '\n';
-            }
-        }
-        return true;
-    }
-    else {
-        file.close();
-        std::cerr << "The file already exists!" << std::endl;
-        return false;
-    }
-    */
-
     std::string line;
     std::ofstream file (filename);
     if (file.is_open()){
@@ -146,8 +113,6 @@ bool Board::fileExport(std::string filename) const {
     return false;
 }
 
-
-
 Board::Board() {
     _hDimension = 20;
     _vDimension = 20;
@@ -160,28 +125,17 @@ Board::Board() {
     }
 }
 
-bool Board::move(Command command) {
-    if (!(command.isMove())) return false;
-
-    int vIndex = getIndex(command.getMove().at(0)).vLine;
-    int hIndex = getIndex(command.getMove().at(0)).hCollumn;
-    char letter = command.getMove().at(1).at(0);
-
-    if (_letters.at(vIndex).at(hIndex) != letter) return false;
-    if (_highlights.at(vIndex).at(hIndex) == 1) return false;
-
-    //start or continue word
-    if (hIndex > 0) {
-        if (_letters.at(vIndex).at(hIndex - 1) != ' ') { //letter before at the line
-            if (_highlights.at(vIndex).at(hIndex - 1) == 0) return false;
-        }
-    }
-    if (vIndex > 0) {
-        if (_letters.at(vIndex - 1).at(hIndex) != ' ') { //letter before at the collumn
-            if (_highlights.at(vIndex - 1).at(hIndex) == 0) return false;
-        }
-    }
-
+bool Board::highlight(int vIndex, int hIndex) {
+    if (vIndex >= _vDimension || hIndex >= _hDimension) return false;
+    if (_highlights.at(vIndex).at(hIndex)) return false;
     _highlights.at(vIndex).at(hIndex) = 1;
     return true;
+}
+
+std::vector<std::vector<char>> Board::getLetters() const {
+    return _letters;
+}
+
+std::vector<std::vector<bool>> Board::getHighlights() const {
+    return _highlights;
 }

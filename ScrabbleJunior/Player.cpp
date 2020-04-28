@@ -63,3 +63,29 @@ bool Player::takeRandom(Pool &pool, int handPosition) {
     _hand.at(handPosition) = random;
     return true;
 }
+
+bool Player::move(Command command, Board& board) {
+    if (!(command.isMove())) return false;
+
+    int vIndex = board.getIndex(command.getMove().at(0)).vLine;
+    int hIndex = board.getIndex(command.getMove().at(0)).hCollumn;
+    char letter = command.getMove().at(1).at(0);
+
+    if (board.getLetters().at(vIndex).at(hIndex) != letter) return false;
+    if (board.getHighlights().at(vIndex).at(hIndex) == 1) return false;
+
+    //start or continue word
+    if (hIndex > 0) {
+        if (board.getLetters().at(vIndex).at(hIndex - 1) != ' ') { //letter before at the line
+            if (board.getHighlights().at(vIndex).at(hIndex - 1) == 0) return false;
+        }
+    }
+    if (vIndex > 0) {
+        if (board.getLetters().at(vIndex - 1).at(hIndex) != ' ') { //letter before at the collumn
+            if (board.getHighlights().at(vIndex - 1).at(hIndex) == 0) return false;
+        }
+    }
+
+    board.highlight(vIndex, hIndex);
+    return true;
+}
