@@ -2,12 +2,16 @@
 #include <iostream>
 #include "stringProcess.h"
 
-Player::Player(Pool pool, std::string name) {
+Player::Player(Pool &pool, std::string name) {
     int handSize = 7;
 	_name = stripSpaces(name);
     _hand.resize(handSize);
     while (handSize--) {
         takeRandom(pool, handSize);
+        if (timesOnHand(_hand.at(handSize)) > 1) { //revert repeated letter take
+            pool.include(_hand.at(handSize));
+            handSize++;
+        }
     }
 }
 
@@ -102,4 +106,16 @@ int Player::getHandPosition(char letter) const{
         }
     }
     return pos;
+}
+
+int Player::timesOnHand(char letter) const {
+    int count = 0;
+    for (auto i : _hand) {
+        if (i == letter) count++;
+    }
+    return count;
+}
+
+char Player::getLetterOnHand(int handPosition) const {
+    return _hand.at(handPosition);
 }
