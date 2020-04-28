@@ -30,7 +30,10 @@ void oppeningMessage(){
 
 
 
-bool oppeningDialogue(int &last){}
+bool oppeningDialogue(int &last){
+    last++;
+    
+}
 
 
 
