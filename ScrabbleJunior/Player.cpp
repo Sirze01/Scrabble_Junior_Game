@@ -64,15 +64,17 @@ bool Player::takeRandom(Pool &pool, int handPosition) {
     return true;
 }
 
-bool Player::move(Command command, Board& board) {
+bool Player::move(Command command, Board& board, Pool &pool) {
     if (!(command.isMove())) return false;
 
     int vIndex = board.getIndex(command.getMove().at(0)).vLine;
     int hIndex = board.getIndex(command.getMove().at(0)).hCollumn;
     char letter = command.getMove().at(1).at(0);
+    int handPosition = getHandPosition(letter);
 
     if (board.getLetters().at(vIndex).at(hIndex) != letter) return false;
     if (board.getHighlights().at(vIndex).at(hIndex) == 1) return false;
+    if (handPosition == -1) return false;
 
     //start or continue word
     if (hIndex > 0) {
@@ -87,5 +89,17 @@ bool Player::move(Command command, Board& board) {
     }
 
     board.highlight(vIndex, hIndex);
+    takeRandom(pool, handPosition);
     return true;
+}
+
+int Player::getHandPosition(char letter) const{
+    int pos = -1;
+    for (int i = 0; i < _hand.size(); ++i) {
+        if (_hand.at(i) == letter) {
+            pos = i;
+            break;
+        }
+    }
+    return pos;
 }

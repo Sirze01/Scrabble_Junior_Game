@@ -1,9 +1,11 @@
 #include <iostream>
 #include <ctime>
+#include <string>
 
 #include "Pool.h"
 #include "Player.h"
 #include "Board.h"
+#include "Command.h"
 
 int main()
 {
@@ -13,26 +15,27 @@ int main()
     std::string englishAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     std::vector<char> alphabet(englishAlphabet.begin(), englishAlphabet.end());
 
-    
     Pool my_pool(alphabet);
-    /*
-    //my_pool.show();
-    my_pool.show();
+    Board my_board("test.txt");
+    Player player1(my_pool, "Alfredo");
 
-    Player p1(my_pool, "Alfredo Martins");
-    p1.showHand();
-    p1.takeRandom(my_pool, 4);
-    std::cout << "took letter 4 from pool.\n";
-    p1.showHand();
-    std::cout << "exchanged first two with pool.\n";
-    p1.exchange(0, 1, my_pool);
-    p1.showHand();
-    my_pool.show();
-    */
-
-    Board newBoard("test.txt");
-    newBoard.show();
-    //std::cout << newBoard.getIndex("Ak").vLine << ' ' << newBoard.getIndex("Ak").hCollumn << std::endl;
-    newBoard.fileExport("test_out.txt");
-    newBoard.showHighlights();
+    while (true) {
+        std::string input;
+        my_board.show(); std::cout << "\n";
+        my_board.showHighlights(); std::cout << "\n";
+        player1.showHand(); std::cout << "\n";
+        my_pool.show();
+        std::cout << "Input command: ";
+        std::getline(std::cin, input);
+        Command command(input);
+        while (command.getCommand() != 1) {
+            std::cout << "Not a move!!\n";
+            Command command(input);
+            std::cout << "Input command: ";
+            std::getline(std::cin, input);
+        }
+        std::cout << "Moving...\n";
+        player1.move(command, my_board, my_pool);
+        std::cout << "Done, asking for another.\n";
+    }
 }
