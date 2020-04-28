@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Move.h"
 #include <iostream>
 #include "stringProcess.h"
 
@@ -30,26 +31,15 @@ void Player::showHand() const {
     std::cout << "\n";
 }
 
+void Player::showScore() const {
+    std::cout << _name << ": " << _score << " points\n";
+}
+
 void Player::addScore(int score) {
     _score += score;
 }
 
-bool Player::exchange(int pos1, int pos2, Pool &pool) {
-    if (pool.getCurrentSize() < 2) return false;
-    char include1 = _hand.at(pos1);
-    char include2 = _hand.at(pos2);
-    if (!takeRandom(pool, pos1)) return false;
-    if (!takeRandom(pool, pos2)) {
-        pool.include(_hand.at(pos1)); //undo previous take
-        return false;
-    }
-    pool.include(include1);
-    pool.include(include2);
-    return true;
-}
-
 bool Player::exchange(int pos1, Pool& pool) {
-    if (pool.getCurrentSize() < 1) return false;
     char include = _hand.at(pos1);
     if (!takeRandom(pool, pos1)) return false;
     pool.include(include);
@@ -69,31 +59,12 @@ bool Player::takeRandom(Pool &pool, int handPosition) {
 }
 
 bool Player::move(Command command, Board& board, Pool &pool) {
-    if (!(command.isMove())) return false;
+    if (!command.isMove()) return false;
+    Move my_move(command,board);
+    if (!my_move.isValid(*this)) return false;
 
-    int vIndex = board.getIndex(command.getMove().at(0)).vLine;
-    int hIndex = board.getIndex(command.getMove().at(0)).hCollumn;
-    char letter = command.getMove().at(1).at(0);
-    int handPosition = getHandPosition(letter);
-
-    if (board.getLetters().at(vIndex).at(hIndex) != letter) return false;
-    if (board.getHighlights().at(vIndex).at(hIndex) == 1) return false;
-    if (handPosition == -1) return false;
-
-    //start or continue word
-    if (hIndex > 0) {
-        if (board.getLetters().at(vIndex).at(hIndex - 1) != ' ') { //letter before at the line
-            if (board.getHighlights().at(vIndex).at(hIndex - 1) == 0) return false;
-        }
-    }
-    if (vIndex > 0) {
-        if (board.getLetters().at(vIndex - 1).at(hIndex) != ' ') { //letter before at the collumn
-            if (board.getHighlights().at(vIndex - 1).at(hIndex) == 0) return false;
-        }
-    }
-
-    board.highlight(vIndex, hIndex);
-    takeRandom(pool, handPosition);
+    board.highlight(command.getMovePos(board).vLine, command.getMovePos(board).hCollumn);
+    takeRandom(pool, getHandPosition(command.getMoveLetter()));
     return true;
 }
 
@@ -118,4 +89,8 @@ int Player::timesOnHand(char letter) const {
 
 char Player::getLetterOnHand(int handPosition) const {
     return _hand.at(handPosition);
+}
+
+bool Player::hasOnHand(char letter) const {
+    return timesOnHand(letter);
 }

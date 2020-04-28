@@ -6,7 +6,6 @@ Command::Command(std::string userInput) {
 	_str = stripSpaces(userInput);
 	if (isMove()) {
 		_commandType = 1;
-		saveMove();
 	}
 	else {
 		_str = lowerCase(_str);
@@ -41,10 +40,12 @@ bool Command::isMove() const {
 	return true;
 }
 
-void Command::saveMove() {
-	_move = { _str.substr(0,2), _str.substr(3) };
+coord Command::getMovePos(Board board) const {
+	if (!isMove()) return { -1,-1 };
+	return board.getIndex(_str.substr(0, 2));
 }
 
-std::vector<std::string> Command::getMove() const {
-	return _move;
+char Command::getMoveLetter() const {
+	if (!isMove()) return '?';
+	return _str.at(3);
 }

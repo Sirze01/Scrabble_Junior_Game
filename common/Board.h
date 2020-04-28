@@ -21,6 +21,7 @@ public:
     bool highlight(int vIndex, int hIndex);
     std::vector<std::vector<char>> getLetters() const;
     std::vector<std::vector<bool>> getHighlights() const;
+    coord getDimensions() const;
 private:
     std::vector<std::vector<bool>> _highlights;
     std::vector<std::vector<char>> _letters;

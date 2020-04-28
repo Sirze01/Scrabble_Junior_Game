@@ -151,3 +151,8 @@ std::vector<std::vector<char>> Board::getLetters() const {
 std::vector<std::vector<bool>> Board::getHighlights() const {
     return _highlights;
 }
+
+coord Board::getDimensions() const {
+    coord dimensions = { _hDimension, _vDimension };
+    return dimensions;
+}
