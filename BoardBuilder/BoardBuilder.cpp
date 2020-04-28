@@ -1,13 +1,13 @@
 #include <iostream>
-#include "Board.h"
-#include "Console_Setup.h"
+#include "../common/Board.h"
+#include "../common/Console_Setup.h"
 
-int main() {
-    #ifdef _WIN32
-    SetupConsole();
-    #endif
+/*#################################################################*/
+
+
+void oppeningMessage(){
     const std::string message = "Board Builder v0.0.1";
-    std::cout << "BordBuilder Debug version v0.0.1\n";
+    std::cout << message << " Debug version\n";
     for(int i = 0; i < 100; i++){
         std::cout << '#';
     }
@@ -26,11 +26,30 @@ int main() {
         std::cout << '#';
     }
     std::cout << std::endl;
-    Board test("test.txt");
+}
 
-    test.show();
-    test.highlight(0,1);
-    test.show();
+
+
+bool oppeningDialogue(int &last){}
+
+
+
+int main() {
+    #ifdef _WIN32
+    SetupConsole();
+    #endif
+
+    /*##############################*/
+    bool validation;
+    int last = 0;
+
+    do {
+        oppeningMessage();
+        validation = oppeningDialogue(last);
+    }while (!validation);
+    last = 0;
+
+
 
     return 0;
 }
