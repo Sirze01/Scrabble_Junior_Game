@@ -54,10 +54,19 @@ Board::Board(std::string filename)  {
         file.close();
     }
     else{
-        std::cerr << "Cannot open file!" << std::endl;
         int defaultSize = 20;
         _hDimension = defaultSize;
         _vDimension = defaultSize;
+        _letters.resize(_vDimension);
+
+        for (auto & _line : _letters){
+            _line.resize(_hDimension);
+            for(char & _letter : _line){
+                _letter = ' ';
+            }
+        }
+        std::cerr << "Cannot open file!" << std::endl;
+
     }
 
     //fill highlights with 0

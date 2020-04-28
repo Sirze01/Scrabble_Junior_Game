@@ -3,16 +3,17 @@
 
 int main()
 {
-    //std::cout << "Hello world!\n";
-
-
-    Board newBoard("test.txt");
-    newBoard.show();
-    //std::cout << newBoard.getIndex("Ak").vLine << ' ' << newBoard.getIndex("Ak").hCollumn << std::endl;
-    newBoard.fileExport("test_out.txt");
-    Board newBoard2(1, 2);
-    newBoard2.show();
-
-    //std::cout << "Hello world!\n";
+    const std::string message = "Board Builder v0.0.1";
+    std::cout << "BordBuilder Debug version v0.0.1\n";
+    for(int i = 0; i < 100; i++){
+        std::cout << '#';
+    }
+    std::cout << std::endl;
+    std::cout << std::string(1, '\n');
+    for(int i = 0; i < 100; i++){
+        std::cout << '#';
+    }
+    std::cout << std::string(1, '\n');
+    
     return 0;
 }
