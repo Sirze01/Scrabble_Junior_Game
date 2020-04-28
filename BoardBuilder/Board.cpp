@@ -54,10 +54,19 @@ Board::Board(std::string filename)  {
         file.close();
     }
     else{
-        std::cerr << "Cannot open file!" << std::endl;
         int defaultSize = 20;
         _hDimension = defaultSize;
         _vDimension = defaultSize;
+        _letters.resize(_vDimension);
+
+        for (auto & _line : _letters){
+            _line.resize(_hDimension);
+            for(char & _letter : _line){
+                _letter = ' ';
+            }
+        }
+        std::cerr << "Cannot open file!" << std::endl;
+
     }
 
     //fill highlights with 0
@@ -74,6 +83,8 @@ Board::Board(std::string filename)  {
     //MISSING HIGHLIGHTS
 }
 
+
+
 void Board::show() const { //Prototype function (needs styling)
     std::cout << " ";
     for (size_t i = 0; i < _hDimension; i++){
@@ -81,14 +92,14 @@ void Board::show() const { //Prototype function (needs styling)
     }
     std::cout << std::endl;
     for (size_t i = 0; i< _vDimension; i++){
-        std::string line;
-        line += toupper(alphabet.at(i));
+        std::cout << std::string(1,(toupper(alphabet.at(i))));
         for(size_t j = 0; j < _hDimension; j++){
-            line += " ";
-            line += _letters[i][j];
+            std::cout << ' ';
+            if (getHighlights().at(i).at(j))
+                std::cout << "\x1b[41;1m"  << _letters[i][j] << "\x1b[0m";
+            else std::cout << _letters[i][j];
         }
-        line += '\n';
-        std::cout << line;
+        std::cout << '\n';
     }
 }
 
