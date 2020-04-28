@@ -13,6 +13,7 @@ public:
 	int getCurrentSize() const;
 	int getAlphabetSize() const;
 private:
+	bool isMostFrequent(char letter) const;
 	std::map<char,int> _letters;
 	std::vector<char> _alphabet;
 	int _currentSize;

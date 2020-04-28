@@ -5,13 +5,14 @@ Pool::Pool(std::vector<char> alphabet) {
 	_alphabet = alphabet;
 	_currentSize = 0;
 	_alphabetSize = alphabet.size();
-	unsigned min = 2;
+	unsigned min = 3;
+	unsigned vowelInc = 3;
 
 	//initialize map
 	for (auto i : alphabet) {
 		if (i == 'A' || i == 'E' || i == 'I' || i == 'O' || i == 'U') {
-			_letters.insert(std::pair<char, int>(i, min + 2));
-			_currentSize += min + 2;
+			_letters.insert(std::pair<char, int>(i, min + vowelInc));
+			_currentSize += min + vowelInc;
 		}
 		else {
 			_letters.insert(std::pair<char, int>(i, min));
@@ -23,7 +24,6 @@ Pool::Pool(std::vector<char> alphabet) {
 	int remaining = 101 - _currentSize; char random;
 	while (remaining--) {
 		random = 'A' + (rand() % _alphabetSize);
-		while (_letters.at(random) > 5) random = 'A' + (rand() % _alphabetSize);
 		_letters.at(random)++;
 		_currentSize++;
 	}
@@ -52,12 +52,9 @@ bool Pool::take(char letter) {
 }
 
 bool Pool::include(char letter) {
-	if (_letters.find(letter) != _letters.end()) {
-		_letters.at(letter)++;
-		_currentSize++;
-		return true;
-	}
-	return false;
+	_letters.at(letter)++;
+	_currentSize++;
+	return true;
 }
 
 std::map<char,int> Pool::getAllLetters() const {

@@ -42,7 +42,7 @@ bool Command::isMove() const {
 }
 
 void Command::saveMove() {
-	_move = { _str.substr(0,1), _str.substr(3) };
+	_move = { _str.substr(0,2), _str.substr(3) };
 }
 
 std::vector<std::string> Command::getMove() const {
