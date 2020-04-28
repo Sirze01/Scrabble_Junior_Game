@@ -83,33 +83,23 @@ Board::Board(std::string filename)  {
     //MISSING HIGHLIGHTS
 }
 
-<<<<<<< HEAD
-void Board::show() const {                              //Prototype function (needs styling)
-    std::cout << ' ';
-    for(size_t i = 0; i < _hDimension; i++){
-        std::cout << ' ' << alphabet.at(i);
-=======
+
+
 void Board::show() const { //Prototype function (needs styling)
     std::cout << " ";
     for (size_t i = 0; i < _hDimension; i++){
         std::cout << " " << alphabet.at(i);
->>>>>>> master
     }
     std::cout << std::endl;
     for (size_t i = 0; i< _vDimension; i++){
-        std::string line;
-        line += toupper(alphabet.at(i));
+        std::cout << std::string(1,(toupper(alphabet.at(i))));
         for(size_t j = 0; j < _hDimension; j++){
-<<<<<<< HEAD
-            line += ' ';
-            line += _letters[i][j];//why the end of the world happens if i concatenate " " also?
-=======
-            line += " ";
-            line += _letters[i][j];
->>>>>>> master
+            std::cout << ' ';
+            if (getHighlights().at(i).at(j))
+                std::cout << "\x1b[41;1m"  << _letters[i][j] << "\x1b[0m";
+            else std::cout << _letters[i][j];
         }
-        line += '\n';
-        std::cout << line;
+        std::cout << '\n';
     }
 }
 
