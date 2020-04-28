@@ -138,6 +138,7 @@ Board::Board() {
 
 bool Board::highlight(int vIndex, int hIndex) {
     if (vIndex >= _vDimension || hIndex >= _hDimension) return false;
+    if (_letters.at(vIndex).at(hIndex) == ' ') return false;
     if (_highlights.at(vIndex).at(hIndex)) return false;
     _highlights.at(vIndex).at(hIndex) = 1;
     return true;

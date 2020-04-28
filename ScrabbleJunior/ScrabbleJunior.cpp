@@ -19,6 +19,7 @@ int main()
     Pool my_pool(alphabet);
     Board my_board("test.txt");
     Player player1(my_pool, "Alfredo");
+    my_board.highlight(2, 0);
 
     while (true) {
         std::string input;
