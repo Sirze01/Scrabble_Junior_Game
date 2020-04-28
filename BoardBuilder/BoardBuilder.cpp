@@ -1,6 +1,6 @@
 #include <iostream>
-#include "Board.h"
-#include "Console_Setup.h"
+#include "../common/Board.h"
+#include "../common/Console_Setup.h"
 
 int main() {
     #ifdef _WIN32

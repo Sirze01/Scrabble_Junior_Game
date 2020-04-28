@@ -1,6 +1,6 @@
 #include "Command.h"
 #include "stringProcess.h"
-#include "Board.h"
+#include "../common/Board.h"
 
 Command::Command(std::string userInput) {
 	_str = stripSpaces(userInput);

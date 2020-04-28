@@ -3,9 +3,13 @@
 #include <iostream>
 
 #ifdef _WIN32
-#define UNICODE
 #include <windows.h>
 #include <wincon.h>
+
+//define UNICODE
+#ifndef UNICODE
+#define UNICODE
+#endif
 
 // Fix compilatin on MinGW
 #ifndef DISABLE_NEWLINE_AUTO_RETURN

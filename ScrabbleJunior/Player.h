@@ -2,7 +2,7 @@
 
 #include "Pool.h"
 #include "Command.h"
-#include "Board.h"
+#include "../common/Board.h"
 
 #include <vector>
 #include <string>

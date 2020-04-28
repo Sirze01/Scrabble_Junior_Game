@@ -4,8 +4,9 @@
 
 #include "Pool.h"
 #include "Player.h"
-#include "Board.h"
+#include "../common/Board.h"
 #include "Command.h"
+#include "../common/Console_Setup.h"
 
 int main()
 {
@@ -22,7 +23,6 @@ int main()
     while (true) {
         std::string input;
         my_board.show(); std::cout << "\n";
-        my_board.showHighlights(); std::cout << "\n";
         player1.showHand(); std::cout << "\n";
         my_pool.show();
         std::cout << "Input command: ";

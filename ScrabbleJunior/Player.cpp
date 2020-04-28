@@ -95,7 +95,7 @@ bool Player::move(Command command, Board& board, Pool &pool) {
 
 int Player::getHandPosition(char letter) const{
     int pos = -1;
-    for (int i = 0; i < _hand.size(); ++i) {
+    for (size_t i = 0; i < _hand.size(); ++i) {
         if (_hand.at(i) == letter) {
             pos = i;
             break;
