@@ -22,21 +22,24 @@ int main()
     my_board.highlight(2, 0);
 
     while (true) {
+        clearConsole();
         std::string input;
         my_board.show(); std::cout << "\n";
         player1.showHand(); std::cout << "\n";
-        my_pool.show();
         std::cout << "Input command: ";
         std::getline(std::cin, input);
         Command command(input);
         while (command.getCommand() != 1) {
             std::cout << "Not a move!!\n";
             Command command(input);
-            std::cout << "Input command: ";
+            std::cout << "\nInput command: ";
             std::getline(std::cin, input);
         }
         std::cout << "Moving...\n";
-        player1.move(command, my_board, my_pool);
+        if (!player1.move(command, my_board, my_pool)) {
+            std::cout << "Invalid move. press enter.\n";
+            std::cin.get();
+        }
         std::cout << "Done, asking for another.\n";
     }
 }
