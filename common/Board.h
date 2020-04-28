@@ -28,3 +28,4 @@ private:
     unsigned _hDimension;
     std::vector<std::string> _words; //needs reworking
 };
+

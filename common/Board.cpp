@@ -6,58 +6,67 @@ Board::Board(int nLines, int nCollumns) {
     _vDimension = nLines;
     _hDimension = nCollumns;
     _letters.resize(_vDimension);
-    for (auto& _letter : _letters) {
+    for (auto & _letter : _letters){
         _letter.resize(_hDimension);
-        for (char& j : _letter) {
+        for(char & j : _letter){
             j = ' ';
         }
     }
 }
 
-Board::Board(std::string filename) {
+Board::Board(std::string filename)  {
     std::string line;
     std::ifstream file;
     file.open(filename, std::ios::in);
 
-    if (file.is_open()) {
+    if(file.is_open()){
         getline(file, line);
         _vDimension = std::stoi(line.substr(0, 2));
-        _hDimension = std::stoi(line.substr(5));
+        _hDimension= std::stoi(line.substr(5));
         _letters.resize(_vDimension);
 
-        for (auto& _line : _letters) {
+        for (auto & _line : _letters){
             _line.resize(_hDimension);
-            for (char& _letter : _line) {
+            for(char & _letter : _line){
                 _letter = ' ';
             }
         }
 
-        while (getline(file, line)) {
+        while(getline(file, line)){
             _words.push_back(line); //maybe implement _words as a vector of strings? {coord, orientation, word}
             coord index{};
             index = Board::getIndex(line.substr(0, 2));
             std::string word = line.substr(5);
 
-            switch (line.at(3)) {
-            case 'H':
-                for (size_t w = 0; w < word.size(); w++) {
-                    _letters[index.vLine][index.hCollumn + w] = word.at(w);
-                }
-                break;
-            case 'V':
-                for (size_t w = 0; w < word.size(); w++) {
-                    _letters[index.vLine + w][index.hCollumn] = word.at(w);
-                }
-                break;
+            switch(line.at(3)){
+                case 'H':
+                    for(size_t w = 0; w < word.size(); w++){
+                        _letters[index.vLine][index.hCollumn + w] = word.at(w);
+                    }
+                    break;
+                case 'V':
+                    for(size_t w = 0; w < word.size(); w++){
+                        _letters[index.vLine + w][index.hCollumn] = word.at(w);
+                    }
+                    break;
             }
         }
         file.close();
     }
-    else {
-        std::cerr << "Cannot open file!" << std::endl;
+    else{
         int defaultSize = 20;
         _hDimension = defaultSize;
         _vDimension = defaultSize;
+        _letters.resize(_vDimension);
+
+        for (auto & _line : _letters){
+            _line.resize(_hDimension);
+            for(char & _letter : _line){
+                _letter = ' ';
+            }
+        }
+        std::cerr << "Cannot open file!" << std::endl;
+
     }
 
     //fill highlights with 0
@@ -74,21 +83,23 @@ Board::Board(std::string filename) {
     //MISSING HIGHLIGHTS
 }
 
+
+
 void Board::show() const { //Prototype function (needs styling)
     std::cout << " ";
-    for (size_t i = 0; i < _hDimension; i++) {
+    for (size_t i = 0; i < _hDimension; i++){
         std::cout << " " << alphabet.at(i);
     }
     std::cout << std::endl;
-    for (size_t i = 0; i < _vDimension; i++) {
-        std::string line;
-        line += toupper(alphabet.at(i));
-        for (size_t j = 0; j < _hDimension; j++) {
-            line += " ";
-            line += _letters[i][j];
+    for (size_t i = 0; i< _vDimension; i++){
+        std::cout << std::string(1,(toupper(alphabet.at(i))));
+        for(size_t j = 0; j < _hDimension; j++){
+            std::cout << ' ';
+            if (getHighlights().at(i).at(j))
+                std::cout << "\x1b[41;1m"  << _letters[i][j] << "\x1b[0m";
+            else std::cout << _letters[i][j];
         }
-        line += '\n';
-        std::cout << line;
+        std::cout << '\n';
     }
 }
 
@@ -101,10 +112,10 @@ coord Board::getIndex(std::string position) const {
 
 bool Board::fileExport(std::string filename) const {
     std::string line;
-    std::ofstream file(filename);
-    if (file.is_open()) {
+    std::ofstream file (filename);
+    if (file.is_open()){
         file << _hDimension << 'x' << _vDimension << '\n';
-        for (auto line : _words) {
+        for (auto line : _words){
             file << line << '\n';
         }
         return true;
@@ -117,16 +128,17 @@ Board::Board() {
     _hDimension = 20;
     _vDimension = 20;
     _letters.resize(_vDimension);
-    for (size_t i = 0; i < _letters.size(); i++) {
+    for (size_t i = 0; i < _letters.size(); i++){
         _letters[i].resize(_hDimension);
-        for (size_t j = 0; j < _letters[i].size(); j++) {
+        for(size_t j = 0; j < _letters[i].size(); j++){
             _letters[i][j] = ' ';
         }
     }
 }
 
 bool Board::highlight(int vIndex, int hIndex) {
-    if (vIndex >= (int) _vDimension || hIndex >= (int) _hDimension) return false;
+    if (vIndex >= _vDimension || hIndex >= _hDimension) return false;
+    if (_letters.at(vIndex).at(hIndex) == ' ') return false;
     if (_highlights.at(vIndex).at(hIndex)) return false;
     _highlights.at(vIndex).at(hIndex) = 1;
     return true;

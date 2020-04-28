@@ -5,18 +5,25 @@ Pool::Pool(std::vector<char> alphabet) {
 	_alphabet = alphabet;
 	_currentSize = 0;
 	_alphabetSize = alphabet.size();
-	unsigned min = 3;
+	unsigned min = 2;
 
 	//initialize map
 	for (auto i : alphabet) {
-		_letters.insert(std::pair<char, int>(i, min));
-		_currentSize += min;
+		if (i == 'A' || i == 'E' || i == 'I' || i == 'O' || i == 'U') {
+			_letters.insert(std::pair<char, int>(i, min + 2));
+			_currentSize += min + 2;
+		}
+		else {
+			_letters.insert(std::pair<char, int>(i, min));
+			_currentSize += min;
+		}
 	}
 
 	//increment number of letters
-	int remaining = 101 - min*_alphabetSize; char random;
+	int remaining = 101 - _currentSize; char random;
 	while (remaining--) {
 		random = 'A' + (rand() % _alphabetSize);
+		while (_letters.at(random) > 5) random = 'A' + (rand() % _alphabetSize);
 		_letters.at(random)++;
 		_currentSize++;
 	}

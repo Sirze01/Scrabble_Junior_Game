@@ -2,7 +2,7 @@
 
 #include "Pool.h"
 #include "Command.h"
-#include "Board.h"
+#include "../common/Board.h"
 
 #include <vector>
 #include <string>
@@ -17,8 +17,9 @@ public:
 	bool exchange(int pos1, int pos2, Pool &pool);
 	bool exchange(int pos1, Pool& pool);
 	bool takeRandom(Pool &pool, int handPosition);
-	bool move(Command command, Board& board);
+	bool move(Command command, Board& board, Pool& pool);
 private:
+	int getHandPosition(char letter) const;
 	std::string _name;
 	int _score;
 	bool _turn;
