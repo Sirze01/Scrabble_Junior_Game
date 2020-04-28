@@ -1,13 +1,6 @@
-
 #include "Board.h"
 
 const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
-
-// Private methods Definitions
-
-
-
-// Public methods Definitions
 
 Board::Board(int nLines, int nCollumns) {
     _vDimension = nLines;
@@ -20,8 +13,6 @@ Board::Board(int nLines, int nCollumns) {
         }
     }
 }
-
-
 
 Board::Board(std::string filename)  {
     std::string line;
@@ -68,29 +59,38 @@ Board::Board(std::string filename)  {
         _hDimension = defaultSize;
         _vDimension = defaultSize;
     }
+
+    //fill highlights with 0
+    std::vector<std::vector<bool>> binaries;
+    for (int i = 0; i < (int)_vDimension; ++i) {
+        std::vector<bool> binary;
+        for (int j = 0; j < (int)_hDimension; ++j) {
+            binary.push_back(0);
+        }
+        binaries.push_back(binary);
+    }
+    _highlights = binaries;
+
+    //MISSING HIGHLIGHTS
 }
 
-
-
-void Board::show() const {                              //Prototype function (needs styling)
-    std::cout << ' ';
-    for(size_t i = 0; i < _hDimension; i++){
-        std::cout << alphabet.at(i);
+void Board::show() const { //Prototype function (needs styling)
+    std::cout << " ";
+    for (size_t i = 0; i < _hDimension; i++){
+        std::cout << " " << alphabet.at(i);
     }
     std::cout << std::endl;
-    for(size_t i = 0; i< _vDimension; i++){
+    for (size_t i = 0; i< _vDimension; i++){
         std::string line;
         line += toupper(alphabet.at(i));
         for(size_t j = 0; j < _hDimension; j++){
-            line += _letters[i][j]; //why the end of the world happens if i concatenate " " also?
+            line += " ";
+            line += _letters[i][j];
         }
         line += '\n';
         std::cout << line;
     }
-
 }
-
-
 
 coord Board::getIndex(std::string position) const {
     coord coordinates{};
@@ -99,31 +99,7 @@ coord Board::getIndex(std::string position) const {
     return coordinates;
 }
 
-
-
 bool Board::fileExport(std::string filename) const {
-    std::string line;
-    std::ifstream file(filename);
-    if (!file) {
-        file.close();
-        std::ofstream file(filename);
-        if (file.is_open()) {
-            file << _hDimension << 'x' << _vDimension << '\n';
-            for (auto line : _words) {
-                file << line << '\n';
-            }
-        }
-        return true;
-    }
-    else {
-        file.close();
-        std::cerr << "The file already exists!" << std::endl;
-        return false;
-    }
-
-
-    /*
-    //SUGGESTED CHANGE - OVERWRITES IF ALREADY EXISTS
     std::string line;
     std::ofstream file (filename);
     if (file.is_open()){
@@ -135,12 +111,11 @@ bool Board::fileExport(std::string filename) const {
     }
     std::cerr << "Could not write to file." << std::endl;
     return false;
-    */
 }
 
-
-
-/*Board::Board() {
+Board::Board() {
+    _hDimension = 20;
+    _vDimension = 20;
     _letters.resize(_vDimension);
     for (size_t i = 0; i < _letters.size(); i++){
         _letters[i].resize(_hDimension);
@@ -148,12 +123,19 @@ bool Board::fileExport(std::string filename) const {
             _letters[i][j] = ' ';
         }
     }
-}*/
+}
 
+bool Board::highlight(int vIndex, int hIndex) {
+    if (vIndex >= _vDimension || hIndex >= _hDimension) return false;
+    if (_highlights.at(vIndex).at(hIndex)) return false;
+    _highlights.at(vIndex).at(hIndex) = 1;
+    return true;
+}
 
+std::vector<std::vector<char>> Board::getLetters() const {
+    return _letters;
+}
 
-/*Board::Board(std::vector<std::vector<char>> letters) {
-    _vDimension = letters.size();
-    _hDimension = letters[0].size();
-    _letters = letters;
-}*/
+std::vector<std::vector<bool>> Board::getHighlights() const {
+    return _highlights;
+}
