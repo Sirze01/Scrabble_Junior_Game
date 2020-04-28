@@ -139,3 +139,22 @@ std::vector<std::vector<char>> Board::getLetters() const {
 std::vector<std::vector<bool>> Board::getHighlights() const {
     return _highlights;
 }
+
+void Board::showHighlights() const { //TO DEBUG. WILL REMOVE
+    std::cout << " ";
+    for (size_t i = 0; i < _hDimension; i++) {
+        std::cout << " " << alphabet.at(i);
+    }
+    std::cout << std::endl;
+    for (size_t i = 0; i < _vDimension; i++) {
+        std::string line;
+        line += toupper(alphabet.at(i));
+        for (size_t j = 0; j < _hDimension; j++) {
+            line += " ";
+            if (_highlights[i][j]) line += '1';
+            else line += "0";
+        }
+        line += '\n';
+        std::cout << line;
+    }
+}

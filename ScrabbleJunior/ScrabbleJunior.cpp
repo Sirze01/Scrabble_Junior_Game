@@ -13,7 +13,9 @@ int main()
     std::string englishAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     std::vector<char> alphabet(englishAlphabet.begin(), englishAlphabet.end());
 
+    
     Pool my_pool(alphabet);
+    /*
     //my_pool.show();
     my_pool.show();
 
@@ -26,4 +28,11 @@ int main()
     p1.exchange(0, 1, my_pool);
     p1.showHand();
     my_pool.show();
+    */
+
+    Board newBoard("test.txt");
+    newBoard.show();
+    //std::cout << newBoard.getIndex("Ak").vLine << ' ' << newBoard.getIndex("Ak").hCollumn << std::endl;
+    newBoard.fileExport("test_out.txt");
+    newBoard.showHighlights();
 }

@@ -16,6 +16,7 @@ public:
 	Board(int nLines, int nCollumns);
     Board(std::string filename);
     void show() const;
+    void showHighlights() const;
 	coord getIndex(std::string position) const;
 	bool fileExport(std::string filename) const;
     bool highlight(int vIndex, int hIndex);
