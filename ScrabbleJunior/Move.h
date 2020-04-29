@@ -5,10 +5,11 @@
 #include <vector>
 #include <string>
 
-class Move{
+class Move {
 public:
 	Move(Command command, Board board);
-	bool isValid(Player player) const;
+	int hasProblems(Player player) const;
+	bool execute(Player& player, Board &board, Pool &pool);
 private:
 	bool inBounds() const;
 	bool letterMatch() const;
@@ -18,6 +19,8 @@ private:
 	bool continueOnCol() const;
 	bool finishOnLine() const;
 	bool finishOnCol() const;
+	bool singleCharWordOnLine() const;
+	bool singleCharWordOnCol() const;
 	coord _posToMove;
 	char _letter;
 	int _maxCol;

@@ -12,30 +12,48 @@ Move::Move(Command command, Board board) {
 	_boardHighlights = board.getHighlights();
 }
 
-bool Move::isValid(Player player) const {
+int Move::hasProblems(Player player) const {
 	if (!player.hasOnHand(_letter)) {
 		std::cout << "Player hasn't got that letter in hand!\n";
-		return false;
+		return 1;
 	}
 	if (_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn)) {
 		std::cout << "Position already filled with a letter!\n";
-		return false;
+		return 2;
 	}
 	if (!inBounds()) {
 		std::cout << "Outside bounds!\n";
-		return false;
+		return 3;
 	}
 	if (!letterMatch()) {
 		std::cout << "Letters do not match!\n";
-		return false;
+		return 4;
 	}
 
 	std::cout << "\nstart;finish;continue - LINE/COL\n";
 	std::cout << startOnLine() << finishOnLine() << continueOnLine() << startOnCol() << finishOnCol() << continueOnCol();
 
-	if ((startOnLine() && !finishOnLine()) || continueOnLine()) return true;
-	if ((startOnCol() && !finishOnCol()) || continueOnCol()) return true;
-	return false;
+	if (singleCharWordOnLine() && singleCharWordOnCol()) return 0; //single char word
+	else if (startOnLine() && !finishOnLine() || continueOnLine()) return 0;
+	else if (startOnCol() && !finishOnCol() || continueOnCol()) return 0;
+
+	return 5;
+}
+
+bool Move::execute(Player& player, Board& board, Pool &pool) {
+	if (hasProblems(player)) return false;
+	board.highlight(_posToMove.vLine, _posToMove.hCollumn);
+	player.takeRandom(pool, player.getHandPosition(_letter));
+	
+	//add scores
+	if (singleCharWordOnLine() && singleCharWordOnCol()) {
+		player.addScore(1);
+		return true;
+	}
+	if (!singleCharWordOnLine() && finishOnLine()) player.addScore(1);
+	if (!singleCharWordOnCol() && finishOnCol()) player.addScore(1);
+
+	return true;
 }
 
 bool Move::inBounds() const {
@@ -49,6 +67,14 @@ bool Move::inBounds() const {
 bool Move::letterMatch() const {
 	if (_letter == ' ') return false;
 	return _letter == _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn);
+}
+
+bool Move::singleCharWordOnLine() const {
+	return startOnLine() && finishOnLine();
+}
+
+bool Move::singleCharWordOnCol() const {
+	return startOnCol() && finishOnCol();
 }
 
 bool Move::startOnLine() const {
@@ -75,12 +101,30 @@ bool Move::continueOnCol() const {
 
 bool Move::finishOnLine() const {
 	if (_posToMove.hCollumn == _maxCol) return true;
-	return !_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn + 1)
-		&& _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn+1) == ' ';
+	bool finishWord = true;
+	for (int i = 1; _posToMove.hCollumn + i < _maxCol; ++i) {
+		if (!_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn + i)) {
+			if (_boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn + i) == ' ') break;
+			else if (_boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn + i) != ' ') {
+				finishWord = false;
+				break;
+			}
+		}
+	}
+	return finishWord;
 }
 
 bool Move::finishOnCol() const {
 	if (_posToMove.vLine == _maxLine) return true;
-	return !_boardHighlights.at(_posToMove.vLine+1).at(_posToMove.hCollumn)
-		&& _boardLetters.at(_posToMove.vLine + 1).at(_posToMove.hCollumn) == ' ';
+	bool finishWord = true;
+	for (int i = 1; _posToMove.vLine + i < _maxLine; ++i) {
+		if (!_boardHighlights.at(_posToMove.vLine+i).at(_posToMove.hCollumn)) {
+			if (_boardLetters.at(_posToMove.vLine+i).at(_posToMove.hCollumn) == ' ') break;
+			else if (_boardLetters.at(_posToMove.vLine + i).at(_posToMove.hCollumn) != ' ') {
+				finishWord = false;
+				break;
+			}
+		}
+	}
+	return finishWord;
 }

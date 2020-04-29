@@ -58,16 +58,6 @@ bool Player::takeRandom(Pool &pool, int handPosition) {
     return true;
 }
 
-bool Player::move(Command command, Board& board, Pool &pool) {
-    if (!command.isMove()) return false;
-    Move my_move(command,board);
-    if (!my_move.isValid(*this)) return false;
-
-    board.highlight(command.getMovePos(board).vLine, command.getMovePos(board).hCollumn);
-    takeRandom(pool, getHandPosition(command.getMoveLetter()));
-    return true;
-}
-
 int Player::getHandPosition(char letter) const{
     int pos = -1;
     for (size_t i = 0; i < _hand.size(); ++i) {
