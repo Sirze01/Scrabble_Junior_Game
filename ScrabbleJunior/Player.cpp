@@ -1,7 +1,7 @@
 #include "Player.h"
 #include "Move.h"
 #include <iostream>
-#include "stringProcess.h"
+#include "../common/StringProcess.h"
 
 Player::Player(Pool &pool, std::string name) {
     int handSize = 7;

@@ -25,8 +25,8 @@ public:
 private:
     std::vector<std::vector<bool>> _highlights;
     std::vector<std::vector<char>> _letters;
-    unsigned _vDimension;
-    unsigned _hDimension;
+    int _vDimension;
+    int _hDimension;
     std::vector<std::string> _words; //needs reworking
 };
 

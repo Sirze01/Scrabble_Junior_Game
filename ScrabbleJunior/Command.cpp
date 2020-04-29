@@ -1,5 +1,5 @@
 #include "Command.h"
-#include "stringProcess.h"
+#include "../common/StringProcess.h"
 #include "../common/Board.h"
 
 Command::Command(std::string userInput) {

@@ -6,13 +6,13 @@
 #include "Player.h"
 #include "../common/Board.h"
 #include "Command.h"
-#include "../common/Console_Setup.h"
+#include "../common/ConsoleSetup.h"
 #include "Move.h"
 
 int main()
 {
 #ifdef _WIN32
-    SetupConsole();
+    setupConsole();
 #endif
     srand((unsigned int) time(NULL)); //letter randomize
 
@@ -33,21 +33,18 @@ int main()
         std::cout << "\nMove: ";
         std::getline(std::cin, input);
         Command command(input);
-        if (!command.isMove()) {
+        if (command.getCommand() == 2) {
             player1.exchange(1, my_pool);
             std::cout << "exchanging from pool...\n";
         }
-        else {
+        else if (command.isMove()) {
             Move move(command, my_board);
             if (!move.hasProblems(player1)) move.execute(player1, my_board, my_pool);
             else std::cout << "move has problems.\n";
         }
+        else std::cout << "Not recognized or implemented yet.\n";
         std::cout << "press enter.\n";
         std::cin.ignore(10000,'\n');
-        //refresh pool to debug
-        for (int i = 0; i < 7;++i) {
-            player1.exchange(i, my_pool);
-        }
         clearConsole();
     }
 }
