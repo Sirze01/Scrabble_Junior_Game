@@ -44,6 +44,10 @@ int main()
         }
         std::cout << "press enter.\n";
         std::cin.ignore(10000,'\n');
+        //refresh pool to debug
+        for (int i = 0; i < 7;++i) {
+            player1.exchange(i, my_pool);
+        }
         clearConsole();
     }
 }
