@@ -12,21 +12,26 @@ Move::Move(Command command, Board board) {
 	_boardHighlights = board.getHighlights();
 }
 
+Move::Move(coord pos, char letter, Board board) {
+	_posToMove = pos;
+	_letter = letter;
+	_maxCol = board.getDimensions().hCollumn - 1;
+	_maxLine = board.getDimensions().vLine - 1;
+	_boardLetters = board.getLetters();
+	_boardHighlights = board.getHighlights();
+}
+
 int Move::hasProblems(Player player) const {
-	if (!player.hasOnHand(_letter)) {
-		std::cout << "Player hasn't got that letter in hand!\n";
+	if (!letterMatch()) {
 		return 1;
 	}
-	if (_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn)) {
-		std::cout << "Position already filled with a letter!\n";
+	if (!player.hasOnHand(_letter)) {
 		return 2;
 	}
-	if (!inBounds()) {
-		std::cout << "Outside bounds!\n";
+	if (_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn)) {
 		return 3;
 	}
-	if (!letterMatch()) {
-		std::cout << "Letters do not match!\n";
+	if (!inBounds()) {
 		return 4;
 	}
 

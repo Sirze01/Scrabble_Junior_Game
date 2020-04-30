@@ -7,13 +7,7 @@ Player::Player(Pool &pool, std::string name) {
     int handSize = 7;
 	_name = stripSpaces(name);
     _hand.resize(handSize);
-    while (handSize--) {
-        takeRandom(pool, handSize);
-        if (timesOnHand(_hand.at(handSize)) > 1) { //revert repeated letter take
-            pool.include(_hand.at(handSize));
-            handSize++;
-        }
-    }
+    while (handSize--) takeRandom(pool, handSize);
 }
 
 int Player::getScore() const {
@@ -47,14 +41,15 @@ bool Player::exchange(int pos1, Pool& pool) {
 }
 
 bool Player::takeRandom(Pool &pool, int handPosition) {
-    if (!pool.getCurrentSize()) return false;
-    if (handPosition > (int) _hand.size()-1) return false;
+    int poolSize = pool.getCurrentSize();
+    if (!poolSize) return false;
 
-    char random;
-    do {
-        random = 'A' + (rand() % pool.getAlphabetSize());
-    } while (!pool.take(random));
-    _hand.at(handPosition) = random;
+    int maxPos = _hand.size() - 1;
+    if (handPosition > maxPos) return false;
+
+    int randomPoolPos = rand() % poolSize;
+    _hand.at(handPosition) = pool.getAllLetters().at(randomPoolPos);
+    pool.take(randomPoolPos);
     return true;
 }
 
@@ -69,18 +64,29 @@ int Player::getHandPosition(char letter) const{
     return pos;
 }
 
-int Player::timesOnHand(char letter) const {
-    int count = 0;
-    for (auto i : _hand) {
-        if (i == letter) count++;
-    }
-    return count;
-}
-
 char Player::getLetterOnHand(int handPosition) const {
     return _hand.at(handPosition);
 }
 
 bool Player::hasOnHand(char letter) const {
-    return timesOnHand(letter);
+    int count = 0;
+    for (auto i : _hand) {
+        if (i == letter) return true;
+    }
+    return false;
+}
+
+bool Player::mayMove(Board board, Pool pool) const{
+    coord boardDim = board.getDimensions();
+    for (int line = 0; line < boardDim.vLine; ++line) {
+        for (int col = 0; col < boardDim.hCollumn; ++col) {
+            coord testPosition = { line,col };
+            char letter = board.getLetters().at(line).at(col);
+            Move tryMove(testPosition, letter, board);
+            if (!tryMove.hasProblems(*this)) {
+                return true;
+            }
+        }
+    }
+    return false;
 }

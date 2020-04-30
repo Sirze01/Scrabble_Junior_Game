@@ -3,7 +3,6 @@
 #include "Pool.h"
 #include "Command.h"
 #include "../common/Board.h"
-
 #include <vector>
 #include <string>
 
@@ -22,7 +21,6 @@ public:
 	int getHandPosition(char letter) const;
 private:
 	char getLetterOnHand(int handPosition) const;
-	int timesOnHand(char letter) const;
 	int _colorCode;
 	std::string _colorName;
 	std::string _name;

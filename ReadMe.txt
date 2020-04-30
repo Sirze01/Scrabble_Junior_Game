@@ -1,3 +1,14 @@
-Testing vs solutions
-CLion Tested
-Git config achieved
+BOARD BUILDER
+Missing:
+(write here)
+
+-------------------------------------------------
+SCRABBLE JUNIOR
+Missing:
+- Multiple players
+- Game termination
+- Exchange desired letter
+- Check hands
+- Check pool
+- Get help
+- Colors and messages

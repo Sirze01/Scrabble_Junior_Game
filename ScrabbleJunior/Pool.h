@@ -1,22 +1,15 @@
 #pragma once
-#include <map>
 #include <vector>
+#include "../common/Board.h"
 
 class Pool {
 public:
-	Pool(std::vector<char> alphabet);
+	Pool(Board board);
 	void show();
-	bool take(char letter);
+	bool take(int pos);
 	bool include(char letter);
-	std::map<char,int> getAllLetters() const;
-	std::vector<char> getAlphabet() const;
+	std::vector<char> getAllLetters() const;
 	int getCurrentSize() const;
-	int getAlphabetSize() const;
 private:
-	bool isMostFrequent(char letter) const;
-	std::map<char,int> _letters;
-	std::vector<char> _alphabet;
-	int _currentSize;
-	int _alphabetSize;
+	std::vector<char> _letters;
 };
-
