@@ -91,7 +91,7 @@ bool Move::startOnCol() const {
 
 
 bool Move::continueOnLine() const {
-	if (_posToMove.hCollumn == 0) return false;
+	if (_posToMove.hCollumn == 0) return true;
 	bool continueWord = true;
 	for (int i = 1; _posToMove.hCollumn - i >= 0; ++i) {
 		if (!_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn - i)) {
