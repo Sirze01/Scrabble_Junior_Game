@@ -1,3 +1,4 @@
+#include "../common/StringProcess.h"
 #include <string>
 
 std::string lowerCase(std::string command) {

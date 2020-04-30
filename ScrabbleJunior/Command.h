@@ -1,17 +1,17 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "../common/Board.h"
 
 class Command {
 public:
 	Command(std::string userInput);
 	int getCommand() const; //list of commands outside move
-	std::vector<std::string> getMove() const;
+    coord getMovePos(Board board) const;
+	char getMoveLetter() const;
 	bool isMove() const;
 private:
-	void saveMove();
 	std::string _str;
-	std::vector<std::string> _move;
 	int _commandType;
 };
 

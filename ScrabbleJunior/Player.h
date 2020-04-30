@@ -9,17 +9,22 @@
 
 class Player {
 public:
-	Player(Pool pool, std::string name);
+	Player(Pool &pool, std::string name);
 	int getScore() const;
 	std::string getName() const;
 	void showHand() const;
+	void showScore() const;
 	void addScore(int score);
-	bool exchange(int pos1, int pos2, Pool &pool);
 	bool exchange(int pos1, Pool& pool);
 	bool takeRandom(Pool &pool, int handPosition);
-	bool move(Command command, Board& board, Pool& pool);
-private:
+	bool mayMove(Board board, Pool pool) const;
+	bool hasOnHand(char letter) const;
 	int getHandPosition(char letter) const;
+private:
+	char getLetterOnHand(int handPosition) const;
+	int timesOnHand(char letter) const;
+	int _colorCode;
+	std::string _colorName;
 	std::string _name;
 	int _score;
 	bool _turn;
