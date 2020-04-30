@@ -29,8 +29,8 @@ void Player::showScore() const {
     std::cout << _name << ": " << _score << " points\n";
 }
 
-void Player::addScore(int score) {
-    _score += score;
+void Player::addScore() {
+    _score++;
 }
 
 bool Player::exchange(int pos1, Pool& pool) {

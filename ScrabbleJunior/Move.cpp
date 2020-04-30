@@ -49,11 +49,11 @@ bool Move::execute(Player& player, Board& board, Pool &pool) {
 	
 	//add scores
 	if (singleCharWordOnLine() && singleCharWordOnCol()) {
-		player.addScore(1);
+		player.addScore();
 		return true;
 	}
-	if (!singleCharWordOnLine() && continueOnLine() && finishOnLine()) player.addScore(1);
-	if (!singleCharWordOnCol() && continueOnCol() && finishOnCol()) player.addScore(1);
+	if (!singleCharWordOnLine() && continueOnLine() && finishOnLine()) player.addScore();
+	if (!singleCharWordOnCol() && continueOnCol() && finishOnCol()) player.addScore();
 
 	return true;
 }

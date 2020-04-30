@@ -13,7 +13,7 @@ public:
 	std::string getName() const;
 	void showHand() const;
 	void showScore() const;
-	void addScore(int score);
+	void addScore();
 	bool exchange(int pos1, Pool& pool);
 	bool takeRandom(Pool &pool, int handPosition);
 	bool mayMove(Board board, Pool pool) const;

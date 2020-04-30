@@ -19,7 +19,6 @@ int main()
     Board my_board("test.txt");
     Pool my_pool(my_board);
     Player player1(my_pool, "Alfredo");
-    my_pool.show();
 
     for (;;) {
         my_board.show();
