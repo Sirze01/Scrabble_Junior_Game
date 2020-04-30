@@ -35,13 +35,7 @@ int Move::hasProblems(Player player) const {
 		return 4;
 	}
 
-	/*
-	//debug board control flags
-	std::cout << "\nstart;finish;continue - LINE/COL\n";
-	std::cout << startOnLine() << finishOnLine() << continueOnLine() << startOnCol() << finishOnCol() << continueOnCol();
-	*/
-
-	if (singleCharWordOnLine() && singleCharWordOnCol()) return 0; //single char word
+	if (singleCharWordOnLine() && singleCharWordOnCol()) return 0;
 	else if (!singleCharWordOnLine() && continueOnLine()) return 0;
 	else if (!singleCharWordOnCol() && continueOnCol()) return 0;
 
