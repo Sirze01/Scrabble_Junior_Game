@@ -16,12 +16,8 @@ int main()
 #endif
     srand((unsigned int) time(NULL)); //letter randomize
 
-    //english alphabet 
-    std::string englishAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    std::vector<char> alphabet(englishAlphabet.begin(), englishAlphabet.end());
-
-    Pool my_pool(alphabet);
     Board my_board("test.txt");
+    Pool my_pool(my_board);
     Player player1(my_pool, "Alfredo");
 
     for (;;) {
@@ -29,13 +25,17 @@ int main()
         std::cout << "\n";
         player1.showHand();
         player1.showScore();
+        player1.mayMove(my_board,my_pool);
         std::string input;
         std::cout << "\nMove: ";
         std::getline(std::cin, input);
         Command command(input);
         if (command.getCommand() == 2) {
-            player1.exchange(1, my_pool);
-            std::cout << "exchanging from pool...\n";
+            if (player1.mayMove(my_board,my_pool)) std::cout << "Oops! You have a valid move, so you can not exchange from pool.\n";
+            else {
+                player1.exchange(1, my_pool);
+                std::cout << "exchanging from pool...\n";
+            }
         }
         else if (command.isMove()) {
             Move move(command, my_board);

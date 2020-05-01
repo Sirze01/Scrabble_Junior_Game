@@ -8,6 +8,7 @@
 class Move {
 public:
 	Move(Command command, Board board);
+	Move(coord pos, char letter, Board board);
 	int hasProblems(Player player) const;
 	bool execute(Player& player, Board &board, Pool &pool);
 private:

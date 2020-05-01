@@ -3,7 +3,6 @@
 #include "Pool.h"
 #include "Command.h"
 #include "../common/Board.h"
-
 #include <vector>
 #include <string>
 
@@ -14,7 +13,7 @@ public:
 	std::string getName() const;
 	void showHand() const;
 	void showScore() const;
-	void addScore(int score);
+	void addScore();
 	bool exchange(int pos1, Pool& pool);
 	bool takeRandom(Pool &pool, int handPosition);
 	bool mayMove(Board board, Pool pool) const;
@@ -22,7 +21,6 @@ public:
 	int getHandPosition(char letter) const;
 private:
 	char getLetterOnHand(int handPosition) const;
-	int timesOnHand(char letter) const;
 	int _colorCode;
 	std::string _colorName;
 	std::string _name;

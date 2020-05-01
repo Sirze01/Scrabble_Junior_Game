@@ -14,4 +14,3 @@ private:
 	std::string _str;
 	int _commandType;
 };
-

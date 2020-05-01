@@ -12,31 +12,30 @@ Move::Move(Command command, Board board) {
 	_boardHighlights = board.getHighlights();
 }
 
+Move::Move(coord pos, char letter, Board board) {
+	_posToMove = pos;
+	_letter = letter;
+	_maxCol = board.getDimensions().hCollumn - 1;
+	_maxLine = board.getDimensions().vLine - 1;
+	_boardLetters = board.getLetters();
+	_boardHighlights = board.getHighlights();
+}
+
 int Move::hasProblems(Player player) const {
-	if (!player.hasOnHand(_letter)) {
-		std::cout << "Player hasn't got that letter in hand!\n";
+	if (!letterMatch()) {
 		return 1;
 	}
-	if (_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn)) {
-		std::cout << "Position already filled with a letter!\n";
+	if (!player.hasOnHand(_letter)) {
 		return 2;
 	}
-	if (!inBounds()) {
-		std::cout << "Outside bounds!\n";
+	if (_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn)) {
 		return 3;
 	}
-	if (!letterMatch()) {
-		std::cout << "Letters do not match!\n";
+	if (!inBounds()) {
 		return 4;
 	}
 
-	/*
-	//debug board control flags
-	std::cout << "\nstart;finish;continue - LINE/COL\n";
-	std::cout << startOnLine() << finishOnLine() << continueOnLine() << startOnCol() << finishOnCol() << continueOnCol();
-	*/
-
-	if (singleCharWordOnLine() && singleCharWordOnCol()) return 0; //single char word
+	if (singleCharWordOnLine() && singleCharWordOnCol()) return 0;
 	else if (!singleCharWordOnLine() && continueOnLine()) return 0;
 	else if (!singleCharWordOnCol() && continueOnCol()) return 0;
 
@@ -50,11 +49,11 @@ bool Move::execute(Player& player, Board& board, Pool &pool) {
 	
 	//add scores
 	if (singleCharWordOnLine() && singleCharWordOnCol()) {
-		player.addScore(1);
+		player.addScore();
 		return true;
 	}
-	if (!singleCharWordOnLine() && continueOnLine() && finishOnLine()) player.addScore(1);
-	if (!singleCharWordOnCol() && continueOnCol() && finishOnCol()) player.addScore(1);
+	if (!singleCharWordOnLine() && continueOnLine() && finishOnLine()) player.addScore();
+	if (!singleCharWordOnCol() && continueOnCol() && finishOnCol()) player.addScore();
 
 	return true;
 }
@@ -92,7 +91,7 @@ bool Move::startOnCol() const {
 
 
 bool Move::continueOnLine() const {
-	if (_posToMove.hCollumn == 0) return false;
+	if (_posToMove.hCollumn == 0) return true;
 	bool continueWord = true;
 	for (int i = 1; _posToMove.hCollumn - i >= 0; ++i) {
 		if (!_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn - i)) {

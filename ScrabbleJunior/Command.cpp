@@ -3,7 +3,9 @@
 #include "../common/Board.h"
 
 Command::Command(std::string userInput) {
-	_str = stripSpaces(userInput);
+	_str = stripSpecialChars(userInput);
+	_str = stripSpaces(_str);
+
 	if (isMove()) {
 		_commandType = 1;
 	}
