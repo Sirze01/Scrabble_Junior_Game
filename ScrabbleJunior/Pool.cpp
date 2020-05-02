@@ -1,5 +1,11 @@
 #include "Pool.h"
 #include <iostream>
+#include <random>
+#include <algorithm>
+
+//for shuffle purposes
+unsigned SEED = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
+std::mt19937 RANDOM_GENERATOR(SEED);
 
 Pool::Pool(Board board) {
 	std::vector<std::vector<char>> boardContent = board.getLetters();
@@ -38,4 +44,9 @@ std::vector<char> Pool::getAllLetters() const {
 
 int Pool::getCurrentSize() const {
 	return _letters.size();
+}
+
+void Pool::shuffle() {
+	//shuffle pool for next take
+	std::shuffle(_letters.begin(), _letters.end(), RANDOM_GENERATOR);
 }

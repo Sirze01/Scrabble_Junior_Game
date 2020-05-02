@@ -1,7 +1,14 @@
 #include "Player.h"
+#include "../common/StringProcess.h"
 #include "Move.h"
 #include <iostream>
-#include "../common/StringProcess.h"
+#include <algorithm>
+#include <random>
+#include <chrono>
+
+//defined in Pool.cpp
+extern unsigned SEED;
+extern std::mt19937 RANDOM_GENERATOR;
 
 Player::Player(Pool &pool, std::string name) {
     int handSize = 7;
@@ -47,9 +54,13 @@ bool Player::takeRandom(Pool &pool, int handPosition) {
     int maxPos = _hand.size() - 1;
     if (handPosition > maxPos) return false;
 
-    int randomPoolPos = rand() % poolSize;
+    //for shuffle purposes
+    std::uniform_int_distribution<int> distribution{ 0, poolSize -1};
+    int randomPoolPos = distribution(RANDOM_GENERATOR);
+
     _hand.at(handPosition) = pool.getAllLetters().at(randomPoolPos);
     pool.take(randomPoolPos);
+
     return true;
 }
 
