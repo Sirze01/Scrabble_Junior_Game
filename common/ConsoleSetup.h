@@ -8,10 +8,10 @@
 #define UNICODE
 #endif
 
-//#ifdef _WIN32
+#ifdef _WIN32
 #include <windows.h>
 #include <wincon.h>
-//#endif
+#endif
 
 #ifdef _WIN32
 // Fix compilatin on MinGW

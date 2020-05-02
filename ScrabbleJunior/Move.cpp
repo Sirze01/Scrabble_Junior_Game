@@ -22,16 +22,16 @@ Move::Move(coord pos, char letter, const Board *board) {
 }
 
 int Move::hasProblems(const Player *player) const {
-	if (!letterMatch()) {
+	if (!inBounds()) {
 		return 1;
 	}
-	if (!player->hasOnHand(_letter)) {
+	if (!letterMatch()) {
 		return 2;
 	}
-	if (_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn)) {
+	if (!player->hasOnHand(_letter)) {
 		return 3;
 	}
-	if (!inBounds()) {
+	if (_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn)) {
 		return 4;
 	}
 
