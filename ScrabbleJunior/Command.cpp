@@ -42,9 +42,9 @@ bool Command::isMove() const {
 	return true;
 }
 
-coord Command::getMovePos(Board board) const {
+coord Command::getMovePos(const Board *board) const {
 	if (!isMove()) return { -1,-1 };
-	return board.getIndex(_str.substr(0, 2));
+	return board->getIndex(_str.substr(0, 2));
 }
 
 char Command::getMoveLetter() const {

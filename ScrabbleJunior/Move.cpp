@@ -3,35 +3,35 @@
 #include "../common/Board.h"
 
 
-Move::Move(Command command, Board board) {
-	_posToMove = command.getMovePos(board);
-	_letter = command.getMoveLetter();
-	_maxCol = board.getDimensions().hCollumn - 1;
-	_maxLine = board.getDimensions().vLine - 1;
-	_boardLetters = board.getLetters();
-	_boardHighlights = board.getHighlights();
+Move::Move(const Command *command, const Board *board) {
+	_posToMove = command->getMovePos(board);
+	_letter = command->getMoveLetter();
+	_maxCol = board->getDimensions().hCollumn - 1;
+	_maxLine = board->getDimensions().vLine - 1;
+	_boardLetters = board->getLetters();
+	_boardHighlights = board->getHighlights();
 }
 
-Move::Move(coord pos, char letter, Board board) {
+Move::Move(coord pos, char letter, const Board *board) {
 	_posToMove = pos;
 	_letter = letter;
-	_maxCol = board.getDimensions().hCollumn - 1;
-	_maxLine = board.getDimensions().vLine - 1;
-	_boardLetters = board.getLetters();
-	_boardHighlights = board.getHighlights();
+	_maxCol = board->getDimensions().hCollumn - 1;
+	_maxLine = board->getDimensions().vLine - 1;
+	_boardLetters = board->getLetters();
+	_boardHighlights = board->getHighlights();
 }
 
-int Move::hasProblems(Player player) const {
-	if (!letterMatch()) {
+int Move::hasProblems(const Player *player) const {
+	if (!inBounds()) {
 		return 1;
 	}
-	if (!player.hasOnHand(_letter)) {
+	if (!letterMatch()) {
 		return 2;
 	}
-	if (_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn)) {
+	if (!player->hasOnHand(_letter)) {
 		return 3;
 	}
-	if (!inBounds()) {
+	if (_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn)) {
 		return 4;
 	}
 
@@ -42,18 +42,18 @@ int Move::hasProblems(Player player) const {
 	return 5;
 }
 
-bool Move::execute(Player& player, Board& board, Pool &pool) {
+bool Move::execute(Player *player, Board *board, Pool *pool) {
 	if (hasProblems(player)) return false;
-	board.highlight(_posToMove.vLine, _posToMove.hCollumn);
-	player.takeRandom(pool, player.getHandPosition(_letter));
+	board->highlight(_posToMove.vLine, _posToMove.hCollumn);
+	player->takeRandom(pool, player->getHandPosition(_letter));
 	
 	//add scores
 	if (singleCharWordOnLine() && singleCharWordOnCol()) {
-		player.addScore();
+		player->addScore();
 		return true;
 	}
-	if (!singleCharWordOnLine() && continueOnLine() && finishOnLine()) player.addScore();
-	if (!singleCharWordOnCol() && continueOnCol() && finishOnCol()) player.addScore();
+	if (!singleCharWordOnLine() && continueOnLine() && finishOnLine()) player->addScore();
+	if (!singleCharWordOnCol() && continueOnCol() && finishOnCol()) player->addScore();
 
 	return true;
 }

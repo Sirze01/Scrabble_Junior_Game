@@ -7,7 +7,7 @@ class Command {
 public:
 	Command(std::string userInput);
 	int getCommand() const; //list of commands outside move
-    coord getMovePos(Board board) const;
+    coord getMovePos(const Board *board) const;
 	char getMoveLetter() const;
 	bool isMove() const;
 private:
