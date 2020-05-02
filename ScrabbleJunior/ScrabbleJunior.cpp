@@ -14,14 +14,13 @@ int main()
     setupConsole();
 
     Board my_board("test.txt");
-    std::vector<std::string> playerNames = { "Alfredo Martins", "Comboios de Portugal", "Nunca Sentado" };
+    std::vector<std::string> playerNames = { "Alfredo Martins", "Comboios de Portugal"};
     Game my_game(&my_board, playerNames);
 
     for (;;) {
         my_board.show();
         std::cout << "\n";
         my_game.askMove();
-        //if game finished break
         my_game.nextTurn();
         //clearConsole();
         std::cout << "\n\n\n";

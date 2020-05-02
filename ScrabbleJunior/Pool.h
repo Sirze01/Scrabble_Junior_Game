@@ -7,7 +7,7 @@
 class Pool {
 public:
 	Pool() = default;
-	Pool(Board Board);
+	Pool(const Board *Board);
 	void show();
 	bool take(int pos);
 	bool include(char letter);

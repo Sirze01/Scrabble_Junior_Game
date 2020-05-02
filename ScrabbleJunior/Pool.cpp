@@ -7,8 +7,8 @@
 unsigned SEED = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
 std::mt19937 RANDOM_GENERATOR(SEED);
 
-Pool::Pool(Board board) {
-	std::vector<std::vector<char>> boardContent = board.getLetters();
+Pool::Pool(const Board *board) {
+	std::vector<std::vector<char>> boardContent = board->getLetters();
 
 	//add letters in board
 	for (std::vector<char> v : boardContent) {

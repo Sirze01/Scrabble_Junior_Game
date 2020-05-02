@@ -8,15 +8,15 @@
 
 class Player {
 public:
-	Player(Pool &pool, std::string name);
+	Player(Pool *pool, std::string name);
 	int getScore() const;
 	std::string getName() const;
 	void showHand() const;
 	void showScore() const;
 	void addScore();
-	bool exchange(int pos1, Pool& pool);
-	bool takeRandom(Pool &pool, int handPosition);
-	bool mayMove(Board board, Pool pool) const;
+	bool exchange(int pos1, Pool *pool);
+	bool takeRandom(Pool *pool, int handPosition);
+	bool mayMove(const Board *board, const Pool *pool) const;
 	bool hasOnHand(char letter) const;
 	int getHandPosition(char letter) const;
 private:
