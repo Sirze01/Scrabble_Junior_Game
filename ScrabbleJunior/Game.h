@@ -9,6 +9,7 @@
 class Game{
 public:
 	Game(Board* board, std::vector<std::string> _playerNames);
+	~Game();
 	void askMove();
 	void nextTurn();
 	bool hasFinished() const;

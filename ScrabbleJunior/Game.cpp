@@ -11,6 +11,13 @@ Game::Game(Board* board, std::vector<std::string> playerNames) {
 	}
 }
 
+Game::~Game() {
+    delete _pool;
+    for (int i = 0; i < _nPlayers;++i) {
+        delete _players.at(i);
+    }
+}
+
 void Game::askMove() {
     Player *player = _players.at(_currentToMove);
     player->showHand();

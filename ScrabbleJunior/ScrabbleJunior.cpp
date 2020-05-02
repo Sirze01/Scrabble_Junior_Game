@@ -23,7 +23,7 @@ int main()
         my_game.askMove();
         my_game.nextTurn();
         //clearConsole();
-        std::cout << "\n\n\n";
         if (my_game.hasFinished()) break;
+        std::cout << "\n\n\n";
     }
 }
