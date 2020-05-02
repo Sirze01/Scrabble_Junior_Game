@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <random>
 #include <chrono>
+#include "../common/ConsoleSetup.h"
 
 //defined in Pool.cpp
 extern unsigned SEED;
@@ -12,6 +13,8 @@ extern std::mt19937 RANDOM_GENERATOR;
 
 Player::Player(Pool *pool, std::string name) {
     int handSize = 7;
+    _score = 0;
+    _colorName = RED_FORE;
 	_name = stripSpaces(name);
     _hand.resize(handSize);
     while (handSize--) takeRandom(pool, handSize);

@@ -25,7 +25,6 @@ private:
 	std::string _colorName;
 	std::string _name;
 	int _score;
-	bool _turn;
 	std::vector<char> _hand;
 };
 
