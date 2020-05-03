@@ -20,10 +20,15 @@ int main()
     for (;;) {
         my_board.show();
         std::cout << "\n";
-        my_game.askMove();
+        my_game.askCommand();
+        clearConsole();
+
+        my_board.show();
+        std::cout << "\n";
+        my_game.askCommand();
+
         my_game.nextTurn();
-        //clearConsole();
+        clearConsole();
         if (my_game.hasFinished()) break;
-        std::cout << "\n\n\n";
     }
 }

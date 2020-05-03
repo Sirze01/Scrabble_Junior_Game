@@ -1,44 +1,21 @@
 #include "Command.h"
 #include "../common/StringProcess.h"
 #include "../common/Board.h"
+#include <string>
 
 Command::Command(std::string userInput) {
 	_str = stripSpecialChars(userInput);
+	_str = lowerCase(_str);
 	_str = stripSpaces(_str);
-
-	if (isMove()) {
-		_commandType = 1;
-	}
-	else {
-		_str = lowerCase(_str);
-		if (_str == "exchange") { // only executed when possible. implement later
-			_commandType = 2;
-		}
-		else if (_str == "check hands") {
-			_commandType = 3;
-		}
-		else if (_str == "check pool") {
-			_commandType = 4;
-		}
-		else if (_str == "help") {
-			_commandType = 5;
-		}
-		else {
-			_commandType = -1;
-		}
-	}
-}
-
-int Command::getCommand() const {
-	return _commandType;
+	if (isExchange()) _exchangeToken = _str.at(_str.size() - 1);
 }
 
 bool Command::isMove() const {
 	if (_str.size() != 4) return false;
-	if (!(_str.at(0) >= 'A' && _str.at(0) <= 'Z')) return false;
+	if (!(_str.at(0) >= 'a' && _str.at(0) <= 'z')) return false;
 	if (!(_str.at(1) >= 'a' && _str.at(0) <= 'z')) return false;
 	if (_str.at(2) != ' ') return false;
-	if (!(_str.at(3) >= 'A' && _str.at(3) <= 'Z')) return false;
+	if (!(_str.at(3) >= 'a' && _str.at(3) <= 'z')) return false;
 	return true;
 }
 
@@ -49,5 +26,32 @@ coord Command::getMovePos(const Board *board) const {
 
 char Command::getMoveLetter() const {
 	if (!isMove()) return '?';
-	return _str.at(3);
+	return toupper(_str.at(3));
+}
+
+bool Command::isExchange() const {
+	return _str.size() == std::string("exchange").size() + 2
+		&& _str.find("exchange") != std::string::npos;
+}
+
+int Command::getExchangeToken() const {
+	if (!isExchange()) return -1;
+	if (isdigit(_exchangeToken)) return _exchangeToken - '0';
+	return _exchangeToken;
+}
+
+bool Command::isCheckHands() const {
+	return _str.find("check hand") != std::string::npos;
+}
+
+bool Command::isCheckPool() const {
+	return _str.find("check pool") != std::string::npos;
+}
+
+bool Command::isHelp() const {
+	return _str.find("help") != std::string::npos;
+}
+
+bool Command::isHint() const {
+	return _str.find("hint") != std::string::npos;
 }

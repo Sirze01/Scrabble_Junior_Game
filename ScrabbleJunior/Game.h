@@ -10,9 +10,10 @@ class Game{
 public:
 	Game(Board* board, std::vector<std::string> _playerNames);
 	~Game();
-	void askMove();
+	void askCommand();
 	void nextTurn();
 	bool hasFinished() const;
+	int getWinner() const;
 private:
 	int _nPlayers;
 	int _currentToMove;

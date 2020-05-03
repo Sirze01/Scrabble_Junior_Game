@@ -6,11 +6,8 @@ Missing:
 SCRABBLE JUNIOR
 Missing:
 - Pass when necessary
-- Exchange desired letter
-- Check hands
-- Check pool
-- Get help
 - Colors and messages
-- Menus
+- Get proper hint (filler now)
+- Menus and text
 Could improve:
 - Don't call the random_device constructor multiple times (how?)

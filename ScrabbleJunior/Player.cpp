@@ -17,6 +17,7 @@ Player::Player(Pool *pool, std::string name) {
     _colorName = RED_FORE;
 	_name = stripSpaces(name);
     _hand.resize(handSize);
+    pool->shuffle();
     while (handSize--) takeRandom(pool, handSize);
 }
 
@@ -43,10 +44,17 @@ void Player::addScore() {
     _score++;
 }
 
-bool Player::exchange(int pos1, Pool *pool) {
-    char include = _hand.at(pos1);
-    if (!takeRandom(pool, pos1)) return false;
-    pool->include(include);
+bool Player::exchange(int handPos, Pool *pool) {
+    char letter = _hand.at(handPos);
+    if (!takeRandom(pool, handPos)) return false;
+    pool->include(letter);
+    return true;
+}
+
+bool Player::exchange(char letter, Pool* pool) {
+    char handPos = getHandPosition(letter);
+    if (!takeRandom(pool, handPos)) return false;
+    pool->include(letter);
     return true;
 }
 
@@ -55,7 +63,7 @@ bool Player::takeRandom(Pool *pool, int handPosition) {
     if (!poolSize) return false;
 
     int maxPos = _hand.size() - 1;
-    if (handPosition > maxPos) return false;
+    if (handPosition > maxPos || handPosition < 0) return false;
 
     //for shuffle purposes
     std::uniform_int_distribution<int> distribution{ 0, poolSize -1};

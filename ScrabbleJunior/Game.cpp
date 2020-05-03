@@ -18,33 +18,46 @@ Game::~Game() {
     }
 }
 
-void Game::askMove() {
+void Game::askCommand() {
     Player *player = _players.at(_currentToMove);
     player->showHand();
     player->showScore();
     std::string input;
     for (;;) {
-        std::cout << "\nMove: ";
+        std::cout << "\n" << player->getName() << ", make a move: ";
         std::getline(std::cin, input);
         Command command(input);
-        if (command.getCommand() == 2) {
-            if (player->mayMove(_board, _pool)) std::cout << "Oops! You have a valid move, so you can not exchange from pool.\n";
-            else {
-                player->exchange(1, _pool);
-                std::cout << "exchanging from pool...\n";
-            }
-        }
-        else if (command.isMove()) {
+        if (command.isMove()) {
             Move move(&command, _board);
-            if (!move.hasProblems(player)) {
+            if (move.hasProblems(player)) std::cout << "move has problems.\n";
+            else {
                 move.execute(player, _board, _pool);
+                std::cout << "executing your beautiful move...\n";
                 break;
             }
-            else std::cout << "move has problems.\n";
         }
-        else std::cout << "Not recognized or implemented yet.\n";
+        else if (command.isExchange()) {
+            int token = command.getExchangeToken();
+            bool success = true;
+            if (isdigit(token) && !player->exchange(token, _pool)) success = false;
+            else if (!isdigit(token) && !player->exchange((char)token, _pool)) success = false;
+
+            if (!success) std::cout << "could not exchange! you have valid moves\n";
+            else std::cout << "exchange successful\n";
+        }
+        else if (command.isCheckHands()) {
+            for (auto player : _players) {
+                std::cout << player->getName() << std::endl;
+                player->showHand();
+                std::cout << std::endl;
+            }
+        }
+        else if (command.isCheckPool()) _pool->show();
+        else if (command.isHelp()) std::cout << "life is short. enjoy yourself\n"; //joke
+        else if (command.isHint()) std::cout << "want an hint? buy premium\n"; //joke
+        else std::cout << "command not recognized\n";
     }
-    std::cout << "current pool size: " << _pool->getCurrentSize() << "\n"; //debug
+
     std::cout << "press enter.\n";
     std::cin.ignore(10000, '\n');
 }
@@ -67,4 +80,15 @@ bool Game::hasFinished() const {
         }
     }
     return true;
+}
+
+int Game::getWinner() const {
+    if (!hasFinished()) return -1;
+    int maxScore = 0; int currentWinner = -1;
+    for (int i = 0; i < _nPlayers;++i) {
+        int score = _players.at(i)->getScore();
+        if (score == maxScore) currentWinner = -1;
+        else if (score > maxScore) currentWinner = i;
+    }
+    return currentWinner;
 }

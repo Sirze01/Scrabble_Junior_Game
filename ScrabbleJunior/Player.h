@@ -14,7 +14,8 @@ public:
 	void showHand() const;
 	void showScore() const;
 	void addScore();
-	bool exchange(int pos1, Pool *pool);
+	bool exchange(int handPos, Pool *pool);
+	bool exchange(char letter, Pool *pool);
 	bool takeRandom(Pool *pool, int handPosition);
 	bool mayMove(const Board *board, const Pool *pool) const;
 	bool hasOnHand(char letter) const;

@@ -1,5 +1,7 @@
 #include "../common/StringProcess.h"
 #include <string>
+#include <vector>
+#include <algorithm>
 
 std::string lowerCase(std::string command) {
     for (auto& i : command) i = tolower(i);
@@ -25,7 +27,7 @@ std::string stripSpaces(std::string name) {
 std::string stripSpecialChars(std::string name) {
     std::string cleanStr;
     for (char c : name) {
-        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ') {
+        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ' || isdigit(c)) {
             cleanStr.push_back(c);
         }
     }
