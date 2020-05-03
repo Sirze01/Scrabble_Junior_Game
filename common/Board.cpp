@@ -1,5 +1,6 @@
 #include "Board.h"
 #include "../common/ConsoleSetup.h"
+#include "../common/ConsoleSetup.h"
 
 const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
