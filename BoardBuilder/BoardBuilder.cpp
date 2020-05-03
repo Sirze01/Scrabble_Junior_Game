@@ -1,61 +1,8 @@
 #include <iostream>
 #include "../common/Board.h"
 #include "../common/ConsoleSetup.h"
-
-/**Funtion to write strings across several lines
- *
- * @param text_width - Number of chars per line
- * @param text       - Text to write
- * @param padding    - Spaces before the line
- * */
-std::string stringWriter(int text_width, std::string text, int padding = 0) {
-    size_t charNbr;
-    std::string output_str;
-
-    while (!text.empty()) {
-        output_str += std::string(padding, ' ');
-        if (text.size() <= text_width) {
-            output_str += (text + '\n');
-            text.erase(0, text.size());
-            continue;
-        }
-
-        charNbr = text_width - 1;
-        if (text.at(charNbr) == '.' || text.at(charNbr) == ',' || text.at(charNbr) == '!' || text.at(charNbr) == '?' ||
-            text.at(charNbr) == ';' || text.at(charNbr) == ' ') {
-            output_str += (text.substr(0, charNbr + 1) + '\n');
-            text.erase(0, charNbr + 1);
-            continue;
-        }
-
-
-        if (isalnum(charNbr)) {
-            if (text.at(charNbr + 1) == ' ') {
-                output_str += (text.substr(0, charNbr + 1) + '\n');
-                text.erase(0, charNbr + 1);
-                text.erase(0, 1);
-                continue;
-            } else if (text.at(charNbr + 1) == '.' || text.at(charNbr + 1) == ',' || text.at(charNbr + 1) == '!' ||
-                       text.at(charNbr + 1) == '?' || text.at(charNbr + 1) == ';') {
-                while (isalnum(text.at(charNbr)) && isalnum(text.at(charNbr - 1))) {
-                    charNbr--;
-                }
-                output_str += (text.substr(0, charNbr) + '\n');
-                text.erase(0, charNbr);
-                continue;
-            } else {
-                while (isalnum(text.at(charNbr)) && isalnum(text.at(charNbr - 1))) {
-                    charNbr--;
-                }
-                output_str += (text.substr(0, charNbr) + '\n');
-                text.erase(0, charNbr);
-                continue;
-            }
-        }
-    }
-    return output_str;
-}
-
+#include "../common/StringProcess.h"
+bool openingDialogue(int &last);
 /*#################################################################*/
 
 void helpMessage() {
@@ -74,7 +21,7 @@ void helpMessage() {
     std::cout << stringWriter(100, "exit - Quit the program", 2);
 }
 
-bool dialogue(Board &board, unsigned type, int &last) {
+bool dialogue(Board &board, std::string boardName, int &last) {
     std::cout << std::string(2, '\n');
     if (!last)
         std::cout << stringWriter(100,
@@ -85,7 +32,7 @@ bool dialogue(Board &board, unsigned type, int &last) {
                 << stringWriter(100, "Please choose a valid command. If you need help input 'help'.", 2);
     last++;
     std::cout << std::string(1, '\n');
-    std::cout << std::string(2, ' ') << "Your input: ";
+    std::cout << std::string(2, ' ') << '(' << boardName << ')' <<" Your input: ";
     std::string userInput;
     std::getline(std::cin, userInput);
     if ((userInput == "help") or (userInput == "h")) {
@@ -109,11 +56,19 @@ bool dialogue(Board &board, unsigned type, int &last) {
         // Export function
         return true;
     }
+    else if ((userInput == "back") or (userInput == "b")){
+        int last = 0;
+        openingDialogue(last);
+        return true;
+    }
     else if ((userInput == "exit"))
         return true;
 
     return false;
 }
+
+
+
 
 void boardManipNew() {
     std::cout << std::string(2, '\n');
@@ -122,13 +77,13 @@ void boardManipNew() {
     bool validation;
     int last = 0;
     std::string hTemp, vTemp;
+    std::string userInput;
     do {
         validation = true;
         if (last)
             std::cout << stringWriter(100, "Input the dimensions in a valid format", 2);
         last++;
         std::cout << std::string(2, ' ') << "Dimensions: ";
-        std::string userInput;
         std::getline(std::cin, userInput);
         for (auto &letter : userInput) {
             if (!(isalnum(letter) or letter == ' ')) {
@@ -156,14 +111,46 @@ void boardManipNew() {
         }
         vTemp = userInput;
     } while (!validation);
+    last = 0;
     Board newBoard(std::stoi(hTemp), std::stoi(vTemp));
-    dialogue(newBoard, 0, last);
+    std::cout << std::string(2, ' ') << "Insert the name of your board." << std::endl;
+    std::cout << std::string(2, ' ') << "Board name: ";
+    std::getline(std::cin, userInput);
+    do{
+        validation = dialogue(newBoard, userInput, last);
+    }while(!validation);
 }
 
 void boardManipImport() {
+    std::cout << std::string(2, '\n');
+    std::cout << stringWriter(100, "Input the file you want to import: ", 2);
+    std::string userInput;
+    std::cout << std::string(2, ' ') << "Path: ";
+    std::getline(std::cin, userInput);
+    std::ifstream file;
+    file.open(userInput, std::ios::in);
+    if(!file.is_open()){
+        bool exists = false;
+        while (!exists){
+            std::cout << '\n' << std::string(2, ' ') << "Cannot open file, try another file" << std::endl;
+            std::cout << std::string(2, ' ') << "Path: ";
+            std::getline(std::cin, userInput);
+            std::ifstream file;
+            file.open(userInput, std::ios::in);
+            exists = file.is_open();
+        }
+    }
+    Board newBoard(userInput);
+    int last = 0;
+    std::cout << '\n' << std::string(2, ' ') << "Insert the name of your board." << std::endl;
+    std::cout << std::string(2, ' ') << "Board name: ";
+    std::getline(std::cin, userInput);
+    bool validation;
+    do{
+        validation = dialogue(newBoard, userInput, last);
+    }while(!validation);
 
 }
-
 
 bool openingDialogue(int &last) {
     std::cout << std::string(2, '\n');
@@ -235,9 +222,8 @@ void openingMessage() {
 
 
 int main() {
-    //SetupConsole();
-
-    /*##############################*/
+    setupConsole();
+    /*#################################################*/
     bool validation;
     int last = 0;
     openingMessage();
