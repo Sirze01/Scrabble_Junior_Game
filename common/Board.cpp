@@ -1,5 +1,6 @@
 #include "Board.h"
 #include "../common/ConsoleSetup.h"
+#include "../common/ConsoleSetup.h"
 
 const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
@@ -22,8 +23,8 @@ Board::Board(std::string filename)  {
 
     if(file.is_open()){
         getline(file, line);
-        _vDimension = std::stoi(line.substr(0, 2));
-        _hDimension= std::stoi(line.substr(5));
+        _hDimension = std::stoi(line.substr(0, 2));
+        _vDimension= std::stoi(line.substr(5));
         _letters.resize(_vDimension);
 
         for (auto & _line : _letters){
@@ -83,8 +84,6 @@ Board::Board(std::string filename)  {
 
     //MISSING HIGHLIGHTS
 }
-
-
 
 void Board::show() const { //Prototype function (needs styling)
     std::cout << " ";
