@@ -12,7 +12,7 @@ struct coord{
 
 class Board {
 public:
-    Board(); //needs default constructor if others are created
+    Board();
 	Board(int nLines, int nCollumns);
     Board(std::string filename);
     void show() const;
@@ -27,6 +27,6 @@ private:
     std::vector<std::vector<char>> _letters;
     int _vDimension;
     int _hDimension;
-    std::vector<std::string> _words; //needs reworking
+    std::vector<std::string> _words;
 };
 
