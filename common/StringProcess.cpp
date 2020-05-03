@@ -27,7 +27,7 @@ std::string stripSpaces(std::string name) {
 std::string stripSpecialChars(std::string name) {
     std::string cleanStr;
     for (char c : name) {
-        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ' || isdigit(c)) {
+        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ') {
             cleanStr.push_back(c);
         }
     }
