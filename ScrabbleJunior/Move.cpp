@@ -45,7 +45,7 @@ int Move::hasProblems(const Player *player) const {
 bool Move::execute(Player *player, Board *board, Pool *pool) {
 	if (hasProblems(player)) return false;
 	board->highlight(_posToMove.vLine, _posToMove.hCollumn);
-	player->takeRandom(pool, player->getHandPosition(_letter));
+	player->takeRandom(player->getHandPosition(_letter),pool);
 	
 	//add scores
 	if (singleCharWordOnLine() && singleCharWordOnCol()) {

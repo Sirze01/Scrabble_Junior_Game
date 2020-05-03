@@ -14,14 +14,13 @@ public:
 	void showHand() const;
 	void showScore() const;
 	void addScore();
-	bool exchange(int handPos, Pool *pool);
 	bool exchange(char letter, Pool *pool);
-	bool takeRandom(Pool *pool, int handPosition);
+	bool takeRandom(int handPos, Pool *pool);
 	bool mayMove(const Board *board, const Pool *pool) const;
 	bool hasOnHand(char letter) const;
 	int getHandPosition(char letter) const;
+	coord getPossiblePos(const Board* board, const Pool* pool) const;
 private:
-	char getLetterOnHand(int handPosition) const;
 	int _colorCode;
 	std::string _colorName;
 	std::string _name;

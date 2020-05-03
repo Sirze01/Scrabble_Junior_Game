@@ -33,3 +33,18 @@ std::string stripSpecialChars(std::string name) {
     }
     return cleanStr;
 }
+
+std::string stripCommandBloat(std::string command) {
+    //an experiment on smart command interpretation. might remove?
+    std::string cleanCommand(command);
+    std::vector<std::string> keywords = //careful not to interfere with board coords or other commands
+    { "play","move","from","letter","check","get","position","board","load","save","write","show"};
+
+    for (std::string word : keywords) {
+        int pos = cleanCommand.find(word);
+        if (cleanCommand.find(word) != std::string::npos) {
+            cleanCommand.erase(pos, pos + word.size());
+        }
+    }
+    return cleanCommand;
+}

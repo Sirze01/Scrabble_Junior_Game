@@ -9,15 +9,13 @@ public:
 	Command(std::string userInput);
     coord getMovePos(const Board *board) const;
 	char getMoveLetter() const;
+	char getExchangeLetter() const;
 	bool isMove() const;
-	int getExchangeToken() const;
 	bool isExchange() const;
 	bool isCheckPool() const;
 	bool isCheckHands() const;
-	bool isHelp() const;
 	bool isHint() const;
+	bool isHelp() const;
 private:
 	std::string _str;
-	int _commandType;
-	int _exchangeToken; //letter or handPos
 };

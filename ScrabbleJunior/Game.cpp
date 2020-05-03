@@ -1,14 +1,16 @@
 #include "Game.h"
 
-Game::Game(Board* board, std::vector<std::string> playerNames) {
+Game::Game(Board* board, std::vector<std::string> playerNames, int firstToMove) {
 	_nPlayers = playerNames.size();
 	_board = board;
 	_pool = new Pool(board);
-	_currentToMove = 0; //may change later, asking user
 
 	for (int i = 0; i < _nPlayers;++i) {
 		_players.push_back(new Player(_pool,playerNames.at(i)));
 	}
+
+    _currentPlayerPos = firstToMove % _nPlayers;
+    _currentPlayer = _players.at(_currentPlayerPos);
 }
 
 Game::~Game() {
@@ -19,31 +21,29 @@ Game::~Game() {
 }
 
 void Game::askCommand() {
-    Player *player = _players.at(_currentToMove);
-    player->showHand();
-    player->showScore();
+    _currentPlayer->showHand();
+    _currentPlayer->showScore();
     std::string input;
     for (;;) {
-        std::cout << "\n" << player->getName() << ", make a move: ";
+        std::cout << "\n" << _currentPlayer->getName() << " to play: ";
         std::getline(std::cin, input);
         Command command(input);
         if (command.isMove()) {
             Move move(&command, _board);
-            if (move.hasProblems(player)) std::cout << "move has problems.\n";
+            if (move.hasProblems(_currentPlayer)) std::cout << "move has problems.\n";
             else {
-                move.execute(player, _board, _pool);
+                move.execute(_currentPlayer, _board, _pool);
                 std::cout << "executing your beautiful move...\n";
                 break;
             }
         }
         else if (command.isExchange()) {
-            int token = command.getExchangeToken();
-            bool success = true;
-            if (isdigit(token) && !player->exchange(token, _pool)) success = false;
-            else if (!isdigit(token) && !player->exchange((char)token, _pool)) success = false;
-
-            if (!success) std::cout << "could not exchange! you have valid moves\n";
-            else std::cout << "exchange successful\n";
+            int token = command.getExchangeLetter();
+            if (!_currentPlayer->exchange((char)token, _pool)) std::cout << "could not exchange!\n";
+            else {
+                std::cout << "exchange successful\n";
+                _currentPlayer->showHand();
+            }
         }
         else if (command.isCheckHands()) {
             for (auto player : _players) {
@@ -54,7 +54,11 @@ void Game::askCommand() {
         }
         else if (command.isCheckPool()) _pool->show();
         else if (command.isHelp()) std::cout << "life is short. enjoy yourself\n"; //joke
-        else if (command.isHint()) std::cout << "want an hint? buy premium\n"; //joke
+        else if (command.isHint()) {
+            coord pos = _currentPlayer->getPossiblePos(_board,_pool);
+            if (pos.hCollumn == -1 || pos.vLine == -1) std::cout << "I'm afraid you can't move right now...\n";
+            else std::cout << "Look carefully at the board on position " << (char)('A' + pos.vLine) << (char)('a' + pos.hCollumn) << "...\n";
+        }
         else std::cout << "command not recognized\n";
     }
 
@@ -63,8 +67,9 @@ void Game::askCommand() {
 }
 
 void Game::nextTurn() {
-    _currentToMove++;
-    if (_currentToMove == _nPlayers) _currentToMove = 0;
+    _currentPlayerPos++;
+    if (_currentPlayerPos == _nPlayers) _currentPlayerPos = 0;
+    _currentPlayer = _players.at(_currentPlayerPos);
 }
 
 bool Game::hasFinished() const {

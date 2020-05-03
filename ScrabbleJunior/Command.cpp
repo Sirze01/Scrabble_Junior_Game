@@ -6,8 +6,9 @@
 Command::Command(std::string userInput) {
 	_str = stripSpecialChars(userInput);
 	_str = lowerCase(_str);
+	_str = stripCommandBloat(_str);
 	_str = stripSpaces(_str);
-	if (isExchange()) _exchangeToken = _str.at(_str.size() - 1);
+	std::cout << "received command: " << "'" << _str << "'\n";
 }
 
 bool Command::isMove() const {
@@ -34,22 +35,22 @@ bool Command::isExchange() const {
 		&& _str.find("exchange") != std::string::npos;
 }
 
-int Command::getExchangeToken() const {
-	if (!isExchange()) return -1;
-	if (isdigit(_exchangeToken)) return _exchangeToken - '0';
-	return _exchangeToken;
+char Command::getExchangeLetter() const {
+	if (!isExchange()) return '?';
+	return toupper(_str.at(_str.size() - 1));
 }
 
 bool Command::isCheckHands() const {
-	return _str.find("check hand") != std::string::npos;
+	return _str.find("hand") != std::string::npos;
 }
 
 bool Command::isCheckPool() const {
-	return _str.find("check pool") != std::string::npos;
+	return _str.find("pool") != std::string::npos;
 }
 
 bool Command::isHelp() const {
-	return _str.find("help") != std::string::npos;
+	return _str.find("help") != std::string::npos
+		|| _str.find("tutorial") != std::string::npos;
 }
 
 bool Command::isHint() const {

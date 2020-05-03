@@ -14,8 +14,8 @@ int main()
     setupConsole();
 
     Board my_board("test.txt");
-    std::vector<std::string> playerNames = { "Alfredo Martins", "Comboios de Portugal"};
-    Game my_game(&my_board, playerNames);
+    std::vector<std::string> playerNames = { "Alfredo Martins", "Comboios de Portugal", "Nunca Sentado"};
+    Game my_game(&my_board, playerNames,1);
 
     for (;;) {
         my_board.show();
