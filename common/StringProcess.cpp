@@ -1,3 +1,4 @@
+#include "../common/StringProcess.h"
 #include <string>
 
 std::string lowerCase(std::string command) {
@@ -19,4 +20,14 @@ std::string stripSpaces(std::string name) {
         }
     }
     return name;
+}
+
+std::string stripSpecialChars(std::string name) {
+    std::string cleanStr;
+    for (char c : name) {
+        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ') {
+            cleanStr.push_back(c);
+        }
+    }
+    return cleanStr;
 }

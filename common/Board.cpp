@@ -1,4 +1,5 @@
 #include "Board.h"
+#include "../common/ConsoleSetup.h"
 
 const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
@@ -85,16 +86,17 @@ Board::Board(std::string filename)  {
 
 void Board::show() const { //Prototype function (needs styling)
     std::cout << " ";
-    for (size_t i = 0; i < _hDimension; i++){
+    for (int i = 0; i < _hDimension; i++){
         std::cout << " " << alphabet.at(i);
     }
     std::cout << std::endl;
-    for (size_t i = 0; i< _vDimension; i++){
+    for (int i = 0; i< _vDimension; i++){
         std::cout << std::string(1,(toupper(alphabet.at(i))));
-        for(size_t j = 0; j < _hDimension; j++){
+        for(int j = 0; j < _hDimension; j++){
             std::cout << ' ';
-            if (getHighlights().at(i).at(j))
-                std::cout << "\x1b[41;1m"  << _letters[i][j] << "\x1b[0m";
+            if (getHighlights().at(i).at(j)) {
+                print(_letters.at(i).at(j), DEFAULT_FORE, RED_BACK);
+            }
             else std::cout << _letters[i][j];
         }
         std::cout << '\n';
@@ -135,7 +137,7 @@ Board::Board() {
 }
 
 bool Board::highlight(int vIndex, int hIndex) {
-    if (vIndex >= _vDimension || hIndex >= _hDimension) return false;
+    if (vIndex >= (int) _vDimension || hIndex >= (int) _hDimension) return false;
     if (_letters.at(vIndex).at(hIndex) == ' ') return false;
     if (_highlights.at(vIndex).at(hIndex)) return false;
     _highlights.at(vIndex).at(hIndex) = 1;
@@ -148,4 +150,9 @@ std::vector<std::vector<char>> Board::getLetters() const {
 
 std::vector<std::vector<bool>> Board::getHighlights() const {
     return _highlights;
+}
+
+coord Board::getDimensions() const {
+    coord dimensions = { _hDimension, _vDimension };
+    return dimensions;
 }

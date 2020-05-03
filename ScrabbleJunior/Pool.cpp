@@ -1,74 +1,52 @@
 #include "Pool.h"
 #include <iostream>
+#include <random>
+#include <algorithm>
 
-Pool::Pool(std::vector<char> alphabet) {
-	_alphabet = alphabet;
-	_currentSize = 0;
-	_alphabetSize = alphabet.size();
-	unsigned min = 3;
-	unsigned vowelInc = 3;
+//for shuffle purposes
+unsigned SEED = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
+std::mt19937 RANDOM_GENERATOR(SEED);
 
-	//initialize map
-	for (auto i : alphabet) {
-		if (i == 'A' || i == 'E' || i == 'I' || i == 'O' || i == 'U') {
-			_letters.insert(std::pair<char, int>(i, min + vowelInc));
-			_currentSize += min + vowelInc;
+Pool::Pool(const Board *board) {
+	std::vector<std::vector<char>> boardContent = board->getLetters();
+
+	//add letters in board
+	for (std::vector<char> v : boardContent) {
+		for (char c : v) {
+			if (c != ' ') {
+				_letters.push_back(c);
+			}
 		}
-		else {
-			_letters.insert(std::pair<char, int>(i, min));
-			_currentSize += min;
-		}
-	}
-
-	//increment number of letters
-	int remaining = 101 - _currentSize; char random;
-	while (remaining--) {
-		random = 'A' + (rand() % _alphabetSize);
-		_letters.at(random)++;
-		_currentSize++;
 	}
 }
 
 void Pool::show() {
-	std::map<char, int> my_letters = getAllLetters();
-	int count = 0;
-	for (auto it = my_letters.cbegin(); it != my_letters.cend(); ++it) {
-		std::cout << it->first << ": " << it->second << "\n";
-		count += it->second;
-	}
-	std::cout << "total letters: " << count << "\n";
-	std::cout << "current size: " << getCurrentSize() << "\n";
+	std::vector<char> my_letters = getAllLetters();
+	for (auto i : my_letters) std::cout << i << " ";
+	std::cout << std::endl;
+	std::cout << "pool size: " << getCurrentSize() << "\n";
 }
 
-bool Pool::take(char letter) {
-	if (_letters.find(letter) != _letters.end()) {
-		if (_letters.at(letter)) {
-			_letters.at(letter)--;
-			_currentSize--;
-			return true;
-		}
-	}
-	return false;
-}
-
-bool Pool::include(char letter) {
-	_letters.at(letter)++;
-	_currentSize++;
+bool Pool::take(int pos) {
+	if (pos > getCurrentSize()) return false;
+	else _letters.erase(_letters.begin() + pos);
 	return true;
 }
 
-std::map<char,int> Pool::getAllLetters() const {
+bool Pool::include(char letter) {
+	_letters.push_back(letter);
+	return true;
+}
+
+std::vector<char> Pool::getAllLetters() const {
 	return _letters;
 }
 
-std::vector<char> Pool::getAlphabet() const {
-	return _alphabet;
-}
-
 int Pool::getCurrentSize() const {
-	return _currentSize;
+	return _letters.size();
 }
 
-int Pool::getAlphabetSize() const {
-	return _alphabetSize;
+void Pool::shuffle() {
+	//shuffle pool for next take
+	std::shuffle(_letters.begin(), _letters.end(), RANDOM_GENERATOR);
 }

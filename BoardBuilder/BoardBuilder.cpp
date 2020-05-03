@@ -1,7 +1,8 @@
 #include <iostream>
 #include "../common/Board.h"
-#include "../common/Console_Setup.h"
+#include "../common/ConsoleSetup.h"
 
+<<<<<<< HEAD
 /**Funtion to write strings across several lines
  *
  * @param text_width - Number of chars per line
@@ -94,6 +95,10 @@ void boardManipNew(){
 
 
 void openingMessage(){
+=======
+int main() {
+    setupConsole();
+>>>>>>> master
     const std::string message = "Board Builder v0.0.1";
     std::cout << std::string(2, ' ') << message << " Debug version\n";
     std::cout << std::string(2, ' ');
@@ -102,12 +107,16 @@ void openingMessage(){
     }
     std::cout << std::endl;
     std::cout << std::string(1, '\n');
+<<<<<<< HEAD
     std::cout << std::string(2, ' ');
     for(int i = 0; i < ((100 - message.size()) / 2); i++){
+=======
+    for(int i = 0; i < (int) ((100 - message.size()) / 2); i++){ //size_t or cast to int to shut vs up
+>>>>>>> master
         std::cout << '-';
     }
     std::cout << message;
-    for(int i = 0; i < ((100 - message.size()) / 2); i++){
+    for(int i = 0; i < (int) ((100 - message.size()) / 2); i++){
         std::cout << '-';
     }
     std::cout << std::endl;

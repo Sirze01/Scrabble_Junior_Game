@@ -1,34 +1,8 @@
-#pragma once
-
+#include "../common/ConsoleSetup.h"
+#include "../common/StringProcess.h"
 #include <iostream>
 
-#ifdef _WIN32
-#include <windows.h>
-#include <wincon.h>
-#endif
-
-//define UNICODE
-#ifndef UNICODE
-#define UNICODE
-#endif
-
-#ifdef _WIN32
-// Fix compilatin on MinGW
-#ifndef DISABLE_NEWLINE_AUTO_RETURN
-#define DISABLE_NEWLINE_AUTO_RETURN 0x0008
-#endif
-
-#ifndef ENABLE_VIRTUAL_TERMINAL_INPUT
-#define ENABLE_VIRTUAL_TERMINAL_INPUT 0x0200
-#endif
-
-#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
-#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
-#endif
-
-#endif
-
-bool SetupConsole() {
+bool setupConsole() {
 #ifdef _WIN32
     SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
@@ -66,7 +40,22 @@ bool SetupConsole() {
     return true;
 }
 
-/**Clears the console*/
-void clearConsole(){
+void clearConsole() {
     std::cout << "\x1B[2J\x1B[H";
+}
+
+void print(std::string message, const int foreColor, const int backColor) {
+    std::cout << "\x1b[" << backColor << ";" << foreColor << "m" << message << "\x1b[" << ALL_DEFAULTS << "m";
+}
+
+void print(std::string message, int foreColor) {
+    std::cout << "\x1b[" << foreColor << "m" << message << "\x1b[" << ALL_DEFAULTS << "m";
+}
+
+void print(const char c, const int foreColor, const int backColor) {
+    std::cout << "\x1b[" << backColor << ";" << foreColor << "m" << c << "\x1b[" << ALL_DEFAULTS << "m";
+}
+
+void print(const char c, const int foreColor) {
+    std::cout << "\x1b[" << foreColor << "m" << c << "\x1b[" << ALL_DEFAULTS << "m";
 }

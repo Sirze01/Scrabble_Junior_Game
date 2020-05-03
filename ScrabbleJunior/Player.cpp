@@ -1,18 +1,23 @@
 #include "Player.h"
+#include "../common/StringProcess.h"
+#include "Move.h"
 #include <iostream>
-#include "stringProcess.h"
+#include <algorithm>
+#include <random>
+#include <chrono>
+#include "../common/ConsoleSetup.h"
 
-Player::Player(Pool &pool, std::string name) {
+//defined in Pool.cpp
+extern unsigned SEED;
+extern std::mt19937 RANDOM_GENERATOR;
+
+Player::Player(Pool *pool, std::string name) {
     int handSize = 7;
+    _score = 0;
+    _colorName = RED_FORE;
 	_name = stripSpaces(name);
     _hand.resize(handSize);
-    while (handSize--) {
-        takeRandom(pool, handSize);
-        if (timesOnHand(_hand.at(handSize)) > 1) { //revert repeated letter take
-            pool.include(_hand.at(handSize));
-            handSize++;
-        }
-    }
+    while (handSize--) takeRandom(pool, handSize);
 }
 
 int Player::getScore() const {
@@ -30,70 +35,35 @@ void Player::showHand() const {
     std::cout << "\n";
 }
 
-void Player::addScore(int score) {
-    _score += score;
+void Player::showScore() const {
+    std::cout << _name << ": " << _score << " points\n";
 }
 
-bool Player::exchange(int pos1, int pos2, Pool &pool) {
-    if (pool.getCurrentSize() < 2) return false;
-    char include1 = _hand.at(pos1);
-    char include2 = _hand.at(pos2);
-    if (!takeRandom(pool, pos1)) return false;
-    if (!takeRandom(pool, pos2)) {
-        pool.include(_hand.at(pos1)); //undo previous take
-        return false;
-    }
-    pool.include(include1);
-    pool.include(include2);
-    return true;
+void Player::addScore() {
+    _score++;
 }
 
-bool Player::exchange(int pos1, Pool& pool) {
-    if (pool.getCurrentSize() < 1) return false;
+bool Player::exchange(int pos1, Pool *pool) {
     char include = _hand.at(pos1);
     if (!takeRandom(pool, pos1)) return false;
-    pool.include(include);
+    pool->include(include);
     return true;
 }
 
-bool Player::takeRandom(Pool &pool, int handPosition) {
-    if (!pool.getCurrentSize()) return false;
-    if (handPosition > (int) _hand.size()-1) return false;
+bool Player::takeRandom(Pool *pool, int handPosition) {
+    int poolSize = pool->getCurrentSize();
+    if (!poolSize) return false;
 
-    char random;
-    do {
-        random = 'A' + (rand() % pool.getAlphabetSize());
-    } while (!pool.take(random));
-    _hand.at(handPosition) = random;
-    return true;
-}
+    int maxPos = _hand.size() - 1;
+    if (handPosition > maxPos) return false;
 
-bool Player::move(Command command, Board& board, Pool &pool) {
-    if (!(command.isMove())) return false;
+    //for shuffle purposes
+    std::uniform_int_distribution<int> distribution{ 0, poolSize -1};
+    int randomPoolPos = distribution(RANDOM_GENERATOR);
 
-    int vIndex = board.getIndex(command.getMove().at(0)).vLine;
-    int hIndex = board.getIndex(command.getMove().at(0)).hCollumn;
-    char letter = command.getMove().at(1).at(0);
-    int handPosition = getHandPosition(letter);
+    _hand.at(handPosition) = pool->getAllLetters().at(randomPoolPos);
+    pool->take(randomPoolPos);
 
-    if (board.getLetters().at(vIndex).at(hIndex) != letter) return false;
-    if (board.getHighlights().at(vIndex).at(hIndex) == 1) return false;
-    if (handPosition == -1) return false;
-
-    //start or continue word
-    if (hIndex > 0) {
-        if (board.getLetters().at(vIndex).at(hIndex - 1) != ' ') { //letter before at the line
-            if (board.getHighlights().at(vIndex).at(hIndex - 1) == 0) return false;
-        }
-    }
-    if (vIndex > 0) {
-        if (board.getLetters().at(vIndex - 1).at(hIndex) != ' ') { //letter before at the collumn
-            if (board.getHighlights().at(vIndex - 1).at(hIndex) == 0) return false;
-        }
-    }
-
-    board.highlight(vIndex, hIndex);
-    takeRandom(pool, handPosition);
     return true;
 }
 
@@ -108,14 +78,29 @@ int Player::getHandPosition(char letter) const{
     return pos;
 }
 
-int Player::timesOnHand(char letter) const {
-    int count = 0;
-    for (auto i : _hand) {
-        if (i == letter) count++;
-    }
-    return count;
-}
-
 char Player::getLetterOnHand(int handPosition) const {
     return _hand.at(handPosition);
+}
+
+bool Player::hasOnHand(char letter) const {
+    int count = 0;
+    for (auto i : _hand) {
+        if (i == letter) return true;
+    }
+    return false;
+}
+
+bool Player::mayMove(const Board *board, const Pool *pool) const{
+    coord boardDim = board->getDimensions();
+    for (int line = 0; line < boardDim.vLine; ++line) {
+        for (int col = 0; col < boardDim.hCollumn; ++col) {
+            coord testPosition = { line,col };
+            char letter = board->getLetters().at(line).at(col);
+            Move tryMove(testPosition, letter, board);
+            if (!tryMove.hasProblems(this)) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
