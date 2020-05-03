@@ -35,9 +35,8 @@ int Move::hasProblems(const Player *player) const {
 		return 4;
 	}
 
-	if (singleCharWordOnLine() && singleCharWordOnCol()) return 0;
-	else if (!singleCharWordOnLine() && continueOnLine()) return 0;
-	else if (!singleCharWordOnCol() && continueOnCol()) return 0;
+	if (!singleCharWordOnLine() && continueOnLine()) return 0;
+	if (!singleCharWordOnCol() && continueOnCol()) return 0;
 
 	return 5;
 }
@@ -45,13 +44,9 @@ int Move::hasProblems(const Player *player) const {
 bool Move::execute(Player *player, Board *board, Pool *pool) {
 	if (hasProblems(player)) return false;
 	board->highlight(_posToMove.vLine, _posToMove.hCollumn);
-	player->takeRandom(pool, player->getHandPosition(_letter));
+	player->takeRandom(player->getHandPosition(_letter),pool);
 	
 	//add scores
-	if (singleCharWordOnLine() && singleCharWordOnCol()) {
-		player->addScore();
-		return true;
-	}
 	if (!singleCharWordOnLine() && continueOnLine() && finishOnLine()) player->addScore();
 	if (!singleCharWordOnCol() && continueOnCol() && finishOnCol()) player->addScore();
 

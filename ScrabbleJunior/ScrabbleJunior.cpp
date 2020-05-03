@@ -14,16 +14,21 @@ int main()
     setupConsole();
 
     Board my_board("test.txt");
-    std::vector<std::string> playerNames = { "Alfredo Martins", "Comboios de Portugal"};
-    Game my_game(&my_board, playerNames);
+    std::vector<std::string> playerNames = { "Alfredo Martins", "Comboios de Portugal", "Nunca Sentado"};
+    Game my_game(&my_board, playerNames,1);
 
     for (;;) {
         my_board.show();
         std::cout << "\n";
-        my_game.askMove();
+        my_game.askCommand();
+        clearConsole();
+
+        my_board.show();
+        std::cout << "\n";
+        my_game.askCommand();
+
         my_game.nextTurn();
-        //clearConsole();
-        std::cout << "\n\n\n";
+        clearConsole();
         if (my_game.hasFinished()) break;
     }
 }
