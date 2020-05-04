@@ -90,9 +90,9 @@ std::string stringWriter(int text_width, std::string text, int padding = 0) {
 }
 
 std::string stripCommandBloat(std::string command) {
-    //an experiment on smart command interpretation. might remove?
+    //an experiment on smart command interpretation
     std::string cleanCommand(command);
-    std::vector<std::string> keywords = //careful not to interfere with board coords or other commands
+    std::vector<std::string> keywords = //careful not to interfere with board coords or reserved commands
     { "play","move","from","letter","check","get","position","board","load","save","write","show"};
 
     for (std::string word : keywords) {

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <random>
 #include <algorithm>
+#include "../common/ConsoleSetup.h"
 
 //for shuffle purposes
 unsigned SEED = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();

@@ -14,8 +14,10 @@ public:
 	bool isExchange() const;
 	bool isCheckPool() const;
 	bool isCheckHands() const;
+	bool isCheckScores() const;
 	bool isHint() const;
 	bool isHelp() const;
+	bool hasNoConflicts() const;
 private:
 	std::string _str;
 };

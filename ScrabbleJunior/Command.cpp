@@ -8,7 +8,6 @@ Command::Command(std::string userInput) {
 	_str = lowerCase(_str);
 	_str = stripCommandBloat(_str);
 	_str = stripSpaces(_str);
-	std::cout << "received command: " << "'" << _str << "'\n";
 }
 
 bool Command::isMove() const {
@@ -48,6 +47,10 @@ bool Command::isCheckPool() const {
 	return _str.find("pool") != std::string::npos;
 }
 
+bool Command::isCheckScores() const {
+	return _str.find("score") != std::string::npos;
+}
+
 bool Command::isHelp() const {
 	return _str.find("help") != std::string::npos
 		|| _str.find("tutorial") != std::string::npos;
@@ -55,4 +58,14 @@ bool Command::isHelp() const {
 
 bool Command::isHint() const {
 	return _str.find("hint") != std::string::npos;
+}
+
+bool Command::hasNoConflicts() const {
+	int count = 0;
+	if (isCheckHands()) count++;
+	if (isCheckPool()) count++;
+	if (isCheckScores()) count++;
+	if (isHelp()) count++;
+	if (isHint()) count++;
+	return count < 2;
 }

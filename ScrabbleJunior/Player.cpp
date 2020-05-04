@@ -10,10 +10,11 @@
 extern unsigned SEED;
 extern std::mt19937 RANDOM_GENERATOR;
 
-Player::Player(Pool *pool, std::string name) {
+Player::Player(Pool *pool, std::string name, int color) {
     int handSize = 7;
     _score = 0;
-    _colorName = RED_FORE;
+    _color = color;
+    _exchangeCount = 0;
 	_name = stripSpaces(name);
     _hand.resize(handSize);
     pool->shuffle();
@@ -45,8 +46,12 @@ void Player::addScore() {
 
 bool Player::exchange(char letter, Pool* pool) {
     char handPos = getHandPosition(letter);
-    if (!takeRandom(handPos, pool)) return false;
+    if (_exchangeCount >= 2 || !takeRandom(handPos, pool)) {
+        _exchangeCount = 2;
+        return false;
+    }
     pool->include(letter);
+    _exchangeCount++;
     return true;
 }
 
@@ -67,6 +72,10 @@ bool Player::takeRandom(int handPos, Pool *pool) {
     return true;
 }
 
+void Player::resetExchangeCount() {
+    _exchangeCount = 0;
+}
+
 int Player::getHandPosition(char letter) const {
     int pos = -1;
     for (size_t i = 0; i < _hand.size(); ++i) {
@@ -77,12 +86,6 @@ int Player::getHandPosition(char letter) const {
     }
     return pos;
 }
-
-/*
-char Player::getLetterOnHand(int handPosition) const {
-    return _hand.at(handPosition);
-}
-*/
 
 bool Player::hasOnHand(char letter) const {
     int count = 0;
@@ -107,6 +110,10 @@ bool Player::mayMove(const Board *board, const Pool *pool) const{
     return false;
 }
 
+bool Player::mustPass() const {
+    return _exchangeCount >= 2;
+}
+
 coord Player::getPossiblePos(const Board* board, const Pool* pool) const {
     if (!mayMove(board, pool)) return { -1,-1 };
     coord boardDim = board->getDimensions();
@@ -120,4 +127,9 @@ coord Player::getPossiblePos(const Board* board, const Pool* pool) const {
             }
         }
     }
+    return { -1,-1 };
+}
+
+int Player::getColor() const {
+    return _color;
 }
