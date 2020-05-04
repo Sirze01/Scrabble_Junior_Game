@@ -57,6 +57,7 @@ bool Player::exchange(char letter, Pool* pool) {
 
 bool Player::takeRandom(int handPos, Pool *pool) {
     int poolSize = pool->getCurrentSize();
+    _hand.at(handPos) = ' ';
     if (!poolSize) return false;
 
     int maxPos = _hand.size() - 1;

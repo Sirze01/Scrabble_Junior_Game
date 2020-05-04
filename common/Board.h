@@ -19,7 +19,7 @@ public:
 	coord getIndex(std::string position) const;
 	bool fileExport(std::string filename) const;
     bool highlight(int color, int vIndex, int hIndex);
-    bool highlightFinishedWord(int color, int vIndex, int hIndex);
+    void highlightFinishedWord(int color, int vIndex, int hIndex);
     std::vector<std::vector<char>> getLetters() const;
     std::vector<std::vector<bool>> getHighlights() const;
     coord getDimensions() const;
