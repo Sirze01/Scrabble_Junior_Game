@@ -65,7 +65,7 @@ bool openingDialogue(int &last) {
     commandInterpreter command(userInput);
     bool temp = command.interpret(last);
     command.cmdExit(last);
-    if (last != -1) {
+    if (last >= 0) {
         bool validation;
         do {
             do {

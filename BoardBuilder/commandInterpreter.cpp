@@ -91,7 +91,7 @@ bool commandInterpreter::interpret(int &last){
     }*/
     else if(_command == "help") {
         cmdHelp();
-        last = 0;
+        last = -2;
     }
     else if (_command == "exit"){
         cmdExit(last);
