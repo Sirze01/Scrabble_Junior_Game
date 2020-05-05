@@ -4,6 +4,18 @@
 
 const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
+Board::Board() {
+    _hDimension = 10;
+    _vDimension = 10;
+    _letters.resize(_vDimension);
+    for (size_t i = 0; i < _letters.size(); i++){
+        _letters[i].resize(_hDimension);
+        for(size_t j = 0; j < _letters[i].size(); j++){
+            _letters[i][j] = ' ';
+        }
+    }
+}
+
 Board::Board(int nLines, int nCollumns) {
     _vDimension = nLines;
     _hDimension = nCollumns;
@@ -123,18 +135,6 @@ bool Board::fileExport(std::string filename) const {
     }
     std::cerr << "Could not write to file." << std::endl;
     return false;
-}
-
-Board::Board() {
-    _hDimension = 20;
-    _vDimension = 20;
-    _letters.resize(_vDimension);
-    for (size_t i = 0; i < _letters.size(); i++){
-        _letters[i].resize(_hDimension);
-        for(size_t j = 0; j < _letters[i].size(); j++){
-            _letters[i][j] = ' ';
-        }
-    }
 }
 
 bool Board::highlight(int vIndex, int hIndex) {
