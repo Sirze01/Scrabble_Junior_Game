@@ -34,7 +34,7 @@ void openingMessage() {
                               2);
 }
 
-bool dialogue(int &last, commandInterpreter aCommand){
+bool dialogue(int &last, commandInterpreter &aCommand){
     std::cout << std::string(1, '\n');
     if (last) {
         std::cout
