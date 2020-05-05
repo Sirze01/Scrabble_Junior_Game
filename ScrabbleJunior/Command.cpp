@@ -29,6 +29,10 @@ char Command::getMoveLetter() const {
 	return toupper(_str.at(3));
 }
 
+std::string Command::getStr() const {
+	return _str;
+}
+
 bool Command::isExchange() const {
 	return _str.size() == std::string("exchange").size() + 2
 		&& _str.find("exchange") != std::string::npos;

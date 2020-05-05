@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "../common/ConsoleSetup.h"
+#include "../common/StringProcess.h"
 
 Game::Game(Board* board, std::vector<std::string> playerNames, std::vector<int> playerForeColors, int firstToMove) {
 	_nPlayers = playerNames.size();
@@ -24,6 +25,8 @@ Game::~Game() {
 
 void Game::askCommand(int turnNumber) {
 	if (_currentPlayer->mayPass() && !_currentPlayer->mayMove(_board, _pool)) return;
+	if (_currentPlayer->mayPass() && _currentPlayer->mayMove(_board, _pool)) _currentPlayer->doNotPass();
+
 	_currentPlayer->resetExchangeCount();
 	std::cout << "You have on hand: ";
 	_currentPlayer->showHand();
@@ -65,16 +68,17 @@ void Game::askCommand(int turnNumber) {
 				else if (!_currentPlayer->exchange(token, _pool)) {
 					if (!_pool->getCurrentSize()) {
 						_currentPlayer->forcePass();
-						std::cout << "The pool is empty. You may pass your move.\n";
+						std::cout << "The pool is empty. Your turn will be skipped as long as you cannot move.\n";
 						std::cout << "Press enter to continue.\n";
-						std::cin.get();
 						std::cin.ignore(10000, '\n');
+						break;
 					}
 					else std::cout << "Could not exchange. Have you got the letter " << command.getExchangeLetter() << " on hand?\n";
 				}
 				else {
 					std::cout << "The exchange was successful!\n";
 					std::cout << "You have now on hand: "; _currentPlayer->showHand();
+					continue;
 				}
 			}
 
@@ -99,12 +103,13 @@ void Game::askCommand(int turnNumber) {
 					break;
 				}
 			}
-			else std::cout << "Command not recognized. Please type 'help' to view available commands.\n";
+			else std::cout << smartCommandAdvice(command.getStr());
+		}
+		else std::cout << smartCommandAdvice(command.getStr());
 
-			if (std::cin.fail()) {
-				std::cin.ignore(10000, '\n');
-				std::cin.clear();
-			}
+		if (std::cin.fail()) {
+			std::cin.ignore(10000, '\n');
+			std::cin.clear();
 		}
 	}
 }
@@ -113,7 +118,6 @@ void Game::nextTurn() {
 	_currentPlayerPos++;
 	if (_currentPlayerPos == _nPlayers) _currentPlayerPos = 0;
 	_currentPlayer = _players.at(_currentPlayerPos);
-	_currentPlayer->doNotPass();
 }
 
 bool Game::allPlayersMustPass() const {
@@ -124,6 +128,8 @@ bool Game::allPlayersMustPass() const {
 }
 
 bool Game::hasFinished() const {
+	if (allPlayersMustPass()) return true;
+
 	Board board = *_board;
 	int maxLine = board.getDimensions().vLine - 1;
 	int maxCol = board.getDimensions().hCollumn - 1;
@@ -135,7 +141,7 @@ bool Game::hasFinished() const {
 			}
 		}
 	}
-	return !allPlayersMustPass();
+	return true;
 }
 
 bool Game::hasWinner() const {

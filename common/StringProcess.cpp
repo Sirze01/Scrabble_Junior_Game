@@ -104,3 +104,17 @@ std::string stripCommandBloat(std::string command) {
     return cleanCommand;
 }
 
+std::string smartCommandAdvice(std::string command) {
+    if (command.size() == 2 && isalpha(command.at(0)) && isalpha(command.at(1))) {
+        std::string processed;
+        processed += toupper(command.at(0));
+        processed += tolower(command.at(1));
+        return "Did you attempt to play a tile in position " + processed + "? Please specify letter as in 'Yx <letter>'.\n";
+    }
+    else if (command == "exchange") {
+        return "Are you trying to exchange one of your tiles? Please specify letter as in 'exchange <letter>'.\n";
+    }
+    else {
+        return "Command not recognized. Please type 'help' to view the available commands.\n";
+    }
+}
