@@ -112,7 +112,6 @@ void Board::show() const { //Prototype function (needs styling)
 			std::cout << ' ';
 			if (getHighlights().at(i).at(j)) {
 				printBackColor(_highlightColors.at(i).at(j), _letters.at(i).at(j));
-				//print(BLACK, BLUE, _letters.at(i).at(j));
 			}
 			else std::cout << _letters[i][j];
 		}
@@ -165,19 +164,31 @@ bool Board::highlight(int color, int vIndex, int hIndex) {
 }
 
 void Board::highlightFinishedWord(int color, int vIndex, int hIndex) {
-	for (int line = vIndex-1; line >= 0; line--) {
-		if (_letters.at(line).at(hIndex) != ' ') {
-			_highlightColors.at(line).at(hIndex) = color;
-		}
-		else break;
-	}
+	std::vector<std::vector<int>> tempCol = _highlightColors;
+	std::vector<std::vector<int>> tempLine = _highlightColors;
+	bool successOnLine = true, successOnCol = true;
 
-	for (int col = hIndex-1; col >= 0; col--) {
-		if (_letters.at(vIndex).at(col) != ' ') {
-			_highlightColors.at(vIndex).at(col) = color;
+	for (int line = vIndex-1; line >= 0; line--) {
+		if (_highlights.at(line).at(hIndex)) {
+			tempCol.at(line).at(hIndex) = color;
 		}
-		else break;
+		else {
+			if (_letters.at(line).at(hIndex) != ' ') successOnCol = false;
+			break;
+		}
 	}
+	if (successOnCol) _highlightColors = tempCol;
+
+	for (int col = hIndex - 1; col >= 0; col--) {
+		if (_highlights.at(vIndex).at(col)) {
+			tempLine.at(vIndex).at(col) = color;
+		}
+		else {
+			if (_letters.at(vIndex).at(col) != ' ') successOnLine = false;
+			break;
+		}
+	}
+	if (successOnLine) _highlightColors = tempLine;
 }
 
 std::vector<std::vector<char>> Board::getLetters() const {

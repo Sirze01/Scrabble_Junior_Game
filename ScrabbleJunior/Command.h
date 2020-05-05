@@ -17,6 +17,7 @@ public:
 	bool isCheckScores() const;
 	bool isHint() const;
 	bool isHelp() const;
+	bool isPass() const;
 	bool hasNoConflicts() const;
 private:
 	std::string _str;

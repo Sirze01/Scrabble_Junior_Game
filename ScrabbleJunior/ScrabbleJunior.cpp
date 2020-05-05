@@ -14,16 +14,16 @@ int main()
     setupConsole();
     Board my_board("test.txt");
     std::vector<std::string> playerNames = { "Alfredo Martins", "Comboios de Portugal", "Nunca Sentado"};
-    std::vector<int> playerColors = { BLUE,RED,GREEN };
+    std::vector<int> playerColors = { GREEN,RED,BLUE };
     Game my_game(&my_board, playerNames, playerColors, 0);
 
     for (;;) {
         my_board.show();
-        my_game.askCommand();
+        my_game.askCommand(1);
         clearConsole();
 
         my_board.show();
-        my_game.askCommand();
+        my_game.askCommand(2);
 
         my_game.nextTurn();
         clearConsole();

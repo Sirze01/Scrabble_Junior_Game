@@ -16,14 +16,18 @@ public:
 	void showScore() const;
 	void addScore();
 	void resetExchangeCount();
+	void forcePass();
+	void doNotPass();
 	bool exchange(char letter, Pool *pool);
 	bool takeRandom(int handPos, Pool *pool);
 	bool mayMove(const Board *board, const Pool *pool) const;
-	bool mustPass() const;
+	bool mayPass() const;
 	bool hasOnHand(char letter) const;
 	int getHandPosition(char letter) const;
+	int getExchangeCount() const;
 	coord getPossiblePos(const Board* board, const Pool* pool) const;
 private:
+	bool _mayPass;
 	int _exchangeCount;
 	int _color;
 	std::string _name;

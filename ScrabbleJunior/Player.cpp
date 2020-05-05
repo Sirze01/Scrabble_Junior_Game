@@ -31,7 +31,9 @@ std::string Player::getName() const {
 
 void Player::showHand() const {
     for (auto i : _hand) {
-        std::cout << i << " ";
+        if (i == ' ') std::cout << i;
+        else print(WHITE,_color, i);
+        std::cout << " ";
     }
     std::cout << "\n";
 }
@@ -46,10 +48,7 @@ void Player::addScore() {
 
 bool Player::exchange(char letter, Pool* pool) {
     char handPos = getHandPosition(letter);
-    if (_exchangeCount >= 2 || !takeRandom(handPos, pool)) {
-        _exchangeCount = 2;
-        return false;
-    }
+    if (!takeRandom(handPos, pool)) return false;
     pool->include(letter);
     _exchangeCount++;
     return true;
@@ -57,11 +56,12 @@ bool Player::exchange(char letter, Pool* pool) {
 
 bool Player::takeRandom(int handPos, Pool *pool) {
     int poolSize = pool->getCurrentSize();
-    _hand.at(handPos) = ' ';
-    if (!poolSize) return false;
 
     int maxPos = _hand.size() - 1;
     if (handPos > maxPos || handPos < 0) return false;
+
+    _hand.at(handPos) = ' ';
+    if (!poolSize) return false;
 
     //for shuffle purposes
     std::uniform_int_distribution<int> distribution{ 0, poolSize -1};
@@ -111,10 +111,6 @@ bool Player::mayMove(const Board *board, const Pool *pool) const{
     return false;
 }
 
-bool Player::mustPass() const {
-    return _exchangeCount >= 2;
-}
-
 coord Player::getPossiblePos(const Board* board, const Pool* pool) const {
     if (!mayMove(board, pool)) return { -1,-1 };
     coord boardDim = board->getDimensions();
@@ -133,4 +129,20 @@ coord Player::getPossiblePos(const Board* board, const Pool* pool) const {
 
 int Player::getColor() const {
     return _color;
+}
+
+int Player::getExchangeCount() const {
+    return _exchangeCount;
+}
+
+bool Player::mayPass() const {
+    return _mayPass;
+}
+
+void Player::forcePass() {
+    _mayPass = true;
+}
+
+void Player::doNotPass() {
+    _mayPass = false;
 }

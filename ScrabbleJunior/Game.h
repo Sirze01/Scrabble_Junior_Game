@@ -10,7 +10,7 @@ class Game{
 public:
 	Game(Board* board, std::vector<std::string> playerNames, std::vector<int> playerForeColors, int firstToMove);
 	~Game();
-	void askCommand();
+	void askCommand(int turnNumber);
 	void nextTurn();
 	void showScores() const;
 	void showHands() const;
