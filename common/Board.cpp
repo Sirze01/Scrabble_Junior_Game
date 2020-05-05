@@ -111,7 +111,7 @@ void Board::show() const { //Prototype function (needs styling)
 		for (int j = 0; j < _hDimension; j++) {
 			std::cout << ' ';
 			if (getHighlights().at(i).at(j)) {
-				printBackColor(_highlightColors.at(i).at(j), _letters.at(i).at(j));
+				print(WHITE,_highlightColors.at(i).at(j), _letters.at(i).at(j));
 			}
 			else std::cout << _letters[i][j];
 		}
