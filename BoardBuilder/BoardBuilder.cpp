@@ -1,82 +1,8 @@
 #include <iostream>
-#include "../common/Board.h"
 #include "../common/ConsoleSetup.h"
-#include "../common/StringProcess.h"
 #include "commandInterpreter.h"
-bool openingDialogue(int &last);
+
 /*#################################################################*/
-
-void helpMessage() {
-
-}
-
-/*bool dialogue(Board &board, std::string boardName, int &last) {
-    std::cout << std::string(2, '\n');
-    if (!last)
-        std::cout << stringWriter(100,
-                                  "Input the desired operation. Alternatively you can access the available commands with 'help' at anytime.",
-                                  2);
-    else
-        std::cout
-                << stringWriter(100, "Please choose a valid command. If you need help input 'help'.", 2);
-    last++;
-    std::cout << std::string(1, '\n');
-    std::cout << std::string(2, ' ') << '(' << boardName << ')' <<" Your input: ";
-    std::string userInput;
-    std::getline(std::cin, userInput);
-    if ((userInput == "help") or (userInput == "h")) {
-        helpMessage();
-        last--;
-        return false;
-    }
-    else if ((userInput == "new") or (userInput == "n")) {
-        // Error (board already open)
-        return false;
-    }
-    else if ((userInput == "import") or (userInput == "i")) {
-        // Error (board already open)
-        return false;
-    }
-    else if ((userInput == "add") or (userInput == "a")) {
-        // Export function
-        return true;
-    }
-    else if ((userInput == "export") or (userInput == "e")) {
-        // Export function
-        return true;
-    }
-    else if ((userInput == "back") or (userInput == "b")){
-        int last = 0;
-        openingDialogue(last);
-        return true;
-    }
-    else if ((userInput == "exit"))
-        return true;
-
-    return false;
-}*/
-
-
-
-bool openingDialogue(int &last) {
-    std::cout << std::string(2, '\n');
-    if (!last)
-        std::cout << stringWriter(100,
-                                  "Input the desired operation. Alternatively you can access the available commands with 'help' at anytime.",
-                                  2);
-    else
-        std::cout
-                << stringWriter(100, "Please choose a valid command. If you need help input 'help'.", 2);
-    last++;
-    std::cout << std::string(1, '\n');
-    std::cout << std::string(2, ' ') << "Your input: ";
-    std::string userInput;
-    std::getline(std::cin, userInput);
-    if((userInput == "help") or (userInput == "h"))
-        last--;
-    commandInterpreter command(userInput);
-    return !command.validation();
-}
 
 void openingMessage() {
     const std::string message = "Board Builder v0.0.1";
@@ -102,7 +28,53 @@ void openingMessage() {
         std::cout << '#';
     }
     std::cout << std::endl;
+    std::cout << std::string(2, '\n');
+    std::cout << stringWriter(100,
+                              "Input the desired operation. Alternatively you can access the available commands with 'help' at anytime.",
+                              2);
+}
 
+bool dialogue(int &last, commandInterpreter aCommand){
+    std::cout << std::string(1, '\n');
+    if (last) {
+        std::cout
+                << stringWriter(100, "Please choose a valid command. If you need help input 'help'.", 2);
+    }
+    last++;
+    std::cout << std::string(1, '\n');
+    std::cout << std::string(2, ' ') << '(' << aCommand.boardName() << ") " << "Your input: ";
+    std::string userInput;
+    std::getline(std::cin, userInput);
+    aCommand.edit(userInput);
+    bool temp = aCommand.interpret(last);
+    aCommand.cmdExit(last);
+    return temp;
+}
+
+bool openingDialogue(int &last) {
+    std::cout << std::string(1, '\n');
+    if (last) {
+        std::cout
+                << stringWriter(100, "Please choose a valid command. If you need help input 'help'.", 2);
+    }
+    last++;
+    std::cout << std::string(1, '\n');
+    std::cout << std::string(2, ' ') << "Your input: ";
+    std::string userInput;
+    std::getline(std::cin, userInput);
+    commandInterpreter command(userInput);
+    bool temp = command.interpret(last);
+    command.cmdExit(last);
+    if (last != -1) {
+        bool validation;
+        do {
+            do {
+                validation = dialogue(last, command);
+            } while (!validation);
+        } while (last != -1);
+    }
+
+    return temp;
 }
 
 
@@ -110,12 +82,13 @@ int main() {
     setupConsole();
     /*#################################################*/
     bool validation;
-    int last = 0;
     openingMessage();
+    int last = 0;
     do {
-        validation = openingDialogue(last);
-    } while (!validation);
-    last = 0;
+        do {
+            validation = openingDialogue(last);
+        } while (!validation);
+    }while (last != -1);
     std::cout << "main exiting" << std::endl;
 
     return 0;
