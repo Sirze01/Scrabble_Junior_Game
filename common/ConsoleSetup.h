@@ -29,6 +29,10 @@
 
 #endif
 
+//card view
+constexpr int
+CARD_LEFT_PADDING = 15;
+
 //define 8-bit colors
 constexpr int
 RED = 88,
@@ -53,3 +57,5 @@ void eraseLineToTheEnd();
 void eraseEntireLine();
 void saveCurrentCursorPosition();
 void restoreSavedCursorPosition();
+
+void eraseCardView(int boardDimension, int col);

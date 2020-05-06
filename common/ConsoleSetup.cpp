@@ -95,3 +95,15 @@ void saveCurrentCursorPosition() {
 void restoreSavedCursorPosition() {
     std::cout << "\0338";
 }
+
+void eraseCardView(int boardDimension, int col) {
+    saveCurrentCursorPosition();
+    int line = 1;
+    boardDimension += 3; //board side + you have on hand
+    while (line <= boardDimension) {
+        putCursorOnPos(line, col);
+        eraseLineToTheEnd();
+        line++;
+    }
+    restoreSavedCursorPosition();
+}

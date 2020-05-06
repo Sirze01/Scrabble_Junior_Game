@@ -5,6 +5,7 @@
 #include "../common/Board.h"
 #include "Pool.h"
 #include "Move.h"
+#include "Command.h"
 
 class Game{
 public:
@@ -14,6 +15,8 @@ public:
 	void nextTurn();
 	void showScores() const;
 	void showHands() const;
+	void showHelp() const;
+	void showPool() const;
 	bool hasFinished() const;
 	bool allPlayersMustPass() const;
 	bool hasWinner() const;

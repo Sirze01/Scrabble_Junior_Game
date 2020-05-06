@@ -93,7 +93,7 @@ std::string stripCommandBloat(std::string command) {
     //an experiment on smart command interpretation
     std::string cleanCommand(command);
     std::vector<std::string> keywords = //careful not to interfere with board coords or reserved commands
-    { "play","move","from","letter","check","get","position","board","load","save","write","show"};
+    { "play","move","from","letter","check","get","position","board","load","save","write","show", "tile"};
 
     for (std::string word : keywords) {
         int pos = cleanCommand.find(word);
@@ -111,7 +111,7 @@ std::string smartCommandAdvice(std::string command) {
         processed += tolower(command.at(1));
         return "Did you attempt to play a tile in position " + processed + "? Please specify letter as in 'Yx <letter>'.\n";
     }
-    else if (command == "exchange") {
+    else if (command.find("exchange") != std::string::npos) {
         return "Are you trying to exchange one of your tiles? Please specify letter as in 'exchange <letter>'.\n";
     }
     else {

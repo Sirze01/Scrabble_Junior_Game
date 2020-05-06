@@ -35,7 +35,8 @@ std::string Command::getStr() const {
 
 bool Command::isExchange() const {
 	return _str.size() == std::string("exchange").size() + 2
-		&& _str.find("exchange") != std::string::npos;
+		&& _str.find("exchange") != std::string::npos
+		&& isalpha(_str.at(_str.size()-1));
 }
 
 char Command::getExchangeLetter() const {
@@ -68,13 +69,19 @@ bool Command::isPass() const {
 	return _str.find("pass") != std::string::npos;
 }
 
+bool Command::isClear() const {
+	return _str.find("clear") != std::string::npos;
+}
+
 bool Command::hasNoConflicts() const {
 	int count = 0;
+	if (isExchange()) count++;
 	if (isCheckHands()) count++;
 	if (isCheckPool()) count++;
 	if (isCheckScores()) count++;
 	if (isHelp()) count++;
 	if (isHint()) count++;
 	if (isPass()) count++;
+	if (isClear()) count++;
 	return count < 2;
 }

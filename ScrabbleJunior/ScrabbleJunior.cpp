@@ -18,15 +18,9 @@ int main()
     Game my_game(&my_board, playerNames, playerColors, 0);
 
     for (;;) {
-        my_board.show();
         my_game.askCommand(1);
-        clearConsole();
-
-        my_board.show();
         my_game.askCommand(2);
-
         my_game.nextTurn();
-        clearConsole();
         if (my_game.hasFinished()) break;
     }
 

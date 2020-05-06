@@ -19,6 +19,7 @@ public:
 	bool isHint() const;
 	bool isHelp() const;
 	bool isPass() const;
+	bool isClear() const;
 	bool hasNoConflicts() const;
 private:
 	std::string _str;
