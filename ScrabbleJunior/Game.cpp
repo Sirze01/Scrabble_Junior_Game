@@ -89,11 +89,7 @@ void Game::askCommand(int turnNumber) {
 					}
 					else std::cout << "Could not exchange. Have you got the letter " << command.getExchangeLetter() << " on hand?\n";
 				}
-				else {
-					std::cout << "The exchange was successful!\n";
-					std::cout << "You have now on hand: "; _currentPlayer->showHand();
-					continue;
-				}
+				else showBoardAndHand();
 			}
 
 			else if (command.isCheckHands()) showHands();
@@ -174,12 +170,10 @@ int Game::getWinner() const {
 void Game::showScores() const {
 	saveCurrentCursorPosition();
 
-	int line = 1; //initial top padding
+	int line = 2; //initial top padding
 	int col = 1 + 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
 
 	eraseCardView(_board->getDimensions().vLine, col);
-	putCursorOnPos(line++, col);
-	std::cout << std::endl;
 
 	for (auto player : _players) {
 		for (int i = 0; i < 5 - _nPlayers; ++i) {
@@ -202,12 +196,10 @@ void Game::showScores() const {
 void Game::showHands() const {
 	saveCurrentCursorPosition();
 
-	int line = 1; //initial top padding
+	int line = 2; //initial top padding
 	int col = 1 + 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
 
 	eraseCardView(_board->getDimensions().vLine, col);
-	putCursorOnPos(line++, col);
-	std::cout << std::endl;
 
 	for (auto player : _players) {
 		for (int i = 0; i < 5-_nPlayers; ++i) {
