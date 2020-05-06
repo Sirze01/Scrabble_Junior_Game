@@ -18,12 +18,14 @@ public:
     void show() const;
 	coord getIndex(std::string position) const;
 	bool fileExport(std::string filename) const;
-    bool highlight(int vIndex, int hIndex);
+    bool highlight(int color, int vIndex, int hIndex);
+    void highlightFinishedWord(int color, int vIndex, int hIndex);
     std::vector<std::vector<char>> getLetters() const;
     std::vector<std::vector<bool>> getHighlights() const;
     coord getDimensions() const;
 private:
     std::vector<std::vector<bool>> _highlights;
+    std::vector<std::vector<int>> _highlightColors;
     std::vector<std::vector<char>> _letters;
     int _vDimension;
     int _hDimension;
