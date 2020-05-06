@@ -13,8 +13,8 @@ int main()
 {
     setupConsole();
     Board my_board("test.txt");
-    std::vector<std::string> playerNames = { "Alfredo Martins", "Comboios de Portugal", "Nunca Sentado"};
-    std::vector<int> playerColors = { GREEN,RED,BLUE };
+    std::vector<std::string> playerNames = { "Alfredo Martins", "Comboios de Portugal","Nunca Sentado"};
+    std::vector<int> playerColors = { GREEN,RED,BLUE};
     Game my_game(&my_board, playerNames, playerColors, 0);
 
     for (;;) {

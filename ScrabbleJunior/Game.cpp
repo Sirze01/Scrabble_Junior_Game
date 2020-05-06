@@ -178,9 +178,11 @@ void Game::showScores() const {
 	int col = 1 + 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
 
 	eraseCardView(_board->getDimensions().vLine, col);
+	putCursorOnPos(line++, col);
+	std::cout << std::endl;
 
 	for (auto player : _players) {
-		for (int i = 0; i < 2; ++i) {
+		for (int i = 0; i < 5 - _nPlayers; ++i) {
 			putCursorOnPos(line++, col);
 			std::cout << std::endl;
 		}
@@ -204,9 +206,11 @@ void Game::showHands() const {
 	int col = 1 + 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
 
 	eraseCardView(_board->getDimensions().vLine, col);
+	putCursorOnPos(line++, col);
+	std::cout << std::endl;
 
 	for (auto player : _players) {
-		for (int i = 0; i < 2; ++i) {
+		for (int i = 0; i < 5-_nPlayers; ++i) {
 			putCursorOnPos(line++, col);
 			std::cout << std::endl;
 		}

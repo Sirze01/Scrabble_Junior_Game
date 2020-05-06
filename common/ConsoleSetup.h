@@ -10,11 +10,11 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <wincon.h>
 #endif
 
 #ifdef _WIN32
 // Fix compilatin on MinGW
+
 #ifndef DISABLE_NEWLINE_AUTO_RETURN
 #define DISABLE_NEWLINE_AUTO_RETURN 0x0008
 #endif
@@ -31,7 +31,7 @@
 
 //card view
 constexpr int
-CARD_LEFT_PADDING = 15;
+CARD_LEFT_PADDING = 12;
 
 //define 8-bit colors
 constexpr int
