@@ -26,6 +26,9 @@ commandInterpreter::commandInterpreter(std::string command) {
     else if ((cmd == "help") or (cmd == "h"))
         _command = "help";
 
+    else if (cmd =="back")
+        _command = "back";
+
     else if (cmd == "exit")
         _command = "exit";
 
@@ -53,6 +56,9 @@ void commandInterpreter::edit(std::string command) {
     else if ((cmd == "help") or (cmd == "h"))
         _command = "help";
 
+    else if (cmd == "back")
+        _command = "back";
+
     else if (cmd == "exit")
         _command = "exit";
 
@@ -63,7 +69,11 @@ std::string commandInterpreter::boardName() {
     return _name;
 }
 
-
+/* -1 Exit
+ * -2 help
+ * -3 invalid
+ * -4 back
+ * */
 bool commandInterpreter::interpret(int &last) {
     if (_command == "new") {
         if (cmdNew() == true)
@@ -73,28 +83,45 @@ bool commandInterpreter::interpret(int &last) {
             return false;
         }
 
-    } else if (_command == "import") {
+    }
+
+    else if (_command == "import") {
         if (cmdImport() == true)
             last = 0;
-        else
+        else{
+            last = -3;
             return false;
-    } else if (_command == "add") {
+        }
+    }
+
+    else if (_command == "add") {
         if (cmdAdd() == true)
             last = 0;
-        else
+        else{
+            last = -3;
             return false;
+        }
     }
+
         /*else if (_command == "export"){
             if(cmdExport() == true)
                 last = 0;
-            else
-                return false;
+            else{
+            last = -3;
+            return false;
+            }
         }*/
+
     else if (_command == "help") {
         cmdHelp();
         last = -2;
-    } else if (_command == "exit") {
-        cmdExit(last);
+    }
+
+    else if (_command == "back")
+        last = -4;
+
+    else if (_command == "exit") {
+        last = -1;
     }
 
     return !_command.empty();
@@ -247,9 +274,4 @@ bool commandInterpreter::cmdAdd() {
 
 bool commandInterpreter::cmdExport() {
     return true;
-}
-
-void commandInterpreter::cmdExit(int &last) {
-    if (_command == "exit")
-        last = -1;
 }

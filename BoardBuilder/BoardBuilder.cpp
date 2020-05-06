@@ -47,7 +47,6 @@ bool dialogue(int &last, commandInterpreter &aCommand){
     std::getline(std::cin, userInput);
     aCommand.edit(userInput);
     bool temp = aCommand.interpret(last);
-    aCommand.cmdExit(last);
     return temp;
 }
 
@@ -64,14 +63,13 @@ bool openingDialogue(int &last) {
     std::getline(std::cin, userInput);
     commandInterpreter command(userInput);
     bool temp = command.interpret(last);
-    command.cmdExit(last);
     if (last >= 0) {
         bool validation;
         do {
             do {
                 validation = dialogue(last, command);
             } while (!validation);
-        } while (last != -1);
+        } while (!((last == -1) || (last == -4)));
     }
 
     return temp;
