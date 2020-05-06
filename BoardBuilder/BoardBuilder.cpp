@@ -53,7 +53,7 @@ bool dialogue(int &last, commandInterpreter &aCommand){
 
 bool openingDialogue(int &last) {
     std::cout << std::string(1, '\n');
-    if (last) {
+    if (last == -3) {
         std::cout
                 << stringWriter(100, "Please choose a valid command. If you need help input 'help'.", 2);
     }
