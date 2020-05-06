@@ -3,6 +3,18 @@
 
 const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
+Board::Board() {
+	_hDimension = 10;
+	_vDimension = 10;
+	_letters.resize(_vDimension);
+	for (size_t i = 0; i < _letters.size(); i++) {
+		_letters[i].resize(_hDimension);
+		for (size_t j = 0; j < _letters[i].size(); j++) {
+			_letters[i][j] = ' ';
+		}
+	}
+}
+
 Board::Board(int nLines, int nCollumns) {
 	_vDimension = nLines;
 	_hDimension = nCollumns;
@@ -48,7 +60,7 @@ Board::Board(std::string filename) {
 		}
 
 		while (getline(file, line)) {
-			_words.push_back(line); //maybe implement _words as a vector of strings? {coord, orientation, word}
+			_words.push_back(line);
 			coord index{};
 			index = Board::getIndex(line.substr(0, 2));
 			std::string word = line.substr(5);
@@ -111,7 +123,7 @@ void Board::show() const { //Prototype function (needs styling)
 		for (int j = 0; j < _hDimension; j++) {
 			std::cout << ' ';
 			if (getHighlights().at(i).at(j)) {
-				print(WHITE,_highlightColors.at(i).at(j), _letters.at(i).at(j));
+				print(WHITE, _highlightColors.at(i).at(j), _letters.at(i).at(j));
 			}
 			else std::cout << _letters[i][j];
 		}
@@ -141,18 +153,6 @@ bool Board::fileExport(std::string filename) const {
 	return false;
 }
 
-Board::Board() {
-	_hDimension = 20;
-	_vDimension = 20;
-	_letters.resize(_vDimension);
-	for (size_t i = 0; i < _letters.size(); i++) {
-		_letters[i].resize(_hDimension);
-		for (size_t j = 0; j < _letters[i].size(); j++) {
-			_letters[i][j] = ' ';
-		}
-	}
-}
-
 bool Board::highlight(int color, int vIndex, int hIndex) {
 	if (vIndex >= (int)_vDimension || hIndex >= (int)_hDimension) return false;
 	if (_letters.at(vIndex).at(hIndex) == ' ') return false;
@@ -168,7 +168,7 @@ void Board::highlightFinishedWord(int color, int vIndex, int hIndex) {
 	std::vector<std::vector<int>> tempLine = _highlightColors;
 	bool successOnLine = true, successOnCol = true;
 
-	for (int line = vIndex-1; line >= 0; line--) {
+	for (int line = vIndex - 1; line >= 0; line--) {
 		if (_highlights.at(line).at(hIndex)) {
 			tempCol.at(line).at(hIndex) = color;
 		}
