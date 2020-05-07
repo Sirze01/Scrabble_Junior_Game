@@ -29,5 +29,6 @@ private:
 	std::vector<Player*> _players;
 	Board* _board;
 	Pool* _pool;
+	bool _compactCardView;
 };
 

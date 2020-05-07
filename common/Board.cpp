@@ -4,8 +4,9 @@
 const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 Board::Board() {
-	_hDimension = 10;
-	_vDimension = 10;
+	_hDimension = 15;
+	_vDimension = 15;
+
 	_letters.resize(_vDimension);
 	for (size_t i = 0; i < _letters.size(); i++) {
 		_letters[i].resize(_hDimension);
@@ -50,6 +51,7 @@ Board::Board(std::string filename) {
 		getline(file, line);
 		_hDimension = std::stoi(line.substr(0, 2));
 		_vDimension = std::stoi(line.substr(5));
+
 		_letters.resize(_vDimension);
 
 		for (auto& _line : _letters) {
