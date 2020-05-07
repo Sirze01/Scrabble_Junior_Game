@@ -10,10 +10,11 @@
 extern unsigned SEED;
 extern std::mt19937 RANDOM_GENERATOR;
 
-Player::Player(Pool *pool, std::string name) {
+Player::Player(Pool *pool, std::string name, int color) {
     int handSize = 7;
     _score = 0;
-    _colorName = RED_FORE;
+    _color = color;
+    _exchangeCount = 0;
 	_name = stripSpaces(name);
     _hand.resize(handSize);
     pool->shuffle();
@@ -30,7 +31,9 @@ std::string Player::getName() const {
 
 void Player::showHand() const {
     for (auto i : _hand) {
-        std::cout << i << " ";
+        if (i == ' ') std::cout << i;
+        else print(WHITE,_color, i);
+        std::cout << " ";
     }
     std::cout << "\n";
 }
@@ -47,15 +50,18 @@ bool Player::exchange(char letter, Pool* pool) {
     char handPos = getHandPosition(letter);
     if (!takeRandom(handPos, pool)) return false;
     pool->include(letter);
+    _exchangeCount++;
     return true;
 }
 
 bool Player::takeRandom(int handPos, Pool *pool) {
     int poolSize = pool->getCurrentSize();
-    if (!poolSize) return false;
 
     int maxPos = _hand.size() - 1;
     if (handPos > maxPos || handPos < 0) return false;
+
+    _hand.at(handPos) = ' ';
+    if (!poolSize) return false;
 
     //for shuffle purposes
     std::uniform_int_distribution<int> distribution{ 0, poolSize -1};
@@ -65,6 +71,10 @@ bool Player::takeRandom(int handPos, Pool *pool) {
     pool->take(randomPoolPos);
 
     return true;
+}
+
+void Player::resetExchangeCount() {
+    _exchangeCount = 0;
 }
 
 int Player::getHandPosition(char letter) const {
@@ -77,12 +87,6 @@ int Player::getHandPosition(char letter) const {
     }
     return pos;
 }
-
-/*
-char Player::getLetterOnHand(int handPosition) const {
-    return _hand.at(handPosition);
-}
-*/
 
 bool Player::hasOnHand(char letter) const {
     int count = 0;
@@ -120,4 +124,25 @@ coord Player::getPossiblePos(const Board* board, const Pool* pool) const {
             }
         }
     }
+    return { -1,-1 };
+}
+
+int Player::getColor() const {
+    return _color;
+}
+
+int Player::getExchangeCount() const {
+    return _exchangeCount;
+}
+
+bool Player::mayPass() const {
+    return _mayPass;
+}
+
+void Player::forcePass() {
+    _mayPass = true;
+}
+
+void Player::doNotPass() {
+    _mayPass = false;
 }

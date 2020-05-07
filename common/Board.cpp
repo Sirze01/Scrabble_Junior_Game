@@ -1,6 +1,5 @@
 #include "Board.h"
 #include "../common/ConsoleSetup.h"
-#include "../common/ConsoleSetup.h"
 
 const int outPadding = 2;
 const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
@@ -123,46 +122,76 @@ void Board::show() const { //Prototype function (needs styling)
         }
         std::cout << '\n';
     }
-}
+  
 
 coord Board::getIndex(std::string position) const {
-    coord coordinates{};
-    coordinates.vLine = alphabet.find(tolower(position.at(0)));
-    coordinates.hCollumn = alphabet.find(position.at(1));
-    return coordinates;
+	coord coordinates{};
+	coordinates.vLine = alphabet.find(tolower(position.at(0)));
+	coordinates.hCollumn = alphabet.find(position.at(1));
+	return coordinates;
 }
 
 bool Board::fileExport(std::string filename) const {
-    std::string line;
-    std::ofstream file (filename);
-    if (file.is_open()){
-        file << _hDimension << 'x' << _vDimension << '\n';
-        for (auto line : _words){
-            file << line << '\n';
-        }
-        return true;
-    }
-    std::cerr << "Could not write to file." << std::endl;
-    return false;
+	std::string line;
+	std::ofstream file(filename);
+	if (file.is_open()) {
+		file << _hDimension << 'x' << _vDimension << '\n';
+		for (auto line : _words) {
+			file << line << '\n';
+		}
+		return true;
+	}
+	std::cerr << "Could not write to file." << std::endl;
+	return false;
 }
 
-bool Board::highlight(int vIndex, int hIndex) {
-    if (vIndex >= (int) _vDimension || hIndex >= (int) _hDimension) return false;
-    if (_letters.at(vIndex).at(hIndex) == ' ') return false;
-    if (_highlights.at(vIndex).at(hIndex)) return false;
-    _highlights.at(vIndex).at(hIndex) = 1;
-    return true;
+bool Board::highlight(int color, int vIndex, int hIndex) {
+	if (vIndex >= (int)_vDimension || hIndex >= (int)_hDimension) return false;
+	if (_letters.at(vIndex).at(hIndex) == ' ') return false;
+	if (_highlights.at(vIndex).at(hIndex)) return false;
+
+	_highlights.at(vIndex).at(hIndex) = 1;
+	_highlightColors.at(vIndex).at(hIndex) = color;
+	return true;
+}
+
+void Board::highlightFinishedWord(int color, int vIndex, int hIndex) {
+	std::vector<std::vector<int>> tempCol = _highlightColors;
+	std::vector<std::vector<int>> tempLine = _highlightColors;
+	bool successOnLine = true, successOnCol = true;
+
+	for (int line = vIndex - 1; line >= 0; line--) {
+		if (_highlights.at(line).at(hIndex)) {
+			tempCol.at(line).at(hIndex) = color;
+		}
+		else {
+			if (_letters.at(line).at(hIndex) != ' ') successOnCol = false;
+			break;
+		}
+	}
+	if (successOnCol) _highlightColors = tempCol;
+
+	for (int col = hIndex - 1; col >= 0; col--) {
+		if (_highlights.at(vIndex).at(col)) {
+			tempLine.at(vIndex).at(col) = color;
+		}
+		else {
+			if (_letters.at(vIndex).at(col) != ' ') successOnLine = false;
+			break;
+		}
+	}
+	if (successOnLine) _highlightColors = tempLine;
 }
 
 std::vector<std::vector<char>> Board::getLetters() const {
-    return _letters;
+	return _letters;
 }
 
 std::vector<std::vector<bool>> Board::getHighlights() const {
-    return _highlights;
+	return _highlights;
 }
 
 coord Board::getDimensions() const {
-    coord dimensions = { _hDimension, _vDimension };
-    return dimensions;
+	coord dimensions = { _hDimension, _vDimension };
+	return dimensions;
 }
