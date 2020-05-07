@@ -26,8 +26,8 @@ commandInterpreter::commandInterpreter(std::string command) {
     else if ((cmd == "help") or (cmd == "h"))
         _command = "help";
 
-    else if (cmd =="back")
-        _command = "back";
+    else if ((cmd =="delete") or (cmd =="d"))
+        _command = "delete";
 
     else if (cmd == "exit")
         _command = "exit";
@@ -56,8 +56,8 @@ void commandInterpreter::edit(std::string command) {
     else if ((cmd == "help") or (cmd == "h"))
         _command = "help";
 
-    else if (cmd == "back")
-        _command = "back";
+    else if ((cmd == "delete") or (cmd == "d"))
+        _command = "delete";
 
     else if (cmd == "exit")
         _command = "exit";
@@ -72,7 +72,7 @@ std::string commandInterpreter::boardName() {
 /* -1 Exit
  * -2 help
  * -3 invalid
- * -4 back
+ * -4 delete
  * */
 bool commandInterpreter::interpret(int &last) {
     if (_command == "new") {
@@ -82,7 +82,6 @@ bool commandInterpreter::interpret(int &last) {
             last = -3;
             return false;
         }
-
     }
 
     else if (_command == "import") {
@@ -117,7 +116,7 @@ bool commandInterpreter::interpret(int &last) {
         last = -2;
     }
 
-    else if (_command == "back")
+    else if (_command == "delete")
         last = -4;
 
     else if (_command == "exit") {
@@ -229,30 +228,40 @@ bool commandInterpreter::cmdNew() {
 bool commandInterpreter::cmdImport() {
     if (_state)
         return false;
+    if(!_modifiers.empty()){
+        std::string temp;
+        temp = _modifiers;
+        _modifiers = _modifiers.substr(0, temp.find_first_of(' '));
+        temp.erase(0, temp.find_first_of(' ') + 1);
+        _name = temp;
+
+    }
+    else{
     std::cout << std::string(1, '\n');
     std::cout << stringWriter(100, "Input the file you want to import: ", 2);
-    std::string userInput;
     std::cout << std::string(2, ' ') << "Path: ";
-    std::getline(std::cin, userInput);
+    std::getline(std::cin, _modifiers);
+    }
     std::ifstream file;
-    file.open(userInput, std::ios::in);
+    file.open(_modifiers, std::ios::in);
     if (!file.is_open()) {
         bool exists = false;
         while (!exists) {
             std::cout << '\n' << std::string(2, ' ') << "Cannot open file, try another file" << std::endl;
             std::cout << std::string(2, ' ') << "Path: ";
-            std::getline(std::cin, userInput);
+            std::getline(std::cin, _modifiers);
             std::ifstream file;
-            file.open(userInput, std::ios::in);
+            file.open(_modifiers, std::ios::in);
             exists = file.is_open();
         }
     }
-    Board newBoard(userInput);
+    Board newBoard(_modifiers);
     _board = newBoard;
-    std::cout << '\n' << std::string(2, ' ') << "Insert the name of your board." << std::endl;
-    std::cout << std::string(2, ' ') << "Board name: ";
-    std::getline(std::cin, userInput);
-    _name = userInput;
+    if(_name.empty()) {
+        std::cout << '\n' << std::string(2, ' ') << "Insert the name of your board." << std::endl;
+        std::cout << std::string(2, ' ') << "Board name: ";
+        std::getline(std::cin, _name);
+    }
     _state = true;
     return true;
 }
