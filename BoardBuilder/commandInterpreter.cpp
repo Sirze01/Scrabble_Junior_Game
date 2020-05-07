@@ -70,8 +70,9 @@ std::string commandInterpreter::boardName() {
     return _name;
 }
 
-/* -1 Exit
- * -2 help
+/* 0  Valid command
+ * -1 Exit
+ * -2 loop, no message
  * -3 invalid
  * -4 delete
  * */
@@ -103,30 +104,28 @@ bool commandInterpreter::interpret(int &last) {
         }
     }
 
-        /*else if (_command == "export"){
+    else if (_command == "export"){
             if(cmdExport() == true)
                 last = 0;
             else{
             last = -3;
             return false;
             }
-        }*/
+    }
 
     else if (_command == "help") {
         cmdHelp();
         last = -2;
     }
 
-    else if (_command == "delete")
-        last = -4;
+    else if (_command == "delete") {
+        cmdDelete(last);
+    }
 
     else if (_command == "exit") {
-        last = -1;
+        cmdExit(last);
     }
 
-    else{
-        last = -3;
-    }
     return !_command.empty();
 }
 
@@ -163,7 +162,7 @@ bool commandInterpreter::cmdNew() {
 
     if (_modifiers.empty()) {
         std::cout << std::string(1, '\n');
-        std::cout << stringWriter(100, "What dimensions should the board be? (Width x Height)", 2);
+        std::cout << stringWriter(100, "What dimensions should the board be? (Height x Width)", 2);
         std::cout << std::string(1, '\n');
         std::cout << std::string(2, ' ') << "Dimensions: ";
         std::getline(std::cin, _modifiers);
@@ -205,8 +204,8 @@ bool commandInterpreter::cmdNew() {
         }
 
         if(_modifiers.find('x') != _modifiers.npos){
-            hTemp = _modifiers.substr(0, _modifiers.find('x'));
-            vTemp = _modifiers.substr(_modifiers.find('x') +1);
+            vTemp = _modifiers.substr(0, _modifiers.find('x'));
+            hTemp = _modifiers.substr(_modifiers.find('x') +1);
         }
         else{
             vTemp = _modifiers.substr(0, _modifiers.find('X'));
@@ -225,6 +224,7 @@ bool commandInterpreter::cmdNew() {
     Board newBoard(std::stoi(vTemp), std::stoi(hTemp));
     _board = newBoard;
     _state = true;
+    _board.show();
     return true;
 }
 
@@ -268,6 +268,7 @@ bool commandInterpreter::cmdImport() {
         std::getline(std::cin, _name);
     }
     _state = true;
+    _board.show();
     return true;
 }
 
@@ -279,9 +280,24 @@ bool commandInterpreter::cmdAdd() {
                                 2);
         return false;
     }
-    _board.show();
 
+    codedWord newEntry;
+    if(!_modifiers.empty()){
+        newEntry.firstCoord = _modifiers.substr(0,2);
+        _modifiers.erase(0, 2);
+        if(!_modifiers.empty()) {
+            newEntry.orientation = _modifiers.substr(1, 1);
+            _modifiers.erase(0, 2);
+        }
+        if(!_modifiers.empty()) {
+            newEntry.word = _modifiers.substr(1);
+        }
+    }
 
+    if(newEntry.firstCoord.empty()){
+        std::cout << std::string (2, ' ') << "Input the coordinates to the first letter of the word" << std::endl;
+        getline(std::cin, newEntry.firstCoord);
+    }
 
     return true;
 }
@@ -289,4 +305,15 @@ bool commandInterpreter::cmdAdd() {
 
 bool commandInterpreter::cmdExport() {
     return true;
+}
+
+
+void commandInterpreter::cmdDelete(int &last) {
+    std::cout << "Board deleted" << std::endl;
+    last = -4;
+}
+
+
+void commandInterpreter::cmdExit(int &last) {
+    last = -1;
 }

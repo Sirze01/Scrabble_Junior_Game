@@ -16,6 +16,7 @@ Board::Board() {
         }
     }
 
+    _highlights.resize(_vDimension);
     for(auto &line : _highlights){
         line.resize(_hDimension);
         for(int i = 0; i < _hDimension; i++)
@@ -33,6 +34,7 @@ Board::Board(int nLines, int nCollumns) {
             j = ' ';
         }
     }
+
     _highlights.resize(_vDimension);
     for(auto &line : _highlights){
         line.resize(_hDimension);
@@ -60,24 +62,25 @@ Board::Board(std::string filename)  {
         }
 
         while(getline(file, line)){
-            _words.push_back(line); //maybe implement _words as a vector of strings? {coord, orientation, word}
-            coord index{};
-            index = Board::getIndex(line.substr(0, 2));
-            std::string word = line.substr(5);
+            codedWord entry;
+            entry.firstCoord = line.substr(0, 2);
+            entry.orientation = line.at(3);
+            entry.word = line.substr(5);
+            _words.push_back(entry);
+            coord index = Board::getIndex(entry.firstCoord);
 
-            switch(line.at(3)){
-                case 'H':
-                    for(size_t w = 0; w < word.size(); w++){
-                        _letters[index.vLine][index.hCollumn + w] = word.at(w);
-                    }
-                    break;
-                case 'V':
-                    for(size_t w = 0; w < word.size(); w++){
-                        _letters[index.vLine + w][index.hCollumn] = word.at(w);
-                    }
-                    break;
+            if((entry.orientation == "H") or (entry.orientation == "h")){
+                for(size_t w = 0; w < entry.word.size(); w++){
+                    _letters[index.vLine][index.hCollumn + w] = entry.word.at(w);
+                }
+            }
+            else if ((entry.orientation == "V") or (entry.orientation == "v")){
+                for(size_t w = 0; w < entry.word.size(); w++){
+                    _letters[index.vLine + w][index.hCollumn] = entry.word.at(w);
+                }
             }
         }
+
         file.close();
     }
     else{
@@ -132,7 +135,7 @@ coord Board::getIndex(std::string position) const {
     return coordinates;
 }
 
-bool Board::fileExport(std::string filename) const {
+/*bool Board::fileExport(std::string filename) const {
     std::string line;
     std::ofstream file (filename);
     if (file.is_open()){
@@ -144,7 +147,7 @@ bool Board::fileExport(std::string filename) const {
     }
     std::cerr << "Could not write to file." << std::endl;
     return false;
-}
+}*/
 
 bool Board::highlight(int vIndex, int hIndex) {
     if (vIndex >= (int) _vDimension || hIndex >= (int) _hDimension) return false;

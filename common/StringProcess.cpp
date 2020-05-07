@@ -104,3 +104,10 @@ std::string stripCommandBloat(std::string command) {
     return cleanCommand;
 }
 
+bool isAlpha(std::string toTest) {
+    for(auto &letter : toTest){
+        if(!std::isalpha(letter))
+            return false;
+    }
+    return true;
+}

@@ -11,18 +11,18 @@ public:
     std::string boardName();
     bool interpret(int &last);
 
+private:
+    std::string _command;
+    std::string _modifiers;
+    bool _state = false; // 0 to board closed, 1 to board open
+    std::string _name;
+    Board _board;
     void cmdHelp();
     bool cmdNew();
     bool cmdImport();
     bool cmdAdd();
     bool cmdExport();
-
-private:
-    std::string _command;
-    std::string _modifiers;
-
-    bool _state = false; // 0 to board closed, 1 to board open
-    std::string _name;
-    Board _board;
+    void cmdDelete(int &last);
+    void cmdExit(int &last);
 };
 
