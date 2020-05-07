@@ -16,7 +16,6 @@ public:
     bool cmdImport();
     bool cmdAdd();
     bool cmdExport();
-    void cmdExit(int& last);
 
 private:
     std::string _command;
