@@ -34,7 +34,7 @@ void openingMessage() {
                               2);
 }
 
-bool dialogue(int &last, commandInterpreter &aCommand){
+bool dialogue(int &last, commandInterpreter aCommand){
     std::cout << std::string(1, '\n');
     if (last) {
         std::cout
@@ -47,12 +47,13 @@ bool dialogue(int &last, commandInterpreter &aCommand){
     std::getline(std::cin, userInput);
     aCommand.edit(userInput);
     bool temp = aCommand.interpret(last);
+    aCommand.cmdExit(last);
     return temp;
 }
 
 bool openingDialogue(int &last) {
     std::cout << std::string(1, '\n');
-    if (last == -3) {
+    if (last) {
         std::cout
                 << stringWriter(100, "Please choose a valid command. If you need help input 'help'.", 2);
     }
@@ -63,13 +64,14 @@ bool openingDialogue(int &last) {
     std::getline(std::cin, userInput);
     commandInterpreter command(userInput);
     bool temp = command.interpret(last);
-    if (last >= 0) {
+    command.cmdExit(last);
+    if (last != -1) {
         bool validation;
         do {
             do {
                 validation = dialogue(last, command);
             } while (!validation);
-        } while (!((last == -1) || (last == -4)));
+        } while (last != -1);
     }
 
     return temp;
