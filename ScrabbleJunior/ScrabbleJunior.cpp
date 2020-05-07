@@ -9,9 +9,20 @@
 #include "Move.h"
 #include "Game.h"
 
+
+
+void createGame() {
+    Board intro_board("intro_board.txt");
+    intro_board.show();
+    std::cout << "Welcome! How many players";
+}
+
 int main()
 {
     setupConsole();
+    createGame();
+    std::cin.ignore();
+
     Board my_board("test.txt");
     std::vector<std::string> playerNames = { "Alfredo Martins", "Comboios de Portugal","Nunca Sentado"};
     std::vector<int> playerColors = { GREEN,RED,BLUE};
