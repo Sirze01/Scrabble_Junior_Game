@@ -276,6 +276,7 @@ void Game::showPool() const {
 
 	eraseCardView(_board->getDimensions().vLine, col);
 	putCursorOnPos(line++, col);
+
 	std::cout << "|" << size << " letters on the pool";
 	putCursorOnPos(line++, col);
 
