@@ -10,7 +10,6 @@ std::mt19937 RANDOM_GENERATOR(SEED);
 
 Pool::Pool(const Board *board) {
 	std::vector<std::vector<char>> boardContent = board->getLetters();
-	_letters.push_back('X');
 
 	//add letters in board
 	for (std::vector<char> v : boardContent) {

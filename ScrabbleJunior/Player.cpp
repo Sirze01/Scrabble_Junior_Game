@@ -30,8 +30,12 @@ std::string Player::getName() const {
 }
 
 void Player::showHand() const {
+    if (!getHandSize()) {
+        std::cout << "nothing\n";
+        return;
+    }
     for (auto i : _hand) {
-        if (i == ' ') std::cout << i;
+        if (i == ' ') continue;
         else print(WHITE,_color, i);
         std::cout << " ";
     }
@@ -47,8 +51,11 @@ void Player::addScore() {
 }
 
 bool Player::exchange(char letter, Pool* pool) {
+    if (!pool->getCurrentSize()) return false;
+
     char handPos = getHandPosition(letter);
     if (!takeRandom(handPos, pool)) return false;
+
     pool->include(letter);
     _exchangeCount++;
     return true;
@@ -56,12 +63,13 @@ bool Player::exchange(char letter, Pool* pool) {
 
 bool Player::takeRandom(int handPos, Pool *pool) {
     int poolSize = pool->getCurrentSize();
-
     int maxPos = _hand.size() - 1;
+
     if (handPos > maxPos || handPos < 0) return false;
 
     _hand.at(handPos) = ' ';
     if (!poolSize) return false;
+
 
     //for shuffle purposes
     std::uniform_int_distribution<int> distribution{ 0, poolSize -1};
@@ -145,4 +153,12 @@ void Player::forcePass() {
 
 void Player::doNotPass() {
     _mayPass = false;
+}
+
+int Player::getHandSize() const {
+    int count = 0;
+    for (auto letter : _hand) {
+        if (letter != ' ') count++;
+    }
+    return count;
 }

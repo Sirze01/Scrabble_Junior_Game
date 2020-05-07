@@ -21,6 +21,7 @@ public:
 	bool allPlayersMustPass() const;
 	bool hasWinner() const;
 	int getWinner() const;
+	std::string getPlayerName(int playerPos) const;
 private:
 	int _nPlayers;
 	std::vector<int> _playerForeColors;
