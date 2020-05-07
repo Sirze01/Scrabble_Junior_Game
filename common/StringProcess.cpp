@@ -27,7 +27,7 @@ std::string stripSpaces(std::string name) {
 std::string stripSpecialChars(std::string name) {
     std::string cleanStr;
     for (char c : name) {
-        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ' || isdigit(c)) {
+        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ') {
             cleanStr.push_back(c);
         }
     }
@@ -90,10 +90,10 @@ std::string stringWriter(int text_width, std::string text, int padding = 0) {
 }
 
 std::string stripCommandBloat(std::string command) {
-    //an experiment on smart command interpretation. might remove?
+    //an experiment on smart command interpretation
     std::string cleanCommand(command);
-    std::vector<std::string> keywords = //careful not to interfere with board coords or other commands
-    { "play","move","from","letter","check","get","position","board","load","save","write","show"};
+    std::vector<std::string> keywords = //careful not to interfere with board coords or reserved commands
+    { "play","move","from","letter","check","get","position","board","load","save","write","show", "tile"};
 
     for (std::string word : keywords) {
         int pos = cleanCommand.find(word);
@@ -104,6 +104,20 @@ std::string stripCommandBloat(std::string command) {
     return cleanCommand;
 }
 
+std::string smartCommandAdvice(std::string command) {
+    if (command.size() == 2 && isalpha(command.at(0)) && isalpha(command.at(1))) {
+        std::string processed;
+        processed += toupper(command.at(0));
+        processed += tolower(command.at(1));
+        return "Did you attempt to play a tile in position " + processed +
+               "? Please specify letter as in 'Yx <letter>'.\n";
+    } else if (command.find("exchange") != std::string::npos) {
+        return "Are you trying to exchange one of your tiles? Please specify letter as in 'exchange <letter>'.\n";
+    } else {
+        return "Command not recognized. Please type 'help' to view the available commands.\n";
+    }
+}
+    
 bool isAlpha(std::string toTest) {
     for(auto &letter : toTest){
         if(!std::isalpha(letter))

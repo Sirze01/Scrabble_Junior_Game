@@ -1,8 +1,6 @@
 #include "Board.h"
 #include "../common/ConsoleSetup.h"
-#include "../common/ConsoleSetup.h"
 
-const int outPadding = 2;
 const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 Board::Board() {
@@ -22,18 +20,25 @@ Board::Board() {
         for(int i = 0; i < _hDimension; i++)
             line[i] = false;
     }
+
+    _highlightColors.resize(_vDimension);
+    for(auto &line : _highlights){
+        line.resize(_hDimension);
+        for(int i = 0; i < _hDimension; i++)
+            line[i] = RED;
+    }
 }
 
 Board::Board(int nLines, int nCollumns) {
-    _vDimension = nLines;
-    _hDimension = nCollumns;
-    _letters.resize(_vDimension);
-    for (auto & line : _letters){
-        line.resize(_hDimension);
-        for(char & j : line){
-            j = ' ';
-        }
-    }
+	_vDimension = nLines;
+	_hDimension = nCollumns;
+	_letters.resize(_vDimension);
+	for (auto& _letter : _letters) {
+		_letter.resize(_hDimension);
+		for (char& j : _letter) {
+			j = ' ';
+		}
+	}
 
     _highlights.resize(_vDimension);
     for(auto &line : _highlights){
@@ -41,14 +46,21 @@ Board::Board(int nLines, int nCollumns) {
         for(int i = 0; i < _hDimension; i++)
             line[i] = false;
     }
+
+    _highlightColors.resize(_vDimension);
+    for(auto &line : _highlights){
+        line.resize(_hDimension);
+        for(int i = 0; i < _hDimension; i++)
+            line[i] = RED;
+    }
 }
 
-Board::Board(std::string filename)  {
-    std::string line;
-    std::ifstream file;
-    file.open(filename, std::ios::in);
+Board::Board(std::string filename) {
+	std::string line;
+	std::ifstream file;
+	file.open(filename, std::ios::in);
 
-    if(file.is_open()){
+	if (file.is_open()) {
         getline(file, line);
         _vDimension = std::stoi(line.substr(0, 2));
         _hDimension= std::stoi(line.substr(5));
@@ -82,22 +94,22 @@ Board::Board(std::string filename)  {
         }
 
         file.close();
-    }
-    else{
-        int defaultSize = 20;
-        _hDimension = defaultSize;
-        _vDimension = defaultSize;
-        _letters.resize(_vDimension);
+	}
+	else {
+		int defaultSize = 20;
+		_hDimension = defaultSize;
+		_vDimension = defaultSize;
+		_letters.resize(_vDimension);
 
-        for (auto & _line : _letters){
-            _line.resize(_hDimension);
-            for(char & _letter : _line){
-                _letter = ' ';
-            }
-        }
-        std::cerr << "Cannot open file!" << std::endl;
+		for (auto& _line : _letters) {
+			_line.resize(_hDimension);
+			for (char& _letter : _line) {
+				_letter = ' ';
+			}
+		}
+		std::cerr << "Cannot open file!" << std::endl;
 
-    }
+	}
 
     _highlights.resize(_vDimension);
     for(auto &line : _highlights){
@@ -105,67 +117,106 @@ Board::Board(std::string filename)  {
         for(int i = 0; i < _hDimension; i++)
             line[i] = false;
     }
+
+    _highlightColors.resize(_vDimension);
+    for(auto &line : _highlights){
+        line.resize(_hDimension);
+        for(int i = 0; i < _hDimension; i++)
+            line[i] = RED;
+    }
 }
 
 void Board::show() const { //Prototype function (needs styling)
-    std::cout << "\n" << '\n' << std::string(outPadding, ' ');
-    std::cout << " ";
-    for (int i = 0; i < _hDimension; i++){
-        std::cout << " " << alphabet.at(i);
-    }
-    std::cout << std::endl;
-    for (int i = 0; i< _vDimension; i++){
-        std::cout << std::string(outPadding, ' ');
-        std::cout << std::string(1,(toupper(alphabet.at(i))));
-        for(int j = 0; j < _hDimension; j++){
-            std::cout << ' ';
-            if (getHighlights().at(i).at(j)) {
-                print(_letters.at(i).at(j), DEFAULT_FORE, RED_BACK);
-            }
-            else std::cout << _letters[i][j];
-        }
-        std::cout << '\n';
-    }
+      std::cout << std::string(BOARD_TOP_PADDING,'\n') << std::string(BOARD_LEFT_PADDING, ' ');
+
+	std::cout << " ";
+	for (int i = 0; i < _hDimension; i++) {
+		std::cout << " " << alphabet.at(i);
+	}
+	std::cout << std::endl;
+	for (int i = 0; i < _vDimension; i++) {
+		std::cout << std::string(BOARD_LEFT_PADDING, ' ');
+		std::cout << std::string(1, (toupper(alphabet.at(i))));
+		for (int j = 0; j < _hDimension; j++) {
+			std::cout << ' ';
+			if (getHighlights().at(i).at(j)) {
+				print(WHITE, _highlightColors.at(i).at(j), _letters.at(i).at(j));
+			}
+			else std::cout << _letters[i][j];
+		}
+		std::cout << '\n';
+	}
+	std::cout << "\n\n";
 }
 
 coord Board::getIndex(std::string position) const {
-    coord coordinates{};
-    coordinates.vLine = alphabet.find(tolower(position.at(0)));
-    coordinates.hCollumn = alphabet.find(position.at(1));
-    return coordinates;
+	coord coordinates{};
+	coordinates.vLine = alphabet.find(tolower(position.at(0)));
+	coordinates.hCollumn = alphabet.find(position.at(1));
+	return coordinates;
 }
 
 /*bool Board::fileExport(std::string filename) const {
-    std::string line;
-    std::ofstream file (filename);
-    if (file.is_open()){
-        file << _hDimension << 'x' << _vDimension << '\n';
-        for (auto line : _words){
-            file << line << '\n';
-        }
-        return true;
-    }
-    std::cerr << "Could not write to file." << std::endl;
-    return false;
+	std::string line;
+	std::ofstream file(filename);
+	if (file.is_open()) {
+		file << _hDimension << 'x' << _vDimension << '\n';
+		for (auto line : _words) {
+			file << line << '\n';
+		}
+		return true;
+	}
+	std::cerr << "Could not write to file." << std::endl;
+	return false;
 }*/
 
-bool Board::highlight(int vIndex, int hIndex) {
-    if (vIndex >= (int) _vDimension || hIndex >= (int) _hDimension) return false;
-    if (_letters.at(vIndex).at(hIndex) == ' ') return false;
-    if (_highlights.at(vIndex).at(hIndex)) return false;
-    _highlights.at(vIndex).at(hIndex) = 1;
-    return true;
+bool Board::highlight(int color, int vIndex, int hIndex) {
+	if (vIndex >= (int)_vDimension || hIndex >= (int)_hDimension) return false;
+	if (_letters.at(vIndex).at(hIndex) == ' ') return false;
+	if (_highlights.at(vIndex).at(hIndex)) return false;
+
+	_highlights.at(vIndex).at(hIndex) = 1;
+	_highlightColors.at(vIndex).at(hIndex) = color;
+	return true;
+}
+
+void Board::highlightFinishedWord(int color, int vIndex, int hIndex) {
+	std::vector<std::vector<int>> tempCol = _highlightColors;
+	std::vector<std::vector<int>> tempLine = _highlightColors;
+	bool successOnLine = true, successOnCol = true;
+
+	for (int line = vIndex - 1; line >= 0; line--) {
+		if (_highlights.at(line).at(hIndex)) {
+			tempCol.at(line).at(hIndex) = color;
+		}
+		else {
+			if (_letters.at(line).at(hIndex) != ' ') successOnCol = false;
+			break;
+		}
+	}
+	if (successOnCol) _highlightColors = tempCol;
+
+	for (int col = hIndex - 1; col >= 0; col--) {
+		if (_highlights.at(vIndex).at(col)) {
+			tempLine.at(vIndex).at(col) = color;
+		}
+		else {
+			if (_letters.at(vIndex).at(col) != ' ') successOnLine = false;
+			break;
+		}
+	}
+	if (successOnLine) _highlightColors = tempLine;
 }
 
 std::vector<std::vector<char>> Board::getLetters() const {
-    return _letters;
+	return _letters;
 }
 
 std::vector<std::vector<bool>> Board::getHighlights() const {
-    return _highlights;
+	return _highlights;
 }
 
 coord Board::getDimensions() const {
-    coord dimensions = { _hDimension, _vDimension };
-    return dimensions;
+	coord dimensions = { _vDimension, _hDimension};
+	return dimensions;
 }
