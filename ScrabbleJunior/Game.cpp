@@ -35,7 +35,7 @@ void Game::askCommand(int turnNumber) {
 		clearConsole();
 		_board->show();
 		showScores();
-		std::cout << "\n" << std::string(BOARD_LEFT_PADDING, ' ') << "You have on hand: ";
+		std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "You have on hand: ";
 		_currentPlayer->showHand();
 	};
 

@@ -41,6 +41,7 @@ RED = 88,
 BLUE = 19,
 GREEN = 22,
 PINK = 127,
+ORANGE = 166,
 WHITE = 15,
 BLACK = 0;
 

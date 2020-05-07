@@ -134,7 +134,7 @@ void Board::show() const { //Prototype function (needs styling)
 		}
 		std::cout << '\n';
 	}
-	std::cout << "\n";
+	std::cout << "\n\n";
 }
 
 coord Board::getIndex(std::string position) const {
