@@ -12,9 +12,22 @@
 
 
 void createGame() {
+    int nPlayers = 2;
     Board intro_board("intro_board.txt");
     intro_board.show();
-    std::cout << "Welcome! How many players";
+    std::cout << "Welcome to our Scrabble Junior Game!\n";
+    std::cout << "We hope you'll have a great time with us\n";
+    std::cout << "For now, we will need some data to create a game.\n";
+    std::cout << "\nNumber of players: ";
+    while (!std::cin >> nPlayers || nPlayers > 4 || nPlayers < 2) {
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(10000,'\n');
+        }
+        std::cout << "Please input a number between 2 and 4!\n";
+    }
+    std::cin.ignore(10000, '\n');
+    //return Game()
 }
 
 int main()

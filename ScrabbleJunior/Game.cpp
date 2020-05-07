@@ -174,7 +174,7 @@ int Game::getWinner() const {
 void Game::showScores() const {
 	saveCurrentCursorPosition();
 
-	int line = 2; //initial top padding
+	int line = 2 + BOARD_TOP_PADDING;
 	int col = 1 + 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
 
 	eraseCardView(_board->getDimensions().vLine, col);
@@ -200,7 +200,7 @@ void Game::showScores() const {
 void Game::showHands() const {
 	saveCurrentCursorPosition();
 
-	int line = 2; //initial top padding
+	int line = 2 + BOARD_TOP_PADDING;
 	int col = 1 + 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
 
 	eraseCardView(_board->getDimensions().vLine, col);
@@ -226,7 +226,7 @@ void Game::showHands() const {
 void Game::showHelp() const {
 	saveCurrentCursorPosition();
 
-	int line = 3; //initial top padding
+	int line = 3 + BOARD_TOP_PADDING; //initial top padding
 	int col = 1 + 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
 
 	eraseCardView(_board->getDimensions().vLine, col);
@@ -268,7 +268,7 @@ void Game::showHelp() const {
 void Game::showPool() const {
 	saveCurrentCursorPosition();
 
-	int line = 3; //initial top padding
+	int line = 3 + BOARD_TOP_PADDING;
 	int col = 1 + 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
 
 	std::vector<char> letters = _pool->getAllLetters();
