@@ -5,6 +5,6 @@ Missing:
 -------------------------------------------------
 SCRABBLE JUNIOR
 Missing:
-- Pass when necessary
-- Colors and messages
-- Menus and text
+- Messages
+- Board refinement
+- "Cards" on the side of the board
