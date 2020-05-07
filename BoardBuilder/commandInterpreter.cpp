@@ -232,8 +232,9 @@ bool commandInterpreter::cmdImport() {
         std::string temp;
         temp = _modifiers;
         _modifiers = _modifiers.substr(0, temp.find_first_of(' '));
-        temp.erase(0, temp.find_first_of(' ') + 1);
-        _name = temp;
+        temp.erase(0, temp.find_first_of(' '));
+        if (!temp.empty())
+            _name = temp.substr(1);
 
     }
     else{
