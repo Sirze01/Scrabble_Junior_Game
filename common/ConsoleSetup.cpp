@@ -44,18 +44,66 @@ void clearConsole() {
     std::cout << "\x1B[2J\x1B[H";
 }
 
-void print(std::string message, const int foreColor, const int backColor) {
-    std::cout << "\x1b[" << backColor << ";" << foreColor << "m" << message << "\x1b[" << ALL_DEFAULTS << "m";
+void printBackColor(int backColor, const char c) {
+    std::cout << "\x1b[1m";
+    std::cout << "\033[48;5;" << backColor << "m" << c << "\033[0m";
 }
 
-void print(std::string message, int foreColor) {
-    std::cout << "\x1b[" << foreColor << "m" << message << "\x1b[" << ALL_DEFAULTS << "m";
+void printBackColor(int backColor, std::string message) {
+    std::cout << "\x1b[1m";
+    std::cout << "\033[48;5;" << backColor << "m" << message << "\033[0m";
 }
 
-void print(const char c, const int foreColor, const int backColor) {
-    std::cout << "\x1b[" << backColor << ";" << foreColor << "m" << c << "\x1b[" << ALL_DEFAULTS << "m";
+void printForeColor(int foreColor, const char c) {
+    std::cout << "\x1b[1m";
+    std::cout << "\033[38;5;" << foreColor << "m" << c << "\033[0m";
 }
 
-void print(const char c, const int foreColor) {
-    std::cout << "\x1b[" << foreColor << "m" << c << "\x1b[" << ALL_DEFAULTS << "m";
+void printForeColor(int foreColor, std::string message) {
+    std::cout << "\x1b[1m";
+    std::cout << "\033[38;1;" << foreColor << "m" << message << "\033[0m";
+}
+
+void print(int foreColor, int backColor, const char c) {
+    std::cout << "\x1b[1m";
+    std::cout << "\033[38;5;" << foreColor << ";48;5;" << backColor << "m" << c << "\033[0m";
+}
+
+void print(int foreColor, int backColor, std::string message) {
+    std::cout << "\x1b[1m";
+    std::cout << "\033[38;5;" << foreColor << ";48;5;" << backColor << "m" << message << "\033[0m";
+}
+
+bool putCursorOnPos(int line, int col) {
+    if (line < 1 || col < 1) return false;
+    std::cout << "\033[" << line << ";" << col << "H";
+    return true;
+}
+
+void eraseLineToTheEnd() {
+    std::cout << "\033[0K";
+}
+
+void eraseEntireLine() {
+    std::cout << "\033[2K";
+}
+
+void saveCurrentCursorPosition() {
+    std::cout << "\0337";
+}
+
+void restoreSavedCursorPosition() {
+    std::cout << "\0338";
+}
+
+void eraseCardView(int boardDimension, int col) {
+    saveCurrentCursorPosition();
+    int line = 1;
+    boardDimension += 3; //board side + you have on hand
+    while (line <= boardDimension) {
+        putCursorOnPos(line, col);
+        eraseLineToTheEnd();
+        line++;
+    }
+    restoreSavedCursorPosition();
 }
