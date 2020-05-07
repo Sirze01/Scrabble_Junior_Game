@@ -30,6 +30,7 @@ public:
     std::vector<std::vector<char>> getLetters() const;
     std::vector<std::vector<bool>> getHighlights() const;
     coord getDimensions() const;
+    bool boardBounds(coord firstLetter, std::string orientation = "H", int wordLen = 0);
 
 private:
     std::vector<std::vector<bool>> _highlights;

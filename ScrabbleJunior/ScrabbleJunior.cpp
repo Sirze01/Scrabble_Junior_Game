@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-
+#include <algorithm>
 #include "Pool.h"
 #include "Player.h"
 #include "../common/Board.h"
@@ -155,7 +155,7 @@ void printIntro() {
     std::cin.ignore(10000, '\n');
 }
 
-Game* createGame() {
+/*Game* createGame() {
     int nPlayers = 2;
     Board intro_board("intro_board.txt");
 
@@ -186,7 +186,7 @@ Game* createGame() {
     Game my_game(&intro_board, playerNames, playerColors, 0);
 
     return &my_game;
-}
+}*/
 
 int main()
 {

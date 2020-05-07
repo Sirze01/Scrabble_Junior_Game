@@ -22,7 +22,7 @@ Board::Board() {
     }
 
     _highlightColors.resize(_vDimension);
-    for(auto &line : _highlights){
+    for(auto &line : _highlightColors){
         line.resize(_hDimension);
         for(int i = 0; i < _hDimension; i++)
             line[i] = RED;
@@ -48,7 +48,7 @@ Board::Board(int nLines, int nCollumns) {
     }
 
     _highlightColors.resize(_vDimension);
-    for(auto &line : _highlights){
+    for(auto &line : _highlightColors){
         line.resize(_hDimension);
         for(int i = 0; i < _hDimension; i++)
             line[i] = RED;
@@ -119,7 +119,7 @@ Board::Board(std::string filename) {
     }
 
     _highlightColors.resize(_vDimension);
-    for(auto &line : _highlights){
+    for(auto &line : _highlightColors){
         line.resize(_hDimension);
         for(int i = 0; i < _hDimension; i++)
             line[i] = RED;
@@ -219,4 +219,12 @@ std::vector<std::vector<bool>> Board::getHighlights() const {
 coord Board::getDimensions() const {
 	coord dimensions = { _vDimension, _hDimension};
 	return dimensions;
+}
+
+bool Board::boardBounds(coord firstLetter, std::string orientation, int wordLen){
+    if((firstLetter.vLine > _vDimension) || (firstLetter.vLine < _vDimension))
+        return false;
+    if((firstLetter.hCollumn > _hDimension) || (firstLetter.hCollumn < _hDimension))
+        return false;
+
 }

@@ -1,5 +1,5 @@
 #include "commandInterpreter.h"
-
+#include "../common/ConsoleSetup.h"
 const int outPadding = 2;
 
 commandInterpreter::commandInterpreter() {
@@ -285,19 +285,50 @@ bool commandInterpreter::cmdAdd() {
     if(!_modifiers.empty()){
         newEntry.firstCoord = _modifiers.substr(0,2);
         _modifiers.erase(0, 2);
+        if(!((newEntry.firstCoord.size() == 2) && isAlpha(newEntry.firstCoord)))
+            return false;
         if(!_modifiers.empty()) {
             newEntry.orientation = _modifiers.substr(1, 1);
             _modifiers.erase(0, 2);
+            if(!((newEntry.orientation.size() == 1) && ((newEntry.orientation == "H") || (newEntry.orientation == "V") ||
+                                                        (newEntry.orientation == "h") || (newEntry.orientation == "v"))))
+                return false;
         }
         if(!_modifiers.empty()) {
             newEntry.word = _modifiers.substr(1);
+            if(!isAlpha(newEntry.word))
+                return false;
         }
     }
 
     if(newEntry.firstCoord.empty()){
-        std::cout << std::string (2, ' ') << "Input the coordinates to the first letter of the word" << std::endl;
-        getline(std::cin, newEntry.firstCoord);
+        do {
+            std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the coordinates to the first letter of the word"
+                      << std::endl;
+            std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Coordinate: ";
+            getline(std::cin, newEntry.firstCoord);
+        } while (!((newEntry.firstCoord.size() == 2) && isAlpha(newEntry.firstCoord)));
     }
+
+    if(newEntry.orientation.empty()){
+        do {
+            std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the desired orientation" << std::endl;
+            std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Orientation: ";
+            getline(std::cin, newEntry.firstCoord);
+        } while (!((newEntry.orientation.size() == 1) && ((newEntry.orientation == "H") ||
+        (newEntry.orientation == "V") || (newEntry.orientation == "h") || (newEntry.orientation == "v"))));
+    }
+
+
+    if(newEntry.word.empty()){
+        do {
+            std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the word you want to place" << std::endl;
+            std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Word: ";
+            getline(std::cin, newEntry.firstCoord);
+        } while (!isAlpha(newEntry.word));
+    }
+
+
 
     return true;
 }
@@ -309,7 +340,7 @@ bool commandInterpreter::cmdExport() {
 
 
 void commandInterpreter::cmdDelete(int &last) {
-    std::cout << "Board deleted" << std::endl;
+    std::cout << "  Board deleted" << std::endl;
     last = -4;
 }
 
