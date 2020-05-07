@@ -4,16 +4,29 @@
 const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 Board::Board() {
-	_hDimension = 15;
-	_vDimension = 15;
+    _hDimension = 10;
+    _vDimension = 10;
+    _letters.resize(_vDimension);
+    for (size_t i = 0; i < _letters.size(); i++){
+        _letters[i].resize(_hDimension);
+        for(size_t j = 0; j < _letters[i].size(); j++){
+            _letters[i][j] = ' ';
+        }
+    }
 
-	_letters.resize(_vDimension);
-	for (size_t i = 0; i < _letters.size(); i++) {
-		_letters[i].resize(_hDimension);
-		for (size_t j = 0; j < _letters[i].size(); j++) {
-			_letters[i][j] = ' ';
-		}
-	}
+    _highlights.resize(_vDimension);
+    for(auto &line : _highlights){
+        line.resize(_hDimension);
+        for(int i = 0; i < _hDimension; i++)
+            line[i] = false;
+    }
+
+    _highlightColors.resize(_vDimension);
+    for(auto &line : _highlights){
+        line.resize(_hDimension);
+        for(int i = 0; i < _hDimension; i++)
+            line[i] = RED;
+    }
 }
 
 Board::Board(int nLines, int nCollumns) {
@@ -26,20 +39,20 @@ Board::Board(int nLines, int nCollumns) {
 			j = ' ';
 		}
 	}
-	//fill highlights with 0 and RED color
-	std::vector<std::vector<bool>> binaries;
-	std::vector<std::vector<int>> colors;
-	for (int i = 0; i < (int)_vDimension; ++i) {
-		std::vector<bool> binary; std::vector<int> color;
-		for (int j = 0; j < (int)_hDimension; ++j) {
-			binary.push_back(0);
-			color.push_back(RED);
-		}
-		binaries.push_back(binary);
-		colors.push_back(color);
-	}
-	_highlights = binaries;
-	_highlightColors = colors;
+
+    _highlights.resize(_vDimension);
+    for(auto &line : _highlights){
+        line.resize(_hDimension);
+        for(int i = 0; i < _hDimension; i++)
+            line[i] = false;
+    }
+
+    _highlightColors.resize(_vDimension);
+    for(auto &line : _highlights){
+        line.resize(_hDimension);
+        for(int i = 0; i < _hDimension; i++)
+            line[i] = RED;
+    }
 }
 
 Board::Board(std::string filename) {
@@ -48,39 +61,39 @@ Board::Board(std::string filename) {
 	file.open(filename, std::ios::in);
 
 	if (file.is_open()) {
-		getline(file, line);
-		_hDimension = std::stoi(line.substr(0, 2));
-		_vDimension = std::stoi(line.substr(5));
+        getline(file, line);
+        _vDimension = std::stoi(line.substr(0, 2));
+        _hDimension= std::stoi(line.substr(5));
+        _letters.resize(_vDimension);
 
-		_letters.resize(_vDimension);
+        for (auto & _line : _letters){
+            _line.resize(_hDimension);
+            for(char & _letter : _line){
+                _letter = ' ';
+            }
+        }
 
-		for (auto& _line : _letters) {
-			_line.resize(_hDimension);
-			for (char& _letter : _line) {
-				_letter = ' ';
-			}
-		}
+        while(getline(file, line)){
+            codedWord entry;
+            entry.firstCoord = line.substr(0, 2);
+            entry.orientation = line.at(3);
+            entry.word = line.substr(5);
+            _words.push_back(entry);
+            coord index = Board::getIndex(entry.firstCoord);
 
-		while (getline(file, line)) {
-			_words.push_back(line);
-			coord index{};
-			index = Board::getIndex(line.substr(0, 2));
-			std::string word = line.substr(5);
+            if((entry.orientation == "H") or (entry.orientation == "h")){
+                for(size_t w = 0; w < entry.word.size(); w++){
+                    _letters[index.vLine][index.hCollumn + w] = entry.word.at(w);
+                }
+            }
+            else if ((entry.orientation == "V") or (entry.orientation == "v")){
+                for(size_t w = 0; w < entry.word.size(); w++){
+                    _letters[index.vLine + w][index.hCollumn] = entry.word.at(w);
+                }
+            }
+        }
 
-			switch (line.at(3)) {
-			case 'H':
-				for (size_t w = 0; w < word.size(); w++) {
-					_letters[index.vLine][index.hCollumn + w] = word.at(w);
-				}
-				break;
-			case 'V':
-				for (size_t w = 0; w < word.size(); w++) {
-					_letters[index.vLine + w][index.hCollumn] = word.at(w);
-				}
-				break;
-			}
-		}
-		file.close();
+        file.close();
 	}
 	else {
 		int defaultSize = 20;
@@ -98,20 +111,19 @@ Board::Board(std::string filename) {
 
 	}
 
-	//fill highlights with 0 and RED color
-	std::vector<std::vector<bool>> binaries;
-	std::vector<std::vector<int>> colors;
-	for (int i = 0; i < (int)_vDimension; ++i) {
-		std::vector<bool> binary; std::vector<int> color;
-		for (int j = 0; j < (int)_hDimension; ++j) {
-			binary.push_back(0);
-			color.push_back(RED);
-		}
-		binaries.push_back(binary);
-		colors.push_back(color);
-	}
-	_highlights = binaries;
-	_highlightColors = colors;
+    _highlights.resize(_vDimension);
+    for(auto &line : _highlights){
+        line.resize(_hDimension);
+        for(int i = 0; i < _hDimension; i++)
+            line[i] = false;
+    }
+
+    _highlightColors.resize(_vDimension);
+    for(auto &line : _highlights){
+        line.resize(_hDimension);
+        for(int i = 0; i < _hDimension; i++)
+            line[i] = RED;
+    }
 }
 
 void Board::show() const { //Prototype function (needs styling)
@@ -144,7 +156,7 @@ coord Board::getIndex(std::string position) const {
 	return coordinates;
 }
 
-bool Board::fileExport(std::string filename) const {
+/*bool Board::fileExport(std::string filename) const {
 	std::string line;
 	std::ofstream file(filename);
 	if (file.is_open()) {
@@ -156,7 +168,7 @@ bool Board::fileExport(std::string filename) const {
 	}
 	std::cerr << "Could not write to file." << std::endl;
 	return false;
-}
+}*/
 
 bool Board::highlight(int color, int vIndex, int hIndex) {
 	if (vIndex >= (int)_vDimension || hIndex >= (int)_hDimension) return false;
@@ -205,6 +217,6 @@ std::vector<std::vector<bool>> Board::getHighlights() const {
 }
 
 coord Board::getDimensions() const {
-	coord dimensions = { _hDimension, _vDimension };
+	coord dimensions = { _vDimension, _hDimension};
 	return dimensions;
 }

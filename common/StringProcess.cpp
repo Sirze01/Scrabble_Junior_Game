@@ -109,12 +109,19 @@ std::string smartCommandAdvice(std::string command) {
         std::string processed;
         processed += toupper(command.at(0));
         processed += tolower(command.at(1));
-        return "Did you attempt to play a tile in position " + processed + "? Please specify letter as in 'Yx <letter>'.\n";
-    }
-    else if (command.find("exchange") != std::string::npos) {
+        return "Did you attempt to play a tile in position " + processed +
+               "? Please specify letter as in 'Yx <letter>'.\n";
+    } else if (command.find("exchange") != std::string::npos) {
         return "Are you trying to exchange one of your tiles? Please specify letter as in 'exchange <letter>'.\n";
-    }
-    else {
+    } else {
         return "Command not recognized. Please type 'help' to view the available commands.\n";
     }
+}
+    
+bool isAlpha(std::string toTest) {
+    for(auto &letter : toTest){
+        if(!std::isalpha(letter))
+            return false;
+    }
+    return true;
 }

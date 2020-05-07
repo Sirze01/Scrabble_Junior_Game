@@ -10,6 +10,13 @@ struct coord{
     int hCollumn;
 };
 
+struct codedWord{
+    std::string firstCoord;
+    std::string orientation;
+    std::string word;
+
+};
+
 class Board {
 public:
     Board();
@@ -23,12 +30,13 @@ public:
     std::vector<std::vector<char>> getLetters() const;
     std::vector<std::vector<bool>> getHighlights() const;
     coord getDimensions() const;
+
 private:
     std::vector<std::vector<bool>> _highlights;
     std::vector<std::vector<int>> _highlightColors;
     std::vector<std::vector<char>> _letters;
+    std::vector<codedWord> _words;
     int _vDimension;
     int _hDimension;
-    std::vector<std::string> _words;
 };
 
