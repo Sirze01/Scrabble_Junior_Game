@@ -115,7 +115,7 @@ Board::Board(std::string filename) {
 }
 
 void Board::show() const { //Prototype function (needs styling)
-      std::cout << "\n" << std::string(2, ' ');
+      std::cout << std::string(BOARD_TOP_PADDING,'\n') << std::string(BOARD_LEFT_PADDING, ' ');
 
 	std::cout << " ";
 	for (int i = 0; i < _hDimension; i++) {
@@ -123,7 +123,7 @@ void Board::show() const { //Prototype function (needs styling)
 	}
 	std::cout << std::endl;
 	for (int i = 0; i < _vDimension; i++) {
-    std::cout << std::string(2, ' ');
+		std::cout << std::string(BOARD_LEFT_PADDING, ' ');
 		std::cout << std::string(1, (toupper(alphabet.at(i))));
 		for (int j = 0; j < _hDimension; j++) {
 			std::cout << ' ';

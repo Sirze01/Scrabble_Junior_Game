@@ -35,7 +35,7 @@ void Game::askCommand(int turnNumber) {
 		clearConsole();
 		_board->show();
 		showScores();
-		std::cout << "You have on hand: ";
+		std::cout << "\n" << std::string(BOARD_LEFT_PADDING, ' ') << "You have on hand: ";
 		_currentPlayer->showHand();
 	};
 
@@ -44,7 +44,7 @@ void Game::askCommand(int turnNumber) {
 	std::string input;
 
 	for (;;) {
-		std::cout << "\n(turn " << turnNumber << ") " << _currentPlayer->getName() << ": ";
+		std::cout << "\n" << std::string(BOARD_LEFT_PADDING, ' ') << "(turn " << turnNumber << ") " << _currentPlayer->getName() << ": ";
 		std::getline(std::cin, input);
 
 		//make sure input buffer is ok

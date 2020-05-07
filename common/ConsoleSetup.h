@@ -31,7 +31,9 @@
 
 //card view
 constexpr int
-CARD_LEFT_PADDING = 12;
+CARD_LEFT_PADDING = 12,
+BOARD_LEFT_PADDING = 2,
+BOARD_TOP_PADDING = 1;
 
 //define 8-bit colors
 constexpr int
