@@ -14,6 +14,10 @@ Game::Game(Board* board, std::vector<std::string> playerNames, std::vector<int> 
 
 	_currentPlayerPos = firstToMove % _nPlayers;
 	_currentPlayer = _players.at(_currentPlayerPos);
+
+	//card settings
+	if (_board->getDimensions().vLine >= 15) _compactCardView = false;
+	else _compactCardView = true;
 }
 
 Game::~Game() {
@@ -176,7 +180,7 @@ void Game::showScores() const {
 	eraseCardView(_board->getDimensions().vLine, col);
 
 	for (auto player : _players) {
-		for (int i = 0; i < 5 - _nPlayers; ++i) {
+		for (int i = 0; i < 5 - _nPlayers - _compactCardView; ++i) {
 			putCursorOnPos(line++, col);
 			std::cout << std::endl;
 		}
@@ -189,7 +193,7 @@ void Game::showScores() const {
 		printForeColor(player->getColor(), '|');
 		std::cout << player->getScore() << " points";
 	}
-	
+
 	restoreSavedCursorPosition();
 }
 
@@ -202,7 +206,7 @@ void Game::showHands() const {
 	eraseCardView(_board->getDimensions().vLine, col);
 
 	for (auto player : _players) {
-		for (int i = 0; i < 5-_nPlayers; ++i) {
+		for (int i = 0; i < 5 - _nPlayers - _compactCardView; ++i) {
 			putCursorOnPos(line++, col);
 			std::cout << std::endl;
 		}
@@ -222,30 +226,38 @@ void Game::showHands() const {
 void Game::showHelp() const {
 	saveCurrentCursorPosition();
 
-	int line = 1; //initial top padding
+	int line = 3; //initial top padding
 	int col = 1 + 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
 
 	eraseCardView(_board->getDimensions().vLine, col);
 
-	std::vector<std::string> sentences =
+	std::vector<std::string> intro =
 	{
-		" ",
-		" ",
 		"|Start or continue words with the tiles you have on hand.",
 		"|You get one point for each word you complete.",
 		"|Available commands:",
-		"|",
+		"|"
+	};
+
+	std::vector<std::string> commands =
+	{
 		"|-> 'move <Yx> <letter>' - play letter on position.",
 		"|-> 'exchange <letter>' - exchange a letter from the pool.",
 		"|-> 'check hands' - have a look at all players' hands.",
 		"|-> 'check scores' - have a look at the current scores.",
-	    "|-> 'check pool' - spy on the current state of the pool.",
+		"|-> 'check pool' - spy on the current state of the pool.",
 		"|-> 'get hint' - get some advice. Do not abuse of this!",
-	    "|-> 'pass' - skip turn when you have no possible moves.",
-		"|-> 'clear' - erase command history and reload screen.",
+		"|-> 'pass' - skip turn when you have no possible moves.",
+		"|-> 'clear' - erase command history and reload screen."
 	};
 
-	for (auto sentence: sentences) {
+	if (!_compactCardView) {
+		for (auto sentence : intro) {
+			putCursorOnPos(line++, col);
+			std::cout << sentence << std::endl;
+		}
+	}
+	for (auto sentence : commands) {
 		putCursorOnPos(line++, col);
 		std::cout << sentence << std::endl;
 	}
@@ -256,7 +268,7 @@ void Game::showHelp() const {
 void Game::showPool() const {
 	saveCurrentCursorPosition();
 
-	int line = 2; //initial top padding
+	int line = 3; //initial top padding
 	int col = 1 + 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
 
 	std::vector<char> letters = _pool->getAllLetters();
@@ -264,8 +276,7 @@ void Game::showPool() const {
 
 	eraseCardView(_board->getDimensions().vLine, col);
 	putCursorOnPos(line++, col);
-	std::cout << std::endl;
-	putCursorOnPos(line++, col);
+
 	std::cout << "|" << size << " letters on the pool";
 	putCursorOnPos(line++, col);
 
