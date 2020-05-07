@@ -2,6 +2,7 @@
 #include "../common/ConsoleSetup.h"
 #include "../common/ConsoleSetup.h"
 
+const int outPadding = 2;
 const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 Board::Board() {
@@ -14,17 +15,29 @@ Board::Board() {
             _letters[i][j] = ' ';
         }
     }
+
+    for(auto &line : _highlights){
+        line.resize(_hDimension);
+        for(int i = 0; i < _hDimension; i++)
+            line[i] = false;
+    }
 }
 
 Board::Board(int nLines, int nCollumns) {
     _vDimension = nLines;
     _hDimension = nCollumns;
     _letters.resize(_vDimension);
-    for (auto & _letter : _letters){
-        _letter.resize(_hDimension);
-        for(char & j : _letter){
+    for (auto & line : _letters){
+        line.resize(_hDimension);
+        for(char & j : line){
             j = ' ';
         }
+    }
+    _highlights.resize(_vDimension);
+    for(auto &line : _highlights){
+        line.resize(_hDimension);
+        for(int i = 0; i < _hDimension; i++)
+            line[i] = false;
     }
 }
 
@@ -35,8 +48,8 @@ Board::Board(std::string filename)  {
 
     if(file.is_open()){
         getline(file, line);
-        _hDimension = std::stoi(line.substr(0, 2));
-        _vDimension= std::stoi(line.substr(5));
+        _vDimension = std::stoi(line.substr(0, 2));
+        _hDimension= std::stoi(line.substr(5));
         _letters.resize(_vDimension);
 
         for (auto & _line : _letters){
@@ -83,27 +96,23 @@ Board::Board(std::string filename)  {
 
     }
 
-    //fill highlights with 0
-    std::vector<std::vector<bool>> binaries;
-    for (int i = 0; i < (int)_vDimension; ++i) {
-        std::vector<bool> binary;
-        for (int j = 0; j < (int)_hDimension; ++j) {
-            binary.push_back(0);
-        }
-        binaries.push_back(binary);
+    _highlights.resize(_vDimension);
+    for(auto &line : _highlights){
+        line.resize(_hDimension);
+        for(int i = 0; i < _hDimension; i++)
+            line[i] = false;
     }
-    _highlights = binaries;
-
-    //MISSING HIGHLIGHTS
 }
 
 void Board::show() const { //Prototype function (needs styling)
+    std::cout << "\n" << '\n' << std::string(outPadding, ' ');
     std::cout << " ";
     for (int i = 0; i < _hDimension; i++){
         std::cout << " " << alphabet.at(i);
     }
     std::cout << std::endl;
     for (int i = 0; i< _vDimension; i++){
+        std::cout << std::string(outPadding, ' ');
         std::cout << std::string(1,(toupper(alphabet.at(i))));
         for(int j = 0; j < _hDimension; j++){
             std::cout << ' ';

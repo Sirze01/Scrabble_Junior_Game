@@ -1,5 +1,6 @@
 #include "commandInterpreter.h"
 
+const int outPadding = 2;
 
 commandInterpreter::commandInterpreter() {
     _command = "";
@@ -123,6 +124,9 @@ bool commandInterpreter::interpret(int &last) {
         last = -1;
     }
 
+    else{
+        last = -3;
+    }
     return !_command.empty();
 }
 
@@ -146,7 +150,7 @@ void commandInterpreter::cmdHelp() {
 
 bool commandInterpreter::cmdNew() {
     if (_state) {
-        std::cout << "Cannot create a new board. You already have one open" << std::endl;
+        std::cout << std::string(outPadding, ' ') << "Cannot create a new board. You already have one open" << std::endl;
         return false;
     }
 
@@ -205,8 +209,8 @@ bool commandInterpreter::cmdNew() {
             vTemp = _modifiers.substr(_modifiers.find('x') +1);
         }
         else{
-            hTemp = _modifiers.substr(0, _modifiers.find('X'));
-            vTemp = _modifiers.substr(_modifiers.find('X') + 1);
+            vTemp = _modifiers.substr(0, _modifiers.find('X'));
+            hTemp = _modifiers.substr(_modifiers.find('X') + 1);
         }
 
     } while (!validation);
@@ -218,7 +222,7 @@ bool commandInterpreter::cmdNew() {
         _name = userInput;
     }
 
-    Board newBoard(std::stoi(hTemp), std::stoi(vTemp));
+    Board newBoard(std::stoi(vTemp), std::stoi(hTemp));
     _board = newBoard;
     _state = true;
     return true;
@@ -276,7 +280,8 @@ bool commandInterpreter::cmdAdd() {
         return false;
     }
     _board.show();
-    std::cout << "You've done it!" << std::endl;
+
+
 
     return true;
 }
