@@ -39,7 +39,10 @@ bool dialogue(int &last, commandInterpreter &aCommand){
         std::cout
                 << stringWriter(100, "Please choose a valid command. If you need help input 'help'.", 2);
     }
-    std::cout << std::string(2, ' ') << '(' << aCommand.boardName() << ") " << "Your input: ";
+    if(aCommand._dictBool and aCommand._state)
+        std::cout << std::string(2, ' ') << '(' << aCommand.boardName() << ") " << "Your input: ";
+    else
+        std::cout << std::string(2, ' ') << "Your input: ";
     std::string userInput;
     std::getline(std::cin, userInput);
     aCommand.edit(userInput);

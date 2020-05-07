@@ -62,10 +62,11 @@ Board::Board(std::string filename) {
 
 	if (file.is_open()) {
         getline(file, line);
-        _vDimension = std::stoi(line.substr(0, 2));
-        _hDimension= std::stoi(line.substr(5));
-        _letters.resize(_vDimension);
+        _vDimension = std::stoi(line.substr(0, line.find_first_of(' ')));
+        line.erase(0, line.find_first_of(' ') + 3);
+        _hDimension= std::stoi(line);
 
+        _letters.resize(_vDimension);
         for (auto & _line : _letters){
             _line.resize(_hDimension);
             for(char & _letter : _line){
@@ -224,18 +225,18 @@ coord Board::getDimensions() const {
 
 // Needs Testing - Reserved area
 bool Board::boardBounds(coord firstLetter, std::string orientation, int wordLen){
-    if((firstLetter.vLine > _vDimension) || (firstLetter.vLine < _vDimension))
+    if((firstLetter.vLine > _vDimension) || (firstLetter.vLine < 0))
         return false;
-    if((firstLetter.hCollumn > _hDimension) || (firstLetter.hCollumn < _hDimension))
+    if((firstLetter.hCollumn > _hDimension) || (firstLetter.hCollumn < 0))
         return false;
 
     if(orientation == "V") {
-        if ((firstLetter.vLine + wordLen > _vDimension) || (firstLetter.vLine + wordLen < _vDimension))
+        if ((firstLetter.vLine + wordLen > _vDimension) || (firstLetter.vLine + wordLen < 0))
             return false;
     }
 
     if(orientation == "H") {
-        if((firstLetter.hCollumn + wordLen > _hDimension) || (firstLetter.hCollumn + wordLen < _hDimension))
+        if((firstLetter.hCollumn + wordLen > _hDimension) || (firstLetter.hCollumn + wordLen < 0))
             return false;
     }
 
@@ -259,4 +260,13 @@ bool Board::goodIntersects(codedWord word) {
         }
     }
     return valid;
+}
+
+
+void Board::lettersManip(coord inates, char letter) {
+    _letters[inates.vLine][inates.hCollumn] = letter;
+}
+
+void Board::addWord(codedWord word) {
+    _words.push_back(word);
 }
