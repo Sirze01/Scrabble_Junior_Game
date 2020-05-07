@@ -99,7 +99,6 @@ bool commandInterpreter::interpret(int &last) {
         if (cmdAdd() == true)
             last = 0;
         else{
-            last = -3;
             return false;
         }
     }
@@ -273,7 +272,7 @@ bool commandInterpreter::cmdImport() {
 }
 
 
-bool commandInterpreter::cmdAdd() {
+bool commandInterpreter::cmdAdd(int &last) {
     if (!_state) {
         std::cout
                 << stringWriter(100, "You need to be editing a board to run this command. Import or create a new one!",
@@ -285,19 +284,25 @@ bool commandInterpreter::cmdAdd() {
     if(!_modifiers.empty()){
         newEntry.firstCoord = _modifiers.substr(0,2);
         _modifiers.erase(0, 2);
-        if(!((newEntry.firstCoord.size() == 2) && isAlpha(newEntry.firstCoord)))
+        if(!((newEntry.firstCoord.size() == 2) && isAlpha(newEntry.firstCoord))){
+            last = -3;
             return false;
+        }
         if(!_modifiers.empty()) {
             newEntry.orientation = _modifiers.substr(1, 1);
             _modifiers.erase(0, 2);
             if(!((newEntry.orientation.size() == 1) && ((newEntry.orientation == "H") || (newEntry.orientation == "V") ||
-                                                        (newEntry.orientation == "h") || (newEntry.orientation == "v"))))
+                                                        (newEntry.orientation == "h") || (newEntry.orientation == "v")))){
+                last = -3;
                 return false;
+            }
         }
         if(!_modifiers.empty()) {
             newEntry.word = _modifiers.substr(1);
-            if(!isAlpha(newEntry.word))
+            if(!isAlpha(newEntry.word)) {
+                last = -3;
                 return false;
+            }
         }
     }
 
@@ -314,21 +319,40 @@ bool commandInterpreter::cmdAdd() {
         do {
             std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the desired orientation" << std::endl;
             std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Orientation: ";
-            getline(std::cin, newEntry.firstCoord);
+            getline(std::cin, newEntry.orientation);
         } while (!((newEntry.orientation.size() == 1) && ((newEntry.orientation == "H") ||
         (newEntry.orientation == "V") || (newEntry.orientation == "h") || (newEntry.orientation == "v"))));
     }
-
 
     if(newEntry.word.empty()){
         do {
             std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the word you want to place" << std::endl;
             std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Word: ";
-            getline(std::cin, newEntry.firstCoord);
+            getline(std::cin, newEntry.word);
         } while (!isAlpha(newEntry.word));
     }
 
+    newEntry.firstCoord[0] = toupper(newEntry.firstCoord[0]);
+    newEntry.firstCoord[1] = tolower(newEntry.firstCoord[1]);
+    for(auto &letter : newEntry.orientation) letter = toupper(letter);
+    for(auto &letter : newEntry.word) letter = toupper(letter);
 
+    if (_board.boardBounds(_board.getIndex(newEntry.firstCoord), newEntry.orientation, newEntry.word.size())){
+        if(_board.goodIntersects(newEntry)){
+            
+        }
+        else{
+            last = -2;
+            std::cout <<stringWriter(100, "The word you're trying to add intersects with another in the wrong letter",
+                    BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
+            return false;
+        }
+    }
+    else {
+        last = -2;
+        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Word is out of range! Try another one." << std::endl;
+        return false;
+    }
 
     return true;
 }

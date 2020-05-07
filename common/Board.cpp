@@ -221,10 +221,42 @@ coord Board::getDimensions() const {
 	return dimensions;
 }
 
+
+// Needs Testing - Reserved area
 bool Board::boardBounds(coord firstLetter, std::string orientation, int wordLen){
     if((firstLetter.vLine > _vDimension) || (firstLetter.vLine < _vDimension))
         return false;
     if((firstLetter.hCollumn > _hDimension) || (firstLetter.hCollumn < _hDimension))
         return false;
 
+    if(orientation == "V") {
+        if ((firstLetter.vLine + wordLen > _vDimension) || (firstLetter.vLine + wordLen < _vDimension))
+            return false;
+    }
+
+    if(orientation == "H") {
+        if((firstLetter.hCollumn + wordLen > _hDimension) || (firstLetter.hCollumn + wordLen < _hDimension))
+            return false;
+    }
+
+    return true;
+}
+
+bool Board::goodIntersects(codedWord word) {
+    bool valid = true;
+    if(word.orientation == "V") {
+        for(int i = 0; i < word.word.size(); i++){
+            if (_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn] != ' ')
+                if(_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn] != word.word[i])
+                    valid = false;
+        }
+    }
+    if(word.orientation == "H") {
+        for(int i = 0; i < word.word.size(); i++){
+            if (_letters[getIndex(word.firstCoord).vLine][getIndex(word.firstCoord).hCollumn + i] != ' ')
+                if(_letters[getIndex(word.firstCoord).vLine][getIndex(word.firstCoord).hCollumn + i] != word.word[i])
+                    valid = false;
+        }
+    }
+    return valid;
 }

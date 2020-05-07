@@ -20,7 +20,7 @@ private:
     void cmdHelp();
     bool cmdNew();
     bool cmdImport();
-    bool cmdAdd();
+    bool cmdAdd(int &last);
     bool cmdExport();
     void cmdDelete(int &last);
     void cmdExit(int &last);
