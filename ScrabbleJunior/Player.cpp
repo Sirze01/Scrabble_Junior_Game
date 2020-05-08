@@ -30,20 +30,12 @@ std::string Player::getName() const {
 }
 
 void Player::showHand() const {
-    if (!getHandSize()) {
-        std::cout << "nothing\n";
-        return;
-    }
     for (auto i : _hand) {
         if (i == ' ') continue;
         else print(WHITE,_color, i);
         std::cout << " ";
     }
     std::cout << "\n";
-}
-
-void Player::showScore() const {
-    std::cout << _name << ": " << _score << " points\n";
 }
 
 void Player::addScore() {
@@ -86,18 +78,15 @@ void Player::resetExchangeCount() {
 }
 
 int Player::getHandPosition(char letter) const {
-    int pos = -1;
     for (size_t i = 0; i < _hand.size(); ++i) {
         if (_hand.at(i) == letter) {
-            pos = i;
-            break;
+            return i;
         }
     }
-    return pos;
+    return -1;
 }
 
 bool Player::hasOnHand(char letter) const {
-    int count = 0;
     for (auto i : _hand) {
         if (i == letter) return true;
     }
@@ -106,6 +95,7 @@ bool Player::hasOnHand(char letter) const {
 
 bool Player::mayMove(const Board *board, const Pool *pool) const{
     coord boardDim = board->getDimensions();
+
     for (int line = 0; line < boardDim.vLine; ++line) {
         for (int col = 0; col < boardDim.hCollumn; ++col) {
             coord testPosition = { line,col };
@@ -121,7 +111,9 @@ bool Player::mayMove(const Board *board, const Pool *pool) const{
 
 coord Player::getPossiblePos(const Board* board, const Pool* pool) const {
     if (!mayMove(board, pool)) return { -1,-1 };
+
     coord boardDim = board->getDimensions();
+
     for (int line = 0; line < boardDim.vLine; ++line) {
         for (int col = 0; col < boardDim.hCollumn; ++col) {
             coord testPosition = { line,col };
@@ -143,7 +135,7 @@ int Player::getExchangeCount() const {
     return _exchangeCount;
 }
 
-bool Player::mayPass() const {
+bool Player::getMayPass() const {
     return _mayPass;
 }
 

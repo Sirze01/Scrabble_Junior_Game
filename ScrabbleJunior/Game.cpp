@@ -28,6 +28,12 @@ Game::~Game() {
 }
 
 void Game::askCommand(int turnNumber) {
+	auto paddingAndPlayerUpChar = [&](bool newLine = true) {
+		if (newLine) std::cout << "\n";
+		std::cout << LEFT_PADDING_STR;
+		printForeColor(_currentPlayer->getColor(), '|');
+	};
+
 	auto showBoardAndHand = [&]() {
 		clearConsole();
 		_board->show();
@@ -36,20 +42,15 @@ void Game::askCommand(int turnNumber) {
 		_currentPlayer->showHand();
 	};
 
-	auto paddingAndPlayerUpChar = [&]() {
-		std::cout << "\n" << LEFT_PADDING_STR;
-		printForeColor(_currentPlayer->getColor(), '|');
-	};
-
-	if (hasFinished()) return;
+	if (!_currentPlayer->getMayPass() && hasFinished()) return;
 
 	//pass if already passed before and still cannot move
-	if (_currentPlayer->mayPass() && !_currentPlayer->mayMove(_board, _pool)) {
+	if (_currentPlayer->getMayPass() && !_currentPlayer->mayMove(_board, _pool)) {
 		if (turnNumber == 1) {
 			showBoardAndHand();
 			paddingAndPlayerUpChar(); std::cout << _currentPlayer->getName() << ", you still cannot move.";
 			paddingAndPlayerUpChar(); std::cout << "We will skip your turn automatically.";
-			paddingAndPlayerUpChar(); std::cout << "Press enter to continue.";
+			paddingAndPlayerUpChar(); std::cout << "Press enter to continue. ";
 			std::cin.ignore(1000, '\n');
 		}
 		return;
@@ -58,13 +59,13 @@ void Game::askCommand(int turnNumber) {
 	showBoardAndHand();
 
 	//force play if can move this time
-	if (_currentPlayer->mayPass() && _currentPlayer->mayMove(_board, _pool)) _currentPlayer->doNotPass();
+	if (_currentPlayer->getMayPass() && _currentPlayer->mayMove(_board, _pool)) _currentPlayer->doNotPass();
 
 	if (!_currentPlayer->getHandSize()) { //player has nothing on hand
 		_currentPlayer->forcePass();
 		paddingAndPlayerUpChar(); std::cout << _currentPlayer->getName() << ", you have nothing on your hand.";
 		paddingAndPlayerUpChar(); std::cout << "Your turn will be skipped as long as you cannot move.";
-		paddingAndPlayerUpChar(); std::cout << "Press enter to continue.";
+		paddingAndPlayerUpChar(); std::cout << "Press enter to continue. ";
 		std::cin.ignore(10000, '\n');
 		return;
 	}
@@ -165,7 +166,7 @@ void Game::nextTurn() {
 
 bool Game::allPlayersMustPass() const {
 	for (Player* player : _players) {
-		if (!player->mayPass()) return false;
+		if (!player->getMayPass()) return false;
 	}
 	return true;
 }
@@ -208,7 +209,7 @@ int Game::getWinner() const {
 	return currentWinner;
 }
 
-void Game::showScores() const {
+void Game::showScores(bool function) const {
 	saveCurrentCursorPosition();
 
 	int line = 2 + BOARD_TOP_PADDING;
@@ -227,8 +228,10 @@ void Game::showScores() const {
 		putCursorOnPos(line++, col);
 		printForeColor(player->getColor(), '|');
 		std::cout << player->getName();
-		if (i == _currentPlayerPos) std::cout << " - to play!";
-		else if (player->mayPass()) std::cout << " - skipped last move";
+		if (function) {
+			if (i == _currentPlayerPos) std::cout << " - to play!";
+			else if (player->getMayPass()) std::cout << " - skipped last turn";
+		}
 		std::cout << std::endl;
 
 		putCursorOnPos(line++, col);
@@ -239,7 +242,7 @@ void Game::showScores() const {
 	restoreSavedCursorPosition();
 }
 
-void Game::showHands() const {
+void Game::showHands(bool function) const {
 	saveCurrentCursorPosition();
 
 	int line = 2 + BOARD_TOP_PADDING;
@@ -258,8 +261,10 @@ void Game::showHands() const {
 		putCursorOnPos(line++, col);
 		printForeColor(player->getColor(), '|');
 		std::cout << player->getName();
-		if (i == _currentPlayerPos) std::cout << " - to play!";
-		else if (player->mayPass()) std::cout << " - skipped last move";
+		if (function) {
+			if (i == _currentPlayerPos) std::cout << " - to play!";
+			else if (player->getMayPass()) std::cout << " - skipped last turn";
+		}
 		std::cout << std::endl;
 
 		putCursorOnPos(line++, col);
@@ -343,4 +348,31 @@ void Game::showPool() const {
 std::string Game::getPlayerName(int playerPos) const {
 	if (playerPos >= _nPlayers || playerPos < 0) return "Not found";
 	else return _players.at(playerPos)->getName();
+}
+
+void Game::end() const {
+	int color;
+	int winner = getWinner();
+
+	if (hasWinner()) color = _players.at(winner)->getColor();
+	else color = WHITE;
+
+	auto paddingAndPlayerUpChar = [&]() {
+		std::cout << LEFT_PADDING_STR;
+		printForeColor(color, '|');
+	};
+
+	showScores(false);
+	std::cout << LEFT_PADDING_STR << "|THE GAME HAS ENDED!\n\n";
+	paddingAndPlayerUpChar();
+
+	if (hasWinner()) {
+		std::cout << _players.at(winner)->getName() << " won with brilliancy!\n\n";
+	}
+	else {
+		std::cout << "|There has been a draw! Congratulations to all.\n\n";
+	}
+
+	std::cout << LEFT_PADDING_STR << "|Press enter to exit. ";
+	std::cin.ignore(10000, '\n');
 }

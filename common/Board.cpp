@@ -212,6 +212,19 @@ std::vector<std::vector<char>> Board::getLetters() const {
 	return _letters;
 }
 
+std::vector<char> Board::getNonEmptyChars() const {
+	std::vector<char> allChars;
+	//add letters in board
+	for (std::vector<char> v : _letters) {
+		for (char c : v) {
+			if (c != ' ') {
+				allChars.push_back(c);
+			}
+		}
+	}
+	return allChars;
+}
+
 std::vector<std::vector<bool>> Board::getHighlights() const {
 	return _highlights;
 }
