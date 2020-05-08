@@ -30,10 +30,13 @@
 #endif
 
 //card view
-constexpr int
+const int
 CARD_LEFT_PADDING = 12,
 BOARD_LEFT_PADDING = 2,
 BOARD_TOP_PADDING = 1;
+
+const std::string
+LEFT_PADDING_STR(BOARD_LEFT_PADDING, ' ');
 
 //define 8-bit colors
 constexpr int

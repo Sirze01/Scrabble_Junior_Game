@@ -16,21 +16,20 @@ struct PlayerData {
 };
 
 PlayerData askPlayer(int position, int introBoardWidth, std::vector<std::string> forbiddenNames, std::vector<int> forbiddenColors) {
-    PlayerData player;
     std::string name = "Default";
     std::string colorName;
     int color = WHITE;
-    position++;
+    PlayerData player = { name,color };
 
     auto paddingAndRedUpChar = []() { //[&] means capture everything outside this scope
-        std::cout << "\n" << std::string(BOARD_LEFT_PADDING, ' ');
+        std::cout << "\n" << LEFT_PADDING_STR;
         printForeColor(RED, '|');
     };
 
     auto showAvailableColors = [&]() {
         saveCurrentCursorPosition();
 
-        int line = 4 + BOARD_TOP_PADDING;
+        int line = 3 + BOARD_TOP_PADDING;
         int col = 1 + 2 * introBoardWidth + CARD_LEFT_PADDING;
 
         std::vector<int> colors = { RED,GREEN,BLUE,PINK,ORANGE };
@@ -53,9 +52,10 @@ PlayerData askPlayer(int position, int introBoardWidth, std::vector<std::string>
 
 
     for (;;) { //ask name
-        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "|Player " << position << " name: ";
+        std::cout << LEFT_PADDING_STR << "|Player " << ++position << " name: ";
         std::getline(std::cin, name);
         name = stripSpaces(name);
+
         if (name == "") {
             paddingAndRedUpChar();
             std::cout << "We do not accept empty names!\n\n";
@@ -75,10 +75,13 @@ PlayerData askPlayer(int position, int introBoardWidth, std::vector<std::string>
 
     for (;;) { //ask color
         showAvailableColors();
-        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "|Player " << position << " color: ";
+        std::cout << LEFT_PADDING_STR << "|Player " << position << " color: ";
         std::getline(std::cin, colorName);
+
+        colorName = stripSpecialChars(colorName);
         colorName = stripSpaces(colorName);
         for (auto& i : colorName) i = tolower(i);
+
         if (colorName == "red") {
             color= RED;
         }
@@ -116,12 +119,12 @@ int askNumberOfPlayers() {
     int nPlayers = 2;
 
     auto paddingAndRedUpChar = []() { //[&] means capture everything outside this scope
-        std::cout << "\n" << std::string(BOARD_LEFT_PADDING, ' ');
+        std::cout << "\n" << LEFT_PADDING_STR;
         printForeColor(RED, '|');
     };
 
     for (;;) {
-        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "|Number of players: ";
+        std::cout << LEFT_PADDING_STR << "|Number of players: ";
         if (!(std::cin >> nPlayers) || nPlayers > 4 || nPlayers < 2) {
             if (std::cin.fail()) {
                 std::cin.clear();
@@ -148,45 +151,12 @@ void printIntro() {
     };
 
     for (auto sentence : sentences) {
-        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << sentence << "\n";
+        std::cout << LEFT_PADDING_STR << sentence << "\n";
     }
 
-    std::cout << std::string(BOARD_LEFT_PADDING, ' ');
+    std::cout << LEFT_PADDING_STR;
     std::cin.ignore(10000, '\n');
 }
-
-/*Game* createGame() {
-    int nPlayers = 2;
-    Board intro_board("intro_board.txt");
-
-    auto clearAndShowIntroBoard = [&]() { //[&] means capture everything outside this scope
-        clearConsole();
-        intro_board.show();
-    };
-
-    std::vector<std::string> playerNames, forbiddenNames;
-    std::vector<int> playerColors, forbiddenColors;
-
-    intro_board.show();
-    printIntro();
-    clearAndShowIntroBoard();
-
-    nPlayers = askNumberOfPlayers();
-    clearAndShowIntroBoard();
-
-    for (int i = 0; i < nPlayers; ++i) {
-        clearAndShowIntroBoard();
-        PlayerData player = askPlayer(i, 17, forbiddenNames, forbiddenColors);
-        playerNames.push_back(player.name);
-        forbiddenNames.push_back(player.name);
-        playerColors.push_back(player.color);
-        forbiddenColors.push_back(player.color);
-    }
-
-    Game my_game(&intro_board, playerNames, playerColors, 0);
-
-    return &my_game;
-}*/
 
 int main()
 {
@@ -194,6 +164,7 @@ int main()
 
     int nPlayers = 2;
     Board intro_board("intro_board.txt");
+    Board board("test.txt"); //will ask the user in the future
 
     auto clearAndShowIntroBoard = [&]() { //[&] means capture everything outside this scope
         clearConsole();
@@ -202,7 +173,7 @@ int main()
 
     std::vector<std::string> playerNames, forbiddenNames;
     std::vector<int> playerColors, forbiddenColors;
-
+    
     intro_board.show();
     printIntro();
     clearAndShowIntroBoard();
@@ -213,23 +184,15 @@ int main()
     for (int i = 0; i < nPlayers; ++i) {
         clearAndShowIntroBoard();
         PlayerData player = askPlayer(i, 17, forbiddenNames, forbiddenColors);
+
         playerNames.push_back(player.name);
         forbiddenNames.push_back(player.name);
+
         playerColors.push_back(player.color);
         forbiddenColors.push_back(player.color);
     }
 
-    Game my_game(&intro_board, playerNames, playerColors, 0);
-
-    /*
-    Game my_game = *createGame();
-    std::cin.ignore();
-  
-    Board my_board("test.txt");
-    std::vector<std::string> playerNames = { "Alfredo Martins", "Comboios de Portugal","Nunca Sentado"};
-    std::vector<int> playerColors = { GREEN,RED,BLUE};
-    //Game my_game(&my_board, playerNames, playerColors, 0);
-    */
+    Game my_game(&board, playerNames, playerColors, 0);
 
     for (;;) {
         my_game.askCommand(1);
@@ -239,9 +202,6 @@ int main()
     }
 
     clearConsole();
-    if (my_game.hasWinner()) {
-        std::cout << my_game.getWinner() << "won! Final classifications:\n";
-        my_game.showScores();
-    }
-    else std::cout << "There has been a draw! Congrats to all.\n";
+    intro_board.show();
+    my_game.end();
 }

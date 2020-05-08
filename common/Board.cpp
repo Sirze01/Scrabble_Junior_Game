@@ -127,7 +127,7 @@ Board::Board(std::string filename) {
 }
 
 void Board::show() const { //Prototype function (needs styling)
-      std::cout << std::string(BOARD_TOP_PADDING,'\n') << std::string(BOARD_LEFT_PADDING, ' ');
+      std::cout << std::string(BOARD_TOP_PADDING,'\n') << LEFT_PADDING_STR;
 
 	std::cout << " ";
 	for (int i = 0; i < _hDimension; i++) {
@@ -135,7 +135,7 @@ void Board::show() const { //Prototype function (needs styling)
 	}
 	std::cout << std::endl;
 	for (int i = 0; i < _vDimension; i++) {
-		std::cout << std::string(BOARD_LEFT_PADDING, ' ');
+		std::cout << LEFT_PADDING_STR;
 		std::cout << std::string(1, (toupper(alphabet.at(i))));
 		for (int j = 0; j < _hDimension; j++) {
 			std::cout << ' ';
@@ -210,6 +210,19 @@ void Board::highlightFinishedWord(int color, int vIndex, int hIndex) {
 
 std::vector<std::vector<char>> Board::getLetters() const {
 	return _letters;
+}
+
+std::vector<char> Board::getNonEmptyChars() const {
+	std::vector<char> allChars;
+	//add letters in board
+	for (std::vector<char> v : _letters) {
+		for (char c : v) {
+			if (c != ' ') {
+				allChars.push_back(c);
+			}
+		}
+	}
+	return allChars;
 }
 
 std::vector<std::vector<bool>> Board::getHighlights() const {

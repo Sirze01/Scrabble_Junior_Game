@@ -9,24 +9,7 @@ unsigned SEED = (unsigned)std::chrono::system_clock::now().time_since_epoch().co
 std::mt19937 RANDOM_GENERATOR(SEED);
 
 Pool::Pool(const Board *board) {
-	std::vector<std::vector<char>> boardContent = board->getLetters();
-	_letters.push_back('X');
-
-	//add letters in board
-	for (std::vector<char> v : boardContent) {
-		for (char c : v) {
-			if (c != ' ') {
-				_letters.push_back(c);
-			}
-		}
-	}
-}
-
-void Pool::show() {
-	std::vector<char> my_letters = getAllLetters();
-	for (auto i : my_letters) std::cout << i << " ";
-	std::cout << std::endl;
-	std::cout << "pool size: " << getCurrentSize() << "\n";
+	_letters = board->getNonEmptyChars();
 }
 
 bool Pool::take(int pos) {
