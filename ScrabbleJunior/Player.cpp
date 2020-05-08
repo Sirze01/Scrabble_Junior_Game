@@ -32,7 +32,9 @@ std::string Player::getName() const {
 void Player::showHand() const {
     for (auto i : _hand) {
         if (i == ' ') continue;
-        else print(WHITE,_color, i);
+        else {
+            print(WHITE, _color, i);
+        }
         std::cout << " ";
     }
     std::cout << "\n";

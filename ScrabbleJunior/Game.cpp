@@ -37,9 +37,9 @@ void Game::askCommand(int turnNumber) {
 	auto showBoardAndHand = [&]() {
 		clearConsole();
 		_board->show();
-		showScores();
-		std::cout << LEFT_PADDING_STR << "You have on hand: ";
-		_currentPlayer->showHand();
+		showHands();
+		//std::cout << LEFT_PADDING_STR << "You have on hand: ";
+		//_currentPlayer->showHand();
 	};
 
 	if (!_currentPlayer->getMayPass() && hasFinished()) return;
@@ -74,7 +74,7 @@ void Game::askCommand(int turnNumber) {
 	std::string input;
 
 	for (;;) {
-		std::cout << "\n" << LEFT_PADDING_STR << "(turn " << turnNumber << ") " << _currentPlayer->getName() << ": ";
+		paddingAndPlayerUpChar(); std::cout << "(turn " << turnNumber << ") " << _currentPlayer->getName() << ": ";
 		std::getline(std::cin, input);
 
 		//make sure input buffer is ok
@@ -88,13 +88,13 @@ void Game::askCommand(int turnNumber) {
 			Move move(&command, _board);
 			int problemLevel = move.hasProblems(_currentPlayer);
 			if (problemLevel) {
-				std::cout << LEFT_PADDING_STR << "Could not play! ";
+				std::cout << "\n" << LEFT_PADDING_STR << "|Could not play! ";
 				if (problemLevel == 1)
 					std::cout << "Are you attempting to put a tile outside the board?\n";
 				if (problemLevel == 2)
 					std::cout << "Is the letter " << command.getMoveLetter() << " in that position?\n";
 				if (problemLevel == 3)
-					std::cout << "You do not have the letter " << command.getMoveLetter() << " in hand.\n";
+					std::cout << "You do not have the letter " << command.getMoveLetter() << " on hand.\n";
 				if (problemLevel == 4)
 					std::cout << "That position already has a tile.\n";
 				if (problemLevel == 5)
@@ -111,20 +111,19 @@ void Game::askCommand(int turnNumber) {
 			if (command.isExchange()) {
 				int token = command.getExchangeLetter();
 				if (_currentPlayer->mayMove(_board, _pool)) {
-					std::cout << LEFT_PADDING_STR << "You can not exchange when you have possible moves. Pay attention!\n";
+					std::cout << "\n" << LEFT_PADDING_STR << "|You can not exchange when you have possible moves. Pay attention!\n";
 				}
 				else if (!_currentPlayer->exchange(token, _pool)) {
 					if (!_pool->getCurrentSize()) {
 						_currentPlayer->forcePass();
-						std::cout << "\n";
 						paddingAndPlayerUpChar(); std::cout << "The pool is empty.";
 						paddingAndPlayerUpChar(); std::cout << "Your turn will be skipped as long as you cannot move.";
 						paddingAndPlayerUpChar(); std::cout << "Press enter to continue.";
 						std::cin.ignore(10000, '\n');
 						break;
 					}
-					else std::cout << LEFT_PADDING_STR
-						<< "Could not exchange. Have you got the letter " << command.getExchangeLetter() << " on hand?\n";
+					else std::cout << "\n" << LEFT_PADDING_STR
+						<< "|Could not exchange. Have you got the letter " << command.getExchangeLetter() << " on hand?\n";
 				}
 				else showBoardAndHand();
 			}
@@ -135,15 +134,16 @@ void Game::askCommand(int turnNumber) {
 			else if (command.isHelp()) showHelp();
 			else if (command.isHint()) {
 				coord pos = _currentPlayer->getPossiblePos(_board, _pool);
-				if (pos.hCollumn == -1 || pos.vLine == -1) std::cout << LEFT_PADDING_STR << "Maybe you can't move right now...\n";
-				else std::cout << LEFT_PADDING_STR << "Look carefully at the board on position " << (char)('A' + pos.vLine) << (char)('a' + pos.hCollumn) << "...\n";
+				std::cout << "\n";
+				if (pos.hCollumn == -1 || pos.vLine == -1) std::cout << LEFT_PADDING_STR << "|Maybe you can't move right now...\n";
+				else std::cout << LEFT_PADDING_STR << "|Look carefully at the board on position " << (char)('A' + pos.vLine) << (char)('a' + pos.hCollumn) << "...\n";
 			}
 			else if (command.isPass()) {
 				if (_currentPlayer->mayMove(_board, _pool)) {
-					std::cout << LEFT_PADDING_STR << "You cannot pass when you have possible moves. Look carefully!\n";
+					std::cout << "\n" << LEFT_PADDING_STR << "|You cannot pass when you have possible moves. Look carefully!\n";
 				}
 				else if (_pool->getCurrentSize() && !_currentPlayer->getExchangeCount()) {
-					std::cout << LEFT_PADDING_STR << "The pool is not empty. Please try to exchange a letter.\n";
+					std::cout << "\n" << LEFT_PADDING_STR << "|The pool is not empty. Please try to exchange a letter.\n";
 				}
 				else {
 					_currentPlayer->forcePass();
@@ -151,10 +151,10 @@ void Game::askCommand(int turnNumber) {
 				}
 			}
 			else if (command.isClear()) showBoardAndHand();
-			else std::cout << LEFT_PADDING_STR << smartCommandAdvice(command.getStr());
+			else std::cout << "\n" << LEFT_PADDING_STR << "|" << smartCommandAdvice(command.getStr());
 		}
 
-		else std::cout << LEFT_PADDING_STR << "We found overlapping command keywords in your input. Type 'help' to learn why.\n";
+		else std::cout << "\n"<< LEFT_PADDING_STR << "|We found overlapping command keywords in your input. Type 'help' to learn why.\n";
 	}
 }
 
