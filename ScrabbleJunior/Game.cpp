@@ -16,7 +16,7 @@ Game::Game(Board* board, std::vector<std::string> playerNames, std::vector<int> 
 	_currentPlayer = _players.at(_currentPlayerPos);
 
 	//card settings
-	if (_board->getDimensions().vLine >= 15) _compactCardView = false;
+	if (_board->getDimensions().vLine >= 12) _compactCardView = false;
 	else _compactCardView = true;
 }
 
