@@ -110,11 +110,11 @@ std::string smartCommandAdvice(std::string command) {
         processed += toupper(command.at(0));
         processed += tolower(command.at(1));
         return "Did you attempt to play a tile on position " + processed +
-               "? Please specify letter as in 'Yx <letter>'.\n";
+               "? Please specify letter as in 'Yx <letter>'.";
     } else if (command.find("exchange") != std::string::npos) {
-        return "Are you trying to exchange one of your tiles? Please specify letter as in 'exchange <letter>'.\n";
+        return "Are you trying to exchange one of your tiles? Please specify letter as in 'exchange <letter>'";
     } else {
-        return "Command not recognized. Please type 'help' to view the available commands.\n";
+        return "Command not recognized. Please type 'help' to view the available commands.";
     }
 }
     

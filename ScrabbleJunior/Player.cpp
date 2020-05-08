@@ -29,11 +29,16 @@ std::string Player::getName() const {
     return _name;
 }
 
-void Player::showHand() const {
+void Player::showHand(bool color) const {
+    if (!getHandSize()) {
+        std::cout << "Nothing on hand";
+        return;
+    }
     for (auto i : _hand) {
         if (i == ' ') continue;
         else {
-            print(WHITE, _color, i);
+            if (color) print(WHITE, _color, i);
+            else std::cout << i;
         }
         std::cout << " ";
     }

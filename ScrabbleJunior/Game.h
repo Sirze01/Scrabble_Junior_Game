@@ -12,6 +12,7 @@ public:
 	Game(Board* board, std::vector<std::string> playerNames, std::vector<int> playerForeColors, int firstToMove);
 	~Game();
 	void end() const;
+	void showBoardAndCardView(std::string view = "hands") const;
 	void askCommand(int turnNumber);
 	void nextTurn();
 	void showScores(bool function = true) const;

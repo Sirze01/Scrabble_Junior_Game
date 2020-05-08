@@ -181,13 +181,13 @@ bool Board::highlight(int color, int vIndex, int hIndex) {
 }
 
 void Board::highlightFinishedWord(int color, int vIndex, int hIndex) {
-	std::vector<std::vector<int>> tempCol = _highlightColors;
-	std::vector<std::vector<int>> tempLine = _highlightColors;
+	std::vector<std::vector<int>> tempCol, tempLine;
+	coord dim = getDimensions();
 	bool successOnLine, successOnCol;
 
 	for (int cof : {-1, 1}) {
-		successOnCol = true;
-		for (int line = vIndex + cof; line >= 0; line+=cof) {
+		successOnCol = true; tempCol = _highlightColors;
+		for (int line = vIndex + cof; line >= 0 && line < dim.vLine; line+=cof) {
 			if (_highlights.at(line).at(hIndex)) {
 				tempCol.at(line).at(hIndex) = color;
 			}
@@ -198,8 +198,8 @@ void Board::highlightFinishedWord(int color, int vIndex, int hIndex) {
 		}
 		if (successOnCol) _highlightColors = tempCol;
 
-		successOnLine = true;
-		for (int col = hIndex + cof; col >= 0; col+=cof) {
+		successOnLine = true; tempLine = _highlightColors;
+		for (int col = hIndex + cof; col >= 0 && col < dim.hCollumn; col+=cof) {
 			if (_highlights.at(vIndex).at(col)) {
 				tempLine.at(vIndex).at(col) = color;
 			}
@@ -218,13 +218,8 @@ std::vector<std::vector<char>> Board::getLetters() const {
 
 std::vector<char> Board::getNonEmptyChars() const {
 	std::vector<char> allChars;
-	//add letters in board
 	for (std::vector<char> v : _letters) {
-		for (char c : v) {
-			if (c != ' ') {
-				allChars.push_back(c);
-			}
-		}
+		for (char c : v) if (c != ' ') allChars.push_back(c);
 	}
 	return allChars;
 }

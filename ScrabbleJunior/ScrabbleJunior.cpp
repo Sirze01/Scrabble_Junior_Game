@@ -253,7 +253,7 @@ int main()
 		intro_board.show();
 		std::cout << "\n";
 	};
-
+	/*
 	std::vector<std::string> playerNames;
 	std::vector<int> playerColors;
 
@@ -263,12 +263,6 @@ int main()
 	clearAndShowIntroBoard();
 	std::string filename = askBoardFileName();
 	Board board(filename); //will ask the user in the future
-
-	auto clearAndShowGameBoard = [&]() {
-		clearConsole();
-		board.show();
-		std::cout << "\n";
-	};
 
 	clearAndShowGameBoard();
 	nPlayers = askNumberOfPlayers();
@@ -284,6 +278,22 @@ int main()
 	clearAndShowGameBoard();
 	int first = askPlayFirst(board.getDimensions().hCollumn, nPlayers, playerNames, playerColors);
 
+	*/
+
+
+	//start debug
+	Board board("intro_board.txt");
+	std::vector<std::string> playerNames = { "Alfredo","Comboios" };
+	std::vector<int> playerColors = { RED,GREEN };
+	int first = 1;
+	//end debug
+
+	auto clearAndShowGameBoard = [&]() {
+		clearConsole();
+		board.show();
+		std::cout << "\n";
+	};
+
 	Game my_game(&board, playerNames, playerColors, first);
 
 	clearAndShowGameBoard();
@@ -297,6 +307,5 @@ int main()
 	}
 
 	clearConsole();
-	intro_board.show();
 	my_game.end();
 }
