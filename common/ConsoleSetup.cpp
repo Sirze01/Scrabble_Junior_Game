@@ -52,32 +52,26 @@ void cleanBuffer() {
 }
 
 void printBackColor(int backColor, const char c) {
-	std::cout << "\x1b[1m";
 	std::cout << "\033[48;5;" << backColor << "m" << c << "\033[0m";
 }
 
 void printBackColor(int backColor, std::string message) {
-	std::cout << "\x1b[1m";
 	std::cout << "\033[48;5;" << backColor << "m" << message << "\033[0m";
 }
 
 void printForeColor(int foreColor, const char c) {
-	std::cout << "\x1b[1m";
 	std::cout << "\033[38;5;" << foreColor << "m" << c << "\033[0m";
 }
 
 void printForeColor(int foreColor, std::string message) {
-	std::cout << "\x1b[1m";
 	std::cout << "\033[38;1;" << foreColor << "m" << message << "\033[0m";
 }
 
 void print(int foreColor, int backColor, const char c) {
-	std::cout << "\x1b[1m";
 	std::cout << "\033[38;5;" << foreColor << ";48;5;" << backColor << "m" << c << "\033[0m";
 }
 
 void print(int foreColor, int backColor, std::string message) {
-	std::cout << "\x1b[1m";
 	std::cout << "\033[38;5;" << foreColor << ";48;5;" << backColor << "m" << message << "\033[0m";
 }
 
@@ -106,7 +100,8 @@ void restoreSavedCursorPosition() {
 void eraseCardView(int boardDimension, int col) {
 	saveCurrentCursorPosition();
 	int line = 1;
-	boardDimension += 3; //board side + you have on hand
+	if (boardDimension < 8) boardDimension = 8;
+	boardDimension += 3; //frame + 2 newlines
 	while (line <= boardDimension) {
 		putCursorOnPos(line, col);
 		eraseLineToTheEnd();

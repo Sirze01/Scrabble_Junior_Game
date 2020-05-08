@@ -35,7 +35,6 @@ void Game::showBoardAndCardView(std::string view, bool showInfo) const {
 }
 
 void Game::askCommand(int turnNumber) {
-	if (!_currentPlayer->getMayPass() && hasFinished()) return;
 	if (_currentPlayer->getMayPass() && _currentPlayer->mayMove(_board, _pool)) _currentPlayer->doNotPass();
 	_currentPlayer->resetExchangeCount();
 
@@ -208,9 +207,8 @@ bool Game::hasFinished() const {
 
 	for (int line = 0; line <= maxLine;++line) {
 		for (int col = 0;col <= maxCol;++col) {
-			if (letters.at(line).at(col) != ' ') {
-				if (highlights.at(line).at(col)) return false;
-			}
+			if (letters.at(line).at(col) != ' '
+				&& !highlights.at(line).at(col)) return false;
 		}
 	}
 	return true;
@@ -254,7 +252,7 @@ void Game::showScores(bool function) const {
 		std::cout << player->getName();
 		if (function) {
 			if (i == _currentPlayerPos) std::cout << " - to play!";
-			else if (player->getMayPass()) std::cout << " - skipped last turn";
+			else if (player->getMayPass()) std::cout << " - passed last turn";
 		}
 		std::cout << std::endl;
 
@@ -284,7 +282,7 @@ void Game::showHands(bool function) const {
 		std::cout << player->getName();
 		if (function) {
 			if (i == _currentPlayerPos) std::cout << " - to play!";
-			else if (player->getMayPass()) std::cout << " - skipped last turn";
+			else if (player->getMayPass()) std::cout << " - passed last turn";
 		}
 		std::cout << std::endl;
 
@@ -383,8 +381,12 @@ void Game::end() const {
 
 
 	paddingAndTopic(WHITE,true); std::cout << "THE GAME HAS ENDED!\n";
-	paddingAndTopic(color,true);
 
+	if (allPlayersMustPass()) {
+		paddingAndTopic(WHITE, true); std::cout << "All players passed their moves.\n";
+	}
+
+	paddingAndTopic(color,true);
 	if (hasWinner()) {
 		std::cout << _players.at(winner)->getName() << " won with brilliancy!\n";
 	}

@@ -62,8 +62,11 @@ Board::Board(std::string filename) {
 
 	if (file.is_open()) {
         getline(file, line);
+		line = stripSpaces(line);
+		//THIS NEEDS TO BE MORE FLEXIBLE!!
         _vDimension = std::stoi(line.substr(0, 2));
-        _hDimension= std::stoi(line.substr(5));
+        _hDimension= std::stoi(line.substr(4,6));
+		//
         _letters.resize(_vDimension);
 
         for (auto & _line : _letters){
@@ -127,16 +130,20 @@ Board::Board(std::string filename) {
 }
 
 void Board::show() const { //Prototype function (needs styling)
-      std::cout << std::string(BOARD_TOP_PADDING,'\n') << LEFT_PADDING_STR;
+	auto darkSpace = []() {printBackColor(DARK_GREY, ' '); };
 
-	std::cout << " ";
+    std::cout << std::string(BOARD_TOP_PADDING,'\n') << LEFT_PADDING_STR;
+
+	darkSpace();
 	for (int i = 0; i < _hDimension; i++) {
-		std::cout << " " << alphabet.at(i);
+		darkSpace(); printBackColor(DARK_GREY, alphabet.at(i));
+		//std::cout << " " << alphabet.at(i);
 	}
-	std::cout << std::endl;
+	//std::cout << std::endl;
+	darkSpace(); darkSpace(); std::cout << std::endl;
 	for (int i = 0; i < _vDimension; i++) {
 		std::cout << LEFT_PADDING_STR;
-		std::cout << std::string(1, (toupper(alphabet.at(i))));
+		printBackColor(DARK_GREY,toupper(alphabet.at(i)));
 		for (int j = 0; j < _hDimension; j++) {
 			std::cout << ' ';
 			if (getHighlights().at(i).at(j)) {
@@ -144,9 +151,14 @@ void Board::show() const { //Prototype function (needs styling)
 			}
 			else std::cout << _letters[i][j];
 		}
-		std::cout << '\n';
+		std::cout << " "; darkSpace(); std::cout << std::endl;
 	}
-	std::cout << "\n";
+	std::cout << LEFT_PADDING_STR;
+	for (int i = 0; i <= 2 * _hDimension + 2; i++) darkSpace();
+
+	//make room for card view
+	int i = 10 - _vDimension; if (i < 2) i = 2;
+	while (i--) std::cout << "\n";
 }
 
 coord Board::getIndex(std::string position) const {

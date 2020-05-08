@@ -12,7 +12,7 @@ public:
 	char getExchangeLetter() const;
 	std::string getStr() const;
 	bool isMove() const;
-	bool isExchange() const;
+	bool isExchange(bool forceToken = true) const;
 	bool isCheckPool() const;
 	bool isCheckHands() const;
 	bool isCheckScores() const;

@@ -55,7 +55,7 @@ int askPlayFirst(int BoardWidth, int nPlayers, std::vector<std::string> playerNa
 			if (playerName == playerNames.at(i)) return i;
 		}
 
-		paddingAndTopic(RED,true); std::cout << "We could not find a player with that name. Please try again.\n";
+		paddingAndTopic(RED,true); std::cout << "We could not find a player with that exact name. Please try again.\n";
 	}
 
 	return 0;
@@ -258,11 +258,13 @@ int main()
 	clearAndShowBoard(&gameBoard);
 	getReady();
 
-	do {
+	for (;;) {
 		my_game.askCommand(1);
+		if (my_game.hasFinished()) break;
 		my_game.askCommand(2);
+		if (my_game.hasFinished()) break;
 		my_game.nextTurn();
-	} while (!my_game.hasFinished());
+	};
 
 	my_game.end();
 }
