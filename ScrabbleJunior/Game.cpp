@@ -27,11 +27,11 @@ Game::~Game() {
 	}
 }
 
-void Game::showBoardAndCardView(std::string view) const {
+void Game::showBoardAndCardView(std::string view, bool showInfo) const {
 	clearConsole();
 	_board->show();
-	if (view == "hands") showHands();
-	else showScores();
+	if (view == "hands") showHands(showInfo);
+	else showScores(showInfo);
 }
 
 void Game::askCommand(int turnNumber) {
@@ -373,7 +373,7 @@ std::string Game::getPlayerName(int playerPos) const {
 }
 
 void Game::end() const {
-	showBoardAndCardView("scores");
+	showBoardAndCardView("scores",false);
 
 	int color;
 	int winner = getWinner();
