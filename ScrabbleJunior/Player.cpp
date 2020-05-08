@@ -12,6 +12,7 @@ extern std::mt19937 RANDOM_GENERATOR;
 
 Player::Player(Pool *pool, std::string name, int color) {
     int handSize = 7;
+    _mayPass = 0;
     _score = 0;
     _color = color;
     _exchangeCount = 0;

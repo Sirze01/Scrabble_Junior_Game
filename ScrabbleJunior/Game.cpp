@@ -21,9 +21,9 @@ Game::Game(Board* board, std::vector<std::string> playerNames, std::vector<int> 
 }
 
 Game::~Game() {
-	delete _pool;
+	if (_pool!=NULL) delete _pool;
 	for (int i = 0; i < _nPlayers;++i) {
-		delete _players.at(i);
+		if (_players.at(i) != NULL) delete _players.at(i);
 	}
 }
 
@@ -145,7 +145,7 @@ void Game::askCommand(int turnNumber) {
 						regularMessage = "Look carefully at the board on position ";
 						regularMessage += (char)('A' + pos.vLine);
 						regularMessage += (char)('a' + pos.hCollumn);
-						regularMessage += " ...";
+						regularMessage += "...";
 					}
 				}
 				else if (command.isPass()) {
@@ -201,14 +201,15 @@ bool Game::hasFinished() const {
 	if (_currentPlayer->mayMove(_board, _pool)) return false;
 	else if (allPlayersMustPass()) return true;
 
-	Board board = *_board;
-	int maxLine = board.getDimensions().vLine - 1;
-	int maxCol = board.getDimensions().hCollumn - 1;
+	int maxLine = _board->getDimensions().vLine - 1;
+	int maxCol = _board->getDimensions().hCollumn - 1;
+	std::vector<std::vector<char>> letters = _board->getLetters();
+	std::vector<std::vector<bool>> highlights = _board->getHighlights();
 
 	for (int line = 0; line <= maxLine;++line) {
 		for (int col = 0;col <= maxCol;++col) {
-			if (board.getLetters().at(line).at(col) != ' ') {
-				if (!board.getHighlights().at(line).at(col)) return false;
+			if (letters.at(line).at(col) != ' ') {
+				if (highlights.at(line).at(col)) return false;
 			}
 		}
 	}
@@ -246,10 +247,7 @@ void Game::showScores(bool function) const {
 	for (int i = 0; i < _nPlayers;++i) {
 		Player* player = _players.at(i);
 
-		for (int i = 0; i < 5 - _nPlayers - _compactCardView; ++i) {
-			putCursorOnPos(line++, col);
-			std::cout << std::endl;
-		}
+		for (int i = 0; i < 5 - _nPlayers - _compactCardView; ++i) line++;
 
 		putCursorOnPos(line++, col);
 		printForeColor(player->getColor(), '|');
@@ -279,10 +277,7 @@ void Game::showHands(bool function) const {
 	for (int i = 0; i < _nPlayers;++i) {
 		Player* player = _players.at(i);
 
-		for (int i = 0; i < 5 - _nPlayers - _compactCardView; ++i) {
-			putCursorOnPos(line++, col);
-			std::cout << std::endl;
-		}
+		for (int i = 0; i < 5 - _nPlayers - _compactCardView; ++i) line++;
 
 		putCursorOnPos(line++, col);
 		printForeColor(player->getColor(), '|');
@@ -397,6 +392,6 @@ void Game::end() const {
 		std::cout << "There has been a draw! Congratulations to all.\n";
 	}
 
-	paddingAndTopic(WHITE); std::cout << "Press enter twice to exit.\n";
+	paddingAndTopic(WHITE,true); std::cout << "Press enter twice to exit.\n";
 	int i = 2; while (i--) std::cin.ignore(10000, '\n');
 }

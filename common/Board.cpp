@@ -238,5 +238,5 @@ bool Board::boardBounds(coord firstLetter, std::string orientation, int wordLen)
         return false;
     if((firstLetter.hCollumn > _hDimension) || (firstLetter.hCollumn < _hDimension))
         return false;
-
+	return true;
 }

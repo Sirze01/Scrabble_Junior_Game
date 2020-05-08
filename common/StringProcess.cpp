@@ -24,6 +24,19 @@ std::string stripSpaces(std::string name) {
     return name;
 }
 
+std::string upperNameInitials(std::string name) {
+    bool doUpper = true;
+    for (size_t i = 0; i < name.length(); i++) {
+        if (doUpper && name.at(i) >= 'A' && name.at(i) <= 'Z') doUpper = false; //already uppercase
+        else if (doUpper && !(name.at(i) >= 'A' && name.at(i) <= 'Z')) {
+            name.at(i) = toupper(name.at(i));
+            doUpper = false;
+        }
+        else if (name.at(i) == ' ') doUpper = true;
+    }
+    return name;
+}
+
 std::string stripSpecialChars(std::string name) {
     std::string cleanStr;
     for (char c : name) {
