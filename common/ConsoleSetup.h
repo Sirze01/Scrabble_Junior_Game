@@ -2,7 +2,9 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <limits>
+#include <functional>
 
 //define UNICODE
 #ifndef UNICODE
@@ -37,7 +39,10 @@ const char TOPIC = '|';
 const int
 CARD_LEFT_PADDING = 12,
 BOARD_LEFT_PADDING = 2,
-BOARD_TOP_PADDING = 1;
+BOARD_TOP_PADDING = 1,
+BOARD_BOTTOM_PADDING = 2,
+BOARD_MIN_DIM = 8,
+COMPACT_VIEW_MAX = 12;
 
 const std::string
 LEFT_PADDING_STR(BOARD_LEFT_PADDING, ' ');
@@ -71,6 +76,7 @@ void eraseEntireLine();
 void saveCurrentCursorPosition();
 void restoreSavedCursorPosition();
 
+void writeCardView(int boardHeight, int boardWidth, std::function<void(int,int)> write);
 void eraseCardView(int boardDimension, int col);
 
 void paddingAndTopic(int color, bool newLine = false);

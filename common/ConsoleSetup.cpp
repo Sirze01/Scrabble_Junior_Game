@@ -105,14 +105,22 @@ void restoreSavedCursorPosition() {
 
 void eraseCardView(int boardDimension, int col) {
 	saveCurrentCursorPosition();
-	int line = 1;
-	if (boardDimension < 8) boardDimension = 8;
-	boardDimension += 3; //frame + 2 newlines
-	while (line <= boardDimension) {
-		putCursorOnPos(line, col);
+	if (boardDimension < BOARD_MIN_DIM) boardDimension = BOARD_MIN_DIM;
+	boardDimension += BOARD_TOP_PADDING + 2; //2 frames
+	for (int i = 1; i <= boardDimension; i++) {
+		putCursorOnPos(i, col);
 		eraseLineToTheEnd();
-		line++;
 	}
+	restoreSavedCursorPosition();
+}
+
+void writeCardView(int boardHeight, int boardWidth, std::function<void(int,int)> write){
+	saveCurrentCursorPosition();
+	int line = 2 + BOARD_TOP_PADDING;
+	int col = 2 * boardWidth + CARD_LEFT_PADDING;
+	eraseCardView(boardHeight, col);
+	putCursorOnPos(line++, col);
+	write(line,col);
 	restoreSavedCursorPosition();
 }
 

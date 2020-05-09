@@ -16,7 +16,7 @@ Game::Game(Board* board, std::vector<std::string> playerNames, std::vector<int> 
 	_currentPlayer = _players.at(_currentPlayerPos);
 
 	//card settings
-	if (_board->getDimensions().vLine >= 12) _compactCardView = false;
+	if (_board->getDimensions().vLine >= COMPACT_VIEW_MAX) _compactCardView = false;
 	else _compactCardView = true;
 }
 
@@ -234,134 +234,113 @@ int Game::getWinner() const {
 }
 
 void Game::showScores(bool function) const {
-	saveCurrentCursorPosition();
+	std::function<void(int, int)> write = [&](int line, int col) {
 
-	int line = 2 + BOARD_TOP_PADDING - _compactCardView;
-	int col = 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
+		for (int i = 0; i < _nPlayers;++i) {
+			Player* player = _players.at(i);
 
-	eraseCardView(_board->getDimensions().vLine, col);
+			putCursorOnPos(line++, col);
+			printForeColor(player->getColor(), '|');
+			std::cout << player->getName();
+			if (function) {
+				if (i == _currentPlayerPos) std::cout << " - to play!";
+				else if (player->getMayPass()) std::cout << " - passed last turn";
+			}
+			std::cout << std::endl;
 
-	for (int i = 0; i < _nPlayers;++i) {
-		Player* player = _players.at(i);
+			putCursorOnPos(line++, col);
+			printForeColor(player->getColor(), '|');
+			std::cout << player->getScore() << " points";
 
-		for (int i = 0; i < 5 - _nPlayers - _compactCardView; ++i) line++;
-
-		putCursorOnPos(line++, col);
-		printForeColor(player->getColor(), '|');
-		std::cout << player->getName();
-		if (function) {
-			if (i == _currentPlayerPos) std::cout << " - to play!";
-			else if (player->getMayPass()) std::cout << " - passed last turn";
+			for (int i = 0; i < 5 - _nPlayers - _compactCardView; ++i) line++;
 		}
-		std::cout << std::endl;
+	};
 
-		putCursorOnPos(line++, col);
-		printForeColor(player->getColor(), '|');
-		std::cout << player->getScore() << " points";
-	}
-
-	restoreSavedCursorPosition();
+	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, write);
 }
 
 void Game::showHands(bool function) const {
-	saveCurrentCursorPosition();
+	std::function<void(int,int)> write = [&](int line, int col){
+		for (int i = 0; i < _nPlayers;++i) {
+			Player* player = _players.at(i);
 
-	int line = 2 + BOARD_TOP_PADDING - _compactCardView;
-	int col = 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
+			putCursorOnPos(line++, col);
+			printForeColor(player->getColor(), '|');
+			std::cout << player->getName();
+			if (function) {
+				if (i == _currentPlayerPos) std::cout << " - to play!";
+				else if (player->getMayPass()) std::cout << " - passed last turn";
+			}
+			std::cout << std::endl;
 
-	eraseCardView(_board->getDimensions().vLine, col);
+			putCursorOnPos(line++, col);
+			printForeColor(player->getColor(), '|');
+			if (i == _currentPlayerPos) player->showHand(true);
+			else player->showHand(false);
 
-	for (int i = 0; i < _nPlayers;++i) {
-		Player* player = _players.at(i);
-
-		for (int i = 0; i < 5 - _nPlayers - _compactCardView; ++i) line++;
-
-		putCursorOnPos(line++, col);
-		printForeColor(player->getColor(), '|');
-		std::cout << player->getName();
-		if (function) {
-			if (i == _currentPlayerPos) std::cout << " - to play!";
-			else if (player->getMayPass()) std::cout << " - passed last turn";
+			for (int i = 0; i < 5 - _nPlayers - _compactCardView; ++i) line++;
 		}
-		std::cout << std::endl;
+	};
 
-		putCursorOnPos(line++, col);
-		printForeColor(player->getColor(), '|');
-		if (i == _currentPlayerPos) player->showHand(true);
-		else player->showHand(false);
-	}
-
-	restoreSavedCursorPosition();
+	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, write);
 }
 
 void Game::showHelp() const {
-	saveCurrentCursorPosition();
+	std::function<void(int, int)> write = [&](int line, int col) {
+		std::vector<std::string> intro =
+		{
+			"|Start or continue words with the tiles you have on hand.",
+			"|You get one point for each word you complete.",
+			"|Available commands:",
+			"|"
+		};
 
-	int line = 2 + BOARD_TOP_PADDING - _compactCardView; //initial top padding
-	int col = 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
+		std::vector<std::string> commands =
+		{
+			"|-> 'move <Yx> <letter>' - play letter on position.",
+			"|-> 'exchange <letter>' - exchange a letter from the pool.",
+			"|-> 'check hands' - have a look at all players' hands.",
+			"|-> 'check scores' - have a look at the current scores.",
+			"|-> 'check pool' - spy on the current state of the pool.",
+			"|-> 'get hint' - get some advice. Do not abuse of this!",
+			"|-> 'pass' - skip turn when you have no possible moves.",
+			"|-> 'clear' - erase command history and reload screen."
+		};
 
-	eraseCardView(_board->getDimensions().vLine, col);
-
-	std::vector<std::string> intro =
-	{
-		"|Start or continue words with the tiles you have on hand.",
-		"|You get one point for each word you complete.",
-		"|Available commands:",
-		"|"
-	};
-
-	std::vector<std::string> commands =
-	{
-		"|-> 'move <Yx> <letter>' - play letter on position.",
-		"|-> 'exchange <letter>' - exchange a letter from the pool.",
-		"|-> 'check hands' - have a look at all players' hands.",
-		"|-> 'check scores' - have a look at the current scores.",
-		"|-> 'check pool' - spy on the current state of the pool.",
-		"|-> 'get hint' - get some advice. Do not abuse of this!",
-		"|-> 'pass' - skip turn when you have no possible moves.",
-		"|-> 'clear' - erase command history and reload screen."
-	};
-
-	if (!_compactCardView) {
-		for (auto sentence : intro) {
-			putCursorOnPos(line++, col);
-			std::cout << sentence << std::endl;
+		if (!_compactCardView) {
+			for (auto sentence : intro) {
+				std::cout << sentence << std::endl;
+				putCursorOnPos(line++, col);
+			}
 		}
-	}
-	for (auto sentence : commands) {
-		putCursorOnPos(line++, col);
-		std::cout << sentence << std::endl;
-	}
+		for (auto sentence : commands) {
+			std::cout << sentence << std::endl;
+			putCursorOnPos(line++, col);
+		}
+	};
 
-	restoreSavedCursorPosition();
+	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, write);
 }
 
 void Game::showPool() const {
-	saveCurrentCursorPosition();
+	std::function<void(int, int)> write = [&](int line, int col) {
 
-	int line = 2 + BOARD_TOP_PADDING - _compactCardView;
-	int col = 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
+		std::vector<char> letters = _pool->getAllLetters();
+		int size = letters.size();
 
-	std::vector<char> letters = _pool->getAllLetters();
-	int size = letters.size();
+		std::cout << "|" << size << " letters on the pool";
+		putCursorOnPos(line++, col);
 
-	eraseCardView(_board->getDimensions().vLine, col);
-	putCursorOnPos(line++, col);
-
-	std::cout << "|" << size << " letters on the pool";
-	putCursorOnPos(line++, col);
-
-
-	for (int i = 0; i < size;++i) {
-		if (i % 11 == 0) {
-			std::cout << std::endl;
-			putCursorOnPos(line++, col);
-			std::cout << "|";
+		for (int i = 0; i < size;++i) {
+			if (i % 11 == 0) {
+				putCursorOnPos(line++, col);
+				std::cout << "|";
+			}
+			std::cout << letters.at(i) << " ";
 		}
-		std::cout << letters.at(i) << " ";
-	}
+	};
 
-	restoreSavedCursorPosition();
+	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, write);
 }
 
 std::string Game::getPlayerName(int playerPos) const {
@@ -378,20 +357,13 @@ void Game::end() const {
 	if (hasWinner()) color = _players.at(winner)->getColor();
 	else color = WHITE;
 
-
 	paddingAndTopic(WHITE, true); std::cout << "THE GAME HAS ENDED!\n";
 
-	if (allPlayersMustPass()) {
-		paddingAndTopic(WHITE, true); std::cout << "All players passed their moves.\n";
-	}
+	if (allPlayersMustPass()) paddingAndTopic(WHITE, true); std::cout << "All players passed their moves.\n";
 
 	paddingAndTopic(color, true);
-	if (hasWinner()) {
-		std::cout << _players.at(winner)->getName() << " won with brilliancy!\n";
-	}
-	else {
-		std::cout << "There has been a draw! Congratulations to all.\n";
-	}
+	if (hasWinner()) std::cout << _players.at(winner)->getName() << " won with brilliancy!\n";
+	else std::cout << "There has been a draw! Congratulations to all.\n";
 
 	paddingAndTopic(WHITE, true); std::cout << "Press enter twice to exit.\n";
 	int i = 2; while (i--) askEnter();

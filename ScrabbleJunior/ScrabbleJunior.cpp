@@ -26,14 +26,9 @@ void getReady() {
 	askEnter();
 }
 
-int askPlayFirst(int BoardWidth, int nPlayers, std::vector<std::string> playerNames, std::vector<int> playerColors) {
-	auto showGamePlayers = [&]() {
-		saveCurrentCursorPosition();
+int askPlayFirst(int boardWidth, int boardHeight, int nPlayers, std::vector<std::string> playerNames, std::vector<int> playerColors) {
 
-		int line = 2 + BOARD_TOP_PADDING;
-		int col = 2 * BoardWidth + CARD_LEFT_PADDING;
-
-		putCursorOnPos(line++, col);
+	std::function<void(int, int)> write = [&](int line, int col) {
 		std::cout << "|Choose one of the players";
 		putCursorOnPos(line++, col);
 		std::cout << "|or type 'random' to randomize.";
@@ -44,11 +39,9 @@ int askPlayFirst(int BoardWidth, int nPlayers, std::vector<std::string> playerNa
 			printForeColor(playerColors.at(i), '|');
 			std::cout << "-> " << playerNames.at(i);
 		}
-
-		restoreSavedCursorPosition();
 	};
 
-	showGamePlayers();
+	writeCardView(boardHeight, boardWidth, write);
 
 	std::string playerName;
 	for (;;) {
@@ -82,14 +75,9 @@ bool exists(std::string filename) {
 	return !(!file);
 }
 
-std::string askBoardFileName(int BoardWidth) {
-	auto showCompanionAppTip = [&]() {
-		saveCurrentCursorPosition();
+std::string askBoardFileName(int boardWidth, int boardHeight) {
 
-		int line = 2 + BOARD_TOP_PADDING;
-		int col = 2 * BoardWidth + CARD_LEFT_PADDING;
-
-		putCursorOnPos(line++, col);
+	std::function<void(int, int)> write = [&](int line, int col) {
 		std::cout << "|Tip";
 		line++; putCursorOnPos(line++, col);
 		std::cout << "|You can use our companion";
@@ -97,11 +85,10 @@ std::string askBoardFileName(int BoardWidth) {
 		std::cout << "|Board Builder program";
 		putCursorOnPos(line++, col);
 		std::cout << "|to create your own board!";
-
-		restoreSavedCursorPosition();
 	};
 
-	showCompanionAppTip();
+
+	writeCardView(boardHeight, boardWidth, write);
 	std::string filename;
 
 	for (;;) {
@@ -142,21 +129,15 @@ std::string askBoardFileName(int BoardWidth) {
 	return filename;
 }
 
-PlayerData askPlayer(int position, int introBoardWidth, std::vector<std::string> forbiddenNames, std::vector<int> forbiddenColors) {
+PlayerData askPlayer(int position, int boardWidth, int boardHeight, std::vector<std::string> forbiddenNames, std::vector<int> forbiddenColors) {
 	std::string name, colorName;
 	int color = WHITE;
 	position++;
 
-	auto showAvailableColors = [&]() {
-		saveCurrentCursorPosition();
-
-		int line = 2 + BOARD_TOP_PADDING;
-		int col = 2 * introBoardWidth + CARD_LEFT_PADDING;
-
+	std::function<void(int, int)> write = [&](int line, int col) {
 		std::vector<int> colors = { RED,GREEN,BLUE,PINK,ORANGE };
 		std::vector<std::string> colorNames = { "RED","GREEN","BLUE","PINK","ORANGE" };
 
-		putCursorOnPos(line++, col);
 		std::cout << "|" << colors.size() - forbiddenColors.size() << " colors available";
 		line++;
 
@@ -166,8 +147,6 @@ PlayerData askPlayer(int position, int introBoardWidth, std::vector<std::string>
 			printForeColor(colors.at(i), TOPIC);
 			std::cout << "-> " << colorNames.at(i) << "\n";
 		}
-
-		restoreSavedCursorPosition();
 	};
 
 
@@ -198,7 +177,7 @@ PlayerData askPlayer(int position, int introBoardWidth, std::vector<std::string>
 		else break;
 	}
 
-	showAvailableColors();
+	writeCardView(boardHeight, boardWidth, write);
 
 	for (;;) { //ask color
 
@@ -289,7 +268,7 @@ int main()
 	printIntro(&introBoard);
 
 	clearAndShowBoard(&introBoard);
-	std::string filename = askBoardFileName(introBoard.getDimensions().hCollumn);
+	std::string filename = askBoardFileName(introBoard.getDimensions().hCollumn, introBoard.getDimensions().vLine);
 	Board gameBoard(filename);
 
 	clearAndShowBoard(&gameBoard);
@@ -297,13 +276,13 @@ int main()
 
 	for (int i = 0; i < nPlayers; ++i) {
 		clearAndShowBoard(&gameBoard);
-		PlayerData player = askPlayer(i, gameBoard.getDimensions().hCollumn, playerNames, playerColors);
+		PlayerData player = askPlayer(i, gameBoard.getDimensions().hCollumn, gameBoard.getDimensions().vLine, playerNames, playerColors);
 		playerNames.push_back(player.name);
 		playerColors.push_back(player.color);
 	}
 
 	clearAndShowBoard(&gameBoard);
-	int first = askPlayFirst(gameBoard.getDimensions().hCollumn, nPlayers, playerNames, playerColors);
+	int first = askPlayFirst(gameBoard.getDimensions().hCollumn, gameBoard.getDimensions().vLine, nPlayers, playerNames, playerColors);
 
 	Game my_game(&gameBoard, playerNames, playerColors, first);
 
