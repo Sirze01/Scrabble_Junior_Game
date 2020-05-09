@@ -163,6 +163,8 @@ void Game::askCommand(int turnNumber) {
 				else regularMessage = smartCommandAdvice(command.getStr());
 			}
 			else regularMessage = "We found overlapping command keywords in your input. Type 'help' to learn why.";
+
+			cleanBuffer();
 		}
 
 		if (regularMessage.size()) {
@@ -178,6 +180,7 @@ void Game::askCommand(int turnNumber) {
 				std::cout << i << "\n";
 			}
 			std::cin.ignore(10000, '\n');
+			cleanBuffer();
 			return;
 		}
 	}
@@ -238,7 +241,7 @@ void Game::showScores(bool function) const {
 	saveCurrentCursorPosition();
 
 	int line = 2 + BOARD_TOP_PADDING - _compactCardView;
-	int col = 1 + 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
+	int col = 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
 
 	eraseCardView(_board->getDimensions().vLine, col);
 
@@ -268,7 +271,7 @@ void Game::showHands(bool function) const {
 	saveCurrentCursorPosition();
 
 	int line = 2 + BOARD_TOP_PADDING - _compactCardView;
-	int col = 1 + 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
+	int col = 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
 
 	eraseCardView(_board->getDimensions().vLine, col);
 
@@ -298,8 +301,8 @@ void Game::showHands(bool function) const {
 void Game::showHelp() const {
 	saveCurrentCursorPosition();
 
-	int line = 3 + BOARD_TOP_PADDING - _compactCardView; //initial top padding
-	int col = 1 + 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
+	int line = 2 + BOARD_TOP_PADDING - _compactCardView; //initial top padding
+	int col = 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
 
 	eraseCardView(_board->getDimensions().vLine, col);
 
@@ -340,8 +343,8 @@ void Game::showHelp() const {
 void Game::showPool() const {
 	saveCurrentCursorPosition();
 
-	int line = 3 + BOARD_TOP_PADDING - _compactCardView;
-	int col = 1 + 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
+	int line = 2 + BOARD_TOP_PADDING - _compactCardView;
+	int col = 2 * (_board->getDimensions().hCollumn) + CARD_LEFT_PADDING;
 
 	std::vector<char> letters = _pool->getAllLetters();
 	int size = letters.size();
@@ -395,5 +398,5 @@ void Game::end() const {
 	}
 
 	paddingAndTopic(WHITE,true); std::cout << "Press enter twice to exit.\n";
-	int i = 2; while (i--) std::cin.ignore(10000, '\n');
+	int i = 2; while (i--) std::cin.ignore(10000, '\n'); cleanBuffer();
 }

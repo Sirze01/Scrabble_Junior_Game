@@ -46,8 +46,8 @@ void clearConsole() {
 
 void cleanBuffer() {
 	if (std::cin.fail()) {
-		std::cin.ignore(10000, '\n');
 		std::cin.clear();
+		std::cin.ignore(10000, '\n');
 	}
 }
 

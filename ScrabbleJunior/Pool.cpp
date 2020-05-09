@@ -4,9 +4,8 @@
 #include <algorithm>
 #include "../common/ConsoleSetup.h"
 
-//for shuffle purposes
-unsigned SEED = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
-std::mt19937 RANDOM_GENERATOR(SEED);
+extern unsigned SEED;
+extern std::mt19937 RANDOM_GENERATOR;
 
 Pool::Pool(const Board *board) {
 	_letters = board->getNonEmptyChars();
