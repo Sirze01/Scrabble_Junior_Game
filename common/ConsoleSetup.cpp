@@ -45,10 +45,16 @@ void clearConsole() {
 }
 
 void cleanBuffer() {
-	if (std::cin.fail()) {
+	if (std::cin.eof()) std::cin.clear();
+	else if (std::cin.fail()) {
 		std::cin.clear();
-		std::cin.ignore(10000, '\n');
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
+}
+
+void askEnter() {
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	if (std::cin.eof()) std::cin.clear();
 }
 
 void printBackColor(int backColor, const char c) {

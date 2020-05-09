@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <limits>
 
 //define UNICODE
 #ifndef UNICODE
@@ -10,6 +11,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#undef max //include max buffer limit without issues
 #endif
 
 #ifdef _WIN32
@@ -54,6 +56,7 @@ BLACK = 0;
 bool setupConsole();
 void clearConsole();
 void cleanBuffer();
+void askEnter();
 
 void printBackColor(int backColor, const char c);
 void printBackColor(int backColor, std::string message);

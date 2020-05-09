@@ -23,8 +23,7 @@ struct PlayerData {
 void getReady() {
 	paddingAndTopic(WHITE,true); std::cout << "Everything set!\n";
 	paddingAndTopic(WHITE,true); std::cout << "Press enter to start!\n";
-	std::cin.ignore(10000, '\n');
-	cleanBuffer();
+	askEnter();
 }
 
 int askPlayFirst(int BoardWidth, int nPlayers, std::vector<std::string> playerNames, std::vector<int> playerColors) {
@@ -53,9 +52,8 @@ int askPlayFirst(int BoardWidth, int nPlayers, std::vector<std::string> playerNa
 
 	std::string playerName;
 	for (;;) {
-		cleanBuffer();
 		paddingAndTopic(WHITE,true); std::cout << "Who should go first? ";
-		std::getline(std::cin, playerName);
+		std::getline(std::cin, playerName); cleanBuffer();
 		playerName = stripSpaces(playerName);
 
 		if (playerName == "random") {
@@ -63,7 +61,7 @@ int askPlayFirst(int BoardWidth, int nPlayers, std::vector<std::string> playerNa
 			int randomPos = distribution(RANDOM_GENERATOR);
 			paddingAndTopic(playerColors.at(randomPos), true); std::cout << playerNames.at(randomPos) << " won the draw.\n";
 			paddingAndTopic(playerColors.at(randomPos), false); std::cout << "Press enter to continue.\n";
-			cleanBuffer(); std::cin.ignore(10000, '\n');
+			askEnter();
 			return randomPos;
 		}
 
@@ -76,7 +74,6 @@ int askPlayFirst(int BoardWidth, int nPlayers, std::vector<std::string> playerNa
 		paddingAndTopic(RED,true); std::cout << "We could not find a player with that exact name. Please try again.\n";
 	}
 
-	cleanBuffer();
 	return 0;
 }
 
@@ -108,10 +105,9 @@ std::string askBoardFileName(int BoardWidth) {
 	std::string filename;
 
 	for (;;) {
-		cleanBuffer();
 		paddingAndTopic(WHITE,true); std::cout << "Import board from file: ";
 
-		std::getline(std::cin, filename);
+		std::getline(std::cin, filename); cleanBuffer();
 		if (filename == "") {
 			paddingAndTopic(RED,true); std::cout << "Empty filenames are invalid. Please try again.\n";
 		}
@@ -126,7 +122,7 @@ std::string askBoardFileName(int BoardWidth) {
 				paddingAndTopic(RED, false); std::cout << "Are you sure you want to proceed? ";
 
 				for (;;) {
-					cleanBuffer(); std::getline(std::cin, userAns); cleanBuffer();
+					std::getline(std::cin, userAns); cleanBuffer();
 					userAns = stripSpaces(userAns);
 					for (auto& i : userAns)i = tolower(i);
 
@@ -143,7 +139,6 @@ std::string askBoardFileName(int BoardWidth) {
 		}
 	}
 
-	cleanBuffer();
 	return filename;
 }
 
@@ -177,9 +172,8 @@ PlayerData askPlayer(int position, int introBoardWidth, std::vector<std::string>
 
 
 	for (;;) { //ask name
-		cleanBuffer();
 		paddingAndTopic(WHITE, true); std::cout << "Player " << position << " name: ";
-		std::getline(std::cin, name);
+		std::getline(std::cin, name); cleanBuffer();
 		name = stripSpaces(name);
 
 		if (name == "random") {
@@ -204,12 +198,12 @@ PlayerData askPlayer(int position, int introBoardWidth, std::vector<std::string>
 		else break;
 	}
 
-	cleanBuffer();
+	showAvailableColors();
+
 	for (;;) { //ask color
-		cleanBuffer();
-		showAvailableColors();
+
 		paddingAndTopic(WHITE,true); std::cout << "Player " << position << " color: ";
-		std::getline(std::cin, colorName);
+		std::getline(std::cin, colorName); cleanBuffer();
 		colorName = stripSpecialChars(colorName);
 		colorName = stripSpaces(colorName);
 		for (auto& i : colorName) i = tolower(i);
@@ -229,7 +223,7 @@ PlayerData askPlayer(int position, int introBoardWidth, std::vector<std::string>
 		}
 		else break;
 	}
-	cleanBuffer();
+
 	return { name,color };
 }
 
@@ -237,7 +231,6 @@ int askNumberOfPlayers() {
 	int nPlayers = 2;
 
 	for (;;) {
-		cleanBuffer();
 		paddingAndTopic(WHITE,true); std::cout << "Number of players: ";
 		if (!(std::cin >> nPlayers) || nPlayers > 4 || nPlayers < 2) {
 			cleanBuffer();
@@ -247,8 +240,7 @@ int askNumberOfPlayers() {
 		else break;
 	}
 
-	std::cin.ignore(10000, '\n');
-	cleanBuffer();
+	askEnter();
 	return nPlayers;
 }
 
@@ -270,8 +262,7 @@ void printIntro(Board* introBoard) {
 		std::cout << sentence;
 	}
 
-	std::cin.ignore(10000, '\n');
-	cleanBuffer();
+	askEnter();
 }
 
 int main()
@@ -287,8 +278,7 @@ int main()
 		std::cerr << "Could not find intro_board.txt in the project folder!";
 	    std::cout << "\nThis file is necessary to load the program introductory board.\n";
 		std::cout << "Fix this issue and press enter to try again.\n";
-		std::cin.ignore(10000, '\n');
-		cleanBuffer();
+		askEnter();
 	}
 
 	Board introBoard("intro_board.txt");

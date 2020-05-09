@@ -63,14 +63,13 @@ void Game::askCommand(int turnNumber) {
 	showBoardAndCardView();
 
 	for (;;) {
-		cleanBuffer();
 
 		if (!coloredMessage.size()) {
 			commandPrompt = "(turn " + std::to_string(turnNumber) + ") " + _currentPlayer->getName() + ": ";
 			regularMessage = "", coloredMessage = {};
 			std::cout << "\n"; paddingAndTopic(playerColor);
 			std::cout << commandPrompt;
-			std::getline(std::cin, input);
+			std::getline(std::cin, input); cleanBuffer();
 			Command command(input);
 
 			if (command.isMove()) {
@@ -163,8 +162,6 @@ void Game::askCommand(int turnNumber) {
 				else regularMessage = smartCommandAdvice(command.getStr());
 			}
 			else regularMessage = "We found overlapping command keywords in your input. Type 'help' to learn why.";
-
-			cleanBuffer();
 		}
 
 		if (regularMessage.size()) {
@@ -179,8 +176,7 @@ void Game::askCommand(int turnNumber) {
 				paddingAndTopic(playerColor, false);
 				std::cout << i << "\n";
 			}
-			std::cin.ignore(10000, '\n');
-			cleanBuffer();
+			askEnter();
 			return;
 		}
 	}
@@ -374,7 +370,7 @@ std::string Game::getPlayerName(int playerPos) const {
 }
 
 void Game::end() const {
-	showBoardAndCardView("scores",false);
+	showBoardAndCardView("scores", false);
 
 	int color;
 	int winner = getWinner();
@@ -383,13 +379,13 @@ void Game::end() const {
 	else color = WHITE;
 
 
-	paddingAndTopic(WHITE,true); std::cout << "THE GAME HAS ENDED!\n";
+	paddingAndTopic(WHITE, true); std::cout << "THE GAME HAS ENDED!\n";
 
 	if (allPlayersMustPass()) {
 		paddingAndTopic(WHITE, true); std::cout << "All players passed their moves.\n";
 	}
 
-	paddingAndTopic(color,true);
+	paddingAndTopic(color, true);
 	if (hasWinner()) {
 		std::cout << _players.at(winner)->getName() << " won with brilliancy!\n";
 	}
@@ -397,6 +393,6 @@ void Game::end() const {
 		std::cout << "There has been a draw! Congratulations to all.\n";
 	}
 
-	paddingAndTopic(WHITE,true); std::cout << "Press enter twice to exit.\n";
-	int i = 2; while (i--) std::cin.ignore(10000, '\n'); cleanBuffer();
+	paddingAndTopic(WHITE, true); std::cout << "Press enter twice to exit.\n";
+	int i = 2; while (i--) askEnter();
 }
