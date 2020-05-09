@@ -156,7 +156,7 @@ PlayerData askPlayer(int position, int boardWidth, int boardHeight, std::vector<
 		name = stripSpaces(name);
 
 		if (name == "random") {
-			paddingAndTopic(RED, true); std::cout << "We might use that keyword later. Please choose a different name.\n";
+			paddingAndTopic(RED, true); std::cout << "That is a reserved keyword. Please choose a different name.\n";
 			continue;
 		}
 
