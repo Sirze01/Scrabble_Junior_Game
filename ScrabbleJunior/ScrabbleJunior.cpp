@@ -26,7 +26,7 @@ int askPlayFirst(int BoardWidth, int nPlayers, std::vector<std::string> playerNa
 	auto showGamePlayers = [&]() {
 		saveCurrentCursorPosition();
 
-		int line = 4 + BOARD_TOP_PADDING;
+		int line = 3 + BOARD_TOP_PADDING;
 		int col = 1 + 2 * BoardWidth + CARD_LEFT_PADDING;
 
 		putCursorOnPos(line++, col);
@@ -70,7 +70,7 @@ std::string askBoardFileName(int BoardWidth) {
 	auto showCompanionAppTip = [&]() {
 		saveCurrentCursorPosition();
 
-		int line = 4 + BOARD_TOP_PADDING;
+		int line = 3 + BOARD_TOP_PADDING;
 		int col = 1 + 2 * BoardWidth + CARD_LEFT_PADDING;
 
 		putCursorOnPos(line++, col);
@@ -225,7 +225,7 @@ int main()
 	};
 
 	if (!exists("intro_board.txt")) {
-		std::cerr << "Fatal error - could not find intro_board.txt! Check your project folder...";
+		std::cerr << "Fatal error - could not find intro_board.txt! Check your project folder...\n";
 		return 1;
 	}
 

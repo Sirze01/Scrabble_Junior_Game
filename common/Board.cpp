@@ -157,7 +157,7 @@ void Board::show() const { //Prototype function (needs styling)
 	for (int i = 0; i <= 2 * _hDimension + 2; i++) darkSpace();
 
 	//make room for card view
-	int i = 10 - _vDimension; if (i < 2) i = 2;
+	int i = 9 - _vDimension; if (i < 2) i = 2;
 	while (i--) std::cout << "\n";
 }
 
