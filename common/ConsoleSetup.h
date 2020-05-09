@@ -29,6 +29,8 @@
 
 #endif
 
+const char TOPIC = '|';
+
 //card view
 const int
 CARD_LEFT_PADDING = 12,
@@ -45,11 +47,13 @@ BLUE = 19,
 GREEN = 22,
 PINK = 127,
 ORANGE = 166,
+DARK_GREY = 233,
 WHITE = 15,
 BLACK = 0;
 
 bool setupConsole();
 void clearConsole();
+void cleanBuffer();
 
 void printBackColor(int backColor, const char c);
 void printBackColor(int backColor, std::string message);
@@ -65,3 +69,5 @@ void saveCurrentCursorPosition();
 void restoreSavedCursorPosition();
 
 void eraseCardView(int boardDimension, int col);
+
+void paddingAndTopic(int color, bool newLine = false);

@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include "../common/StringProcess.h"
 
 struct coord{
     int vLine;

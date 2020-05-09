@@ -62,8 +62,11 @@ Board::Board(std::string filename) {
 
 	if (file.is_open()) {
         getline(file, line);
+		line = stripSpaces(line);
+		//THIS NEEDS TO BE MORE FLEXIBLE!!
         _vDimension = std::stoi(line.substr(0, 2));
-        _hDimension= std::stoi(line.substr(5));
+        _hDimension= std::stoi(line.substr(4,6));
+		//
         _letters.resize(_vDimension);
 
         for (auto & _line : _letters){
@@ -127,16 +130,20 @@ Board::Board(std::string filename) {
 }
 
 void Board::show() const { //Prototype function (needs styling)
-      std::cout << std::string(BOARD_TOP_PADDING,'\n') << LEFT_PADDING_STR;
+	auto darkSpace = []() {printBackColor(DARK_GREY, ' '); };
 
-	std::cout << " ";
+    std::cout << std::string(BOARD_TOP_PADDING,'\n') << LEFT_PADDING_STR;
+
+	darkSpace();
 	for (int i = 0; i < _hDimension; i++) {
-		std::cout << " " << alphabet.at(i);
+		darkSpace(); printBackColor(DARK_GREY, alphabet.at(i));
+		//std::cout << " " << alphabet.at(i);
 	}
-	std::cout << std::endl;
+	//std::cout << std::endl;
+	darkSpace(); darkSpace(); std::cout << std::endl;
 	for (int i = 0; i < _vDimension; i++) {
 		std::cout << LEFT_PADDING_STR;
-		std::cout << std::string(1, (toupper(alphabet.at(i))));
+		printBackColor(DARK_GREY,toupper(alphabet.at(i)));
 		for (int j = 0; j < _hDimension; j++) {
 			std::cout << ' ';
 			if (getHighlights().at(i).at(j)) {
@@ -144,9 +151,14 @@ void Board::show() const { //Prototype function (needs styling)
 			}
 			else std::cout << _letters[i][j];
 		}
-		std::cout << '\n';
+		std::cout << " "; darkSpace(); std::cout << std::endl;
 	}
-	std::cout << "\n\n";
+	std::cout << LEFT_PADDING_STR;
+	for (int i = 0; i <= 2 * _hDimension + 2; i++) darkSpace();
+
+	//make room for card view
+	int i = 9 - _vDimension; if (i < 2) i = 2;
+	while (i--) std::cout << "\n";
 }
 
 coord Board::getIndex(std::string position) const {
@@ -181,31 +193,35 @@ bool Board::highlight(int color, int vIndex, int hIndex) {
 }
 
 void Board::highlightFinishedWord(int color, int vIndex, int hIndex) {
-	std::vector<std::vector<int>> tempCol = _highlightColors;
-	std::vector<std::vector<int>> tempLine = _highlightColors;
-	bool successOnLine = true, successOnCol = true;
+	std::vector<std::vector<int>> tempCol, tempLine;
+	coord dim = getDimensions();
+	bool successOnLine, successOnCol;
 
-	for (int line = vIndex - 1; line >= 0; line--) {
-		if (_highlights.at(line).at(hIndex)) {
-			tempCol.at(line).at(hIndex) = color;
+	for (int cof : {-1, 1}) {
+		successOnCol = true; tempCol = _highlightColors;
+		for (int line = vIndex + cof; line >= 0 && line < dim.vLine; line+=cof) {
+			if (_highlights.at(line).at(hIndex)) {
+				tempCol.at(line).at(hIndex) = color;
+			}
+			else {
+				if (_letters.at(line).at(hIndex) != ' ') successOnCol = false;
+				break;
+			}
 		}
-		else {
-			if (_letters.at(line).at(hIndex) != ' ') successOnCol = false;
-			break;
-		}
-	}
-	if (successOnCol) _highlightColors = tempCol;
+		if (successOnCol) _highlightColors = tempCol;
 
-	for (int col = hIndex - 1; col >= 0; col--) {
-		if (_highlights.at(vIndex).at(col)) {
-			tempLine.at(vIndex).at(col) = color;
+		successOnLine = true; tempLine = _highlightColors;
+		for (int col = hIndex + cof; col >= 0 && col < dim.hCollumn; col+=cof) {
+			if (_highlights.at(vIndex).at(col)) {
+				tempLine.at(vIndex).at(col) = color;
+			}
+			else {
+				if (_letters.at(vIndex).at(col) != ' ') successOnLine = false;
+				break;
+			}
 		}
-		else {
-			if (_letters.at(vIndex).at(col) != ' ') successOnLine = false;
-			break;
-		}
+		if (successOnLine) _highlightColors = tempLine;
 	}
-	if (successOnLine) _highlightColors = tempLine;
 }
 
 std::vector<std::vector<char>> Board::getLetters() const {
@@ -214,13 +230,8 @@ std::vector<std::vector<char>> Board::getLetters() const {
 
 std::vector<char> Board::getNonEmptyChars() const {
 	std::vector<char> allChars;
-	//add letters in board
 	for (std::vector<char> v : _letters) {
-		for (char c : v) {
-			if (c != ' ') {
-				allChars.push_back(c);
-			}
-		}
+		for (char c : v) if (c != ' ') allChars.push_back(c);
 	}
 	return allChars;
 }
@@ -239,5 +250,5 @@ bool Board::boardBounds(coord firstLetter, std::string orientation, int wordLen)
         return false;
     if((firstLetter.hCollumn > _hDimension) || (firstLetter.hCollumn < _hDimension))
         return false;
-
+	return true;
 }

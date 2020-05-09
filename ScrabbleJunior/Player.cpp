@@ -12,6 +12,7 @@ extern std::mt19937 RANDOM_GENERATOR;
 
 Player::Player(Pool *pool, std::string name, int color) {
     int handSize = 7;
+    _mayPass = 0;
     _score = 0;
     _color = color;
     _exchangeCount = 0;
@@ -29,10 +30,17 @@ std::string Player::getName() const {
     return _name;
 }
 
-void Player::showHand() const {
+void Player::showHand(bool color) const {
+    if (!getHandSize()) {
+        std::cout << "Nothing on hand";
+        return;
+    }
     for (auto i : _hand) {
         if (i == ' ') continue;
-        else print(WHITE,_color, i);
+        else {
+            if (color) print(WHITE, _color, i);
+            else std::cout << i;
+        }
         std::cout << " ";
     }
     std::cout << "\n";
