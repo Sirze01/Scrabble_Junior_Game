@@ -428,14 +428,14 @@ bool commandInterpreter::cmdAdd(int &last) {
             for(auto &letter : newEntry.word) letter = tolower(letter);
             /*while (!inDict && first <= final){
                 middle = (first + final) / 2;
-                if (newEntry.word == _dict[middle]){
+                if (newEntry.word == _dict[middle + 2]){
                     inDict = true;
                 }
-                else if(_dict[middle] > newEntry.word)
+                else if(_dict[middle].compare(newEntry.word) > 0)
                     final = middle - 1;
                 else
-                    final = middle + 1;
-            }*/
+                    first = middle + 1;
+            }
             for(auto &letter : newEntry.word) letter = toupper(letter);
             if (inDict){
                 coord temp = _board.getIndex(newEntry.firstCoord);
@@ -455,7 +455,7 @@ bool commandInterpreter::cmdAdd(int &last) {
                     }
                 }
                 _board.addWord(newEntry);
-                _board.show();
+                _board.show();*/
             }
             else{
                 last = -2;
