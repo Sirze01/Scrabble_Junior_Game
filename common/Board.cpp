@@ -157,7 +157,9 @@ void Board::show() const { //Prototype function (needs styling)
 	for (int i = 0; i <= 2 * _hDimension + 2; i++) darkSpace();
 
 	//make room for card view
-	int i = 9 - _vDimension; if (i < 2) i = 2;
+	// PLEASE DO NOT TOUCH ON THIS!! IF YOU NEED TO CHANGE THESE SPACES, INCLUDE A DEFAULT ARGUMENT FOR IT
+	//it means a lot to me. :) :)
+	int i = BOARD_MIN_DIM - _vDimension + BOARD_BOTTOM_PADDING; if (i < BOARD_BOTTOM_PADDING) i = BOARD_BOTTOM_PADDING;
 	while (i--) std::cout << "\n";
 }
 
