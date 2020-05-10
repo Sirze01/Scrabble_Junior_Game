@@ -138,3 +138,8 @@ bool isAlpha(std::string toTest) {
     }
     return true;
 }
+
+bool isDigit(std::string toTest) {
+    for (auto letter : toTest) if (!isdigit(letter)) return false;
+    return true;
+}
