@@ -24,6 +24,19 @@ std::string stripSpaces(std::string name) {
     return name;
 }
 
+std::string upperNameInitials(std::string name) {
+    bool doUpper = true;
+    for (size_t i = 0; i < name.length(); i++) {
+        if (doUpper && name.at(i) >= 'A' && name.at(i) <= 'Z') doUpper = false; //already uppercase
+        else if (doUpper && !(name.at(i) >= 'A' && name.at(i) <= 'Z')) {
+            name.at(i) = toupper(name.at(i));
+            doUpper = false;
+        }
+        else if (name.at(i) == ' ') doUpper = true;
+    }
+    return name;
+}
+
 std::string stripSpecialChars(std::string name) {
     std::string cleanStr;
     for (char c : name) {
@@ -109,12 +122,12 @@ std::string smartCommandAdvice(std::string command) {
         std::string processed;
         processed += toupper(command.at(0));
         processed += tolower(command.at(1));
-        return "Did you attempt to play a tile in position " + processed +
-               "? Please specify letter as in 'Yx <letter>'.\n";
+        return "Did you attempt to play a tile on position " + processed +
+               "? Please specify letter as in 'Yx <letter>'.";
     } else if (command.find("exchange") != std::string::npos) {
-        return "Are you trying to exchange one of your tiles? Please specify letter as in 'exchange <letter>'.\n";
+        return "Are you trying to exchange one of your tiles? Please specify letter as in 'exchange <letter>'.";
     } else {
-        return "Command not recognized. Please type 'help' to view the available commands.\n";
+        return "Command not recognized. Please type 'help' to view the available commands.";
     }
 }
     

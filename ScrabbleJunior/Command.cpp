@@ -33,9 +33,12 @@ std::string Command::getStr() const {
 	return _str;
 }
 
-bool Command::isExchange() const {
-	return _str.size() == std::string("exchange").size() + 2
-		&& _str.find("exchange") != std::string::npos
+bool Command::isExchange(bool forceToken) const {
+	bool hasExchange = _str.find("exchange") != std::string::npos;
+	if (!forceToken) return hasExchange;
+
+	return hasExchange
+		&& _str.size() == std::string("exchange").size() + 2
 		&& isalpha(_str.at(_str.size()-1));
 }
 
@@ -66,7 +69,8 @@ bool Command::isHint() const {
 }
 
 bool Command::isPass() const {
-	return _str.find("pass") != std::string::npos;
+	return _str.find("pass") != std::string::npos
+		|| _str.find("skip") != std::string::npos;
 }
 
 bool Command::isClear() const {
@@ -75,7 +79,7 @@ bool Command::isClear() const {
 
 bool Command::hasNoConflicts() const {
 	int count = 0;
-	if (isExchange()) count++;
+	if (isExchange(false)) count++;
 	if (isCheckHands()) count++;
 	if (isCheckPool()) count++;
 	if (isCheckScores()) count++;

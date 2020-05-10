@@ -8,7 +8,6 @@ class Pool {
 public:
 	Pool() = default;
 	Pool(const Board *Board);
-	void show();
 	bool take(int pos);
 	bool include(char letter);
 	void shuffle();

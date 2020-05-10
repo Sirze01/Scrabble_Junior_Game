@@ -12,8 +12,7 @@ public:
 	int getScore() const;
 	std::string getName() const;
 	int getColor() const;
-	void showHand() const;
-	void showScore() const;
+	void showHand(bool color = true) const;
 	void addScore();
 	void resetExchangeCount();
 	void forcePass();
@@ -21,11 +20,12 @@ public:
 	bool exchange(char letter, Pool *pool);
 	bool takeRandom(int handPos, Pool *pool);
 	bool mayMove(const Board *board, const Pool *pool) const;
-	bool mayPass() const;
+	bool getMayPass() const;
 	bool hasOnHand(char letter) const;
 	int getHandPosition(char letter) const;
 	int getExchangeCount() const;
 	coord getPossiblePos(const Board* board, const Pool* pool) const;
+	int getHandSize() const;
 private:
 	bool _mayPass;
 	int _exchangeCount;

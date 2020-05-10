@@ -2,6 +2,9 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
+#include <limits>
+#include <functional>
 
 //define UNICODE
 #ifndef UNICODE
@@ -10,6 +13,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#undef max //include max buffer limit without issues
 #endif
 
 #ifdef _WIN32
@@ -29,11 +33,19 @@
 
 #endif
 
+const char TOPIC = '|';
+
 //card view
-constexpr int
+const int
 CARD_LEFT_PADDING = 12,
 BOARD_LEFT_PADDING = 2,
-BOARD_TOP_PADDING = 1;
+BOARD_TOP_PADDING = 1,
+BOARD_BOTTOM_PADDING = 2,
+BOARD_MIN_DIM = 8,
+COMPACT_VIEW_MAX = 12;
+
+const std::string
+LEFT_PADDING_STR(BOARD_LEFT_PADDING, ' ');
 
 //define 8-bit colors
 constexpr int
@@ -42,11 +54,14 @@ BLUE = 19,
 GREEN = 22,
 PINK = 127,
 ORANGE = 166,
+DARK_GREY = 233,
 WHITE = 15,
 BLACK = 0;
 
 bool setupConsole();
 void clearConsole();
+void cleanBuffer();
+void askEnter();
 
 void printBackColor(int backColor, const char c);
 void printBackColor(int backColor, std::string message);
@@ -61,4 +76,7 @@ void eraseEntireLine();
 void saveCurrentCursorPosition();
 void restoreSavedCursorPosition();
 
+void writeCardView(int boardHeight, int boardWidth, std::function<void(int,int)> write);
 void eraseCardView(int boardDimension, int col);
+
+void paddingAndTopic(int color, bool newLine = false);

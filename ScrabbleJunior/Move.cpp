@@ -50,8 +50,8 @@ bool Move::execute(Player *player, Board *board, Pool *pool) {
 	player->takeRandom(player->getHandPosition(_letter),pool);
 	
 	//add scores and highlight ("territory dominance" feature)
-	if ((!singleCharWordOnLine() && continueOnLine() && finishOnLine())
-		|| !singleCharWordOnCol() && continueOnCol() && finishOnCol()) {
+	if ( (!singleCharWordOnLine() && continueOnLine() && finishOnLine())
+		|| (!singleCharWordOnCol() && continueOnCol() && finishOnCol()) ) {
 		player->addScore();
 		board->highlightFinishedWord(player->getColor(), _posToMove.vLine, _posToMove.hCollumn);
 	}
