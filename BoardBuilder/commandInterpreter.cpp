@@ -422,11 +422,11 @@ bool commandInterpreter::cmdAdd(int &last) {
 
     if (_board.boardBounds(_board.getIndex(newEntry.firstCoord), newEntry.orientation, newEntry.word.size())){
         if(_board.goodIntersects(newEntry)){
-            // Binary search
+            /*// Binary search
             bool inDict = false;
             int first = 0, final = _dict.size() - 1, middle;
             for(auto &letter : newEntry.word) letter = tolower(letter);
-            /*while (!inDict && first <= final){
+            while (!inDict && first <= final){
                 middle = (first + final) / 2;
                 if (newEntry.word == _dict[middle]){
                     inDict = true;
@@ -435,7 +435,7 @@ bool commandInterpreter::cmdAdd(int &last) {
                     final = middle - 1;
                 else
                     final = middle + 1;
-            }*/
+            }
             for(auto &letter : newEntry.word) letter = toupper(letter);
             if (inDict){
                 coord temp = _board.getIndex(newEntry.firstCoord);
@@ -462,9 +462,9 @@ bool commandInterpreter::cmdAdd(int &last) {
                 std::cout <<stringWriter(100, "The word you chose isn't in the dictionary",
                                          BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
                 return false;
-            }
+            }*/
 
-        }
+    }
         else{
             last = -2;
             std::cout <<stringWriter(100, "The word you're trying to add intersects with another in the wrong letter",
