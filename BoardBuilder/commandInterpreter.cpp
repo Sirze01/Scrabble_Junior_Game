@@ -195,6 +195,12 @@ bool commandInterpreter::cmdDict() {
             file.open(_modifiers, std::ios::in);
             exists = file.is_open();
         }
+        while(getline(file, line)){
+            if(line.size() > 1){
+                _dict.push_back(line);
+            }
+        }
+        file.close();
     }
 
     _dictBool = true;
@@ -448,15 +454,18 @@ bool commandInterpreter::cmdAdd(int &last) {
         std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Word is out of range! Try another one." << std::endl;
         retValue = false;
     }
-    else if(!(_board.goodIntersects(newEntry))){
+    else if(!(_board.goodIntersects(newEntry))) {
         last = -2;
-        std::cout <<stringWriter(100, "The word you're trying to add intersects with another in the wrong letter",
-                                 BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
+        std::cout << stringWriter(100, "The word you're trying to add intersects with another in the wrong letter",
+                                  BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
         retValue = false;
     }
-
-
-
+    else if(!(_board.wordSpaces(newEntry))){
+        last = -2;
+        std::cout << stringWriter(100, "The word you're trying to add doesn't fit in that space",
+                                  BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
+        retValue = false;
+    }
 
 
     if(retValue){

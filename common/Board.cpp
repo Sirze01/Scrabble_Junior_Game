@@ -286,11 +286,76 @@ bool Board::goodIntersects(codedWord word) {
     return valid;
 }
 
-
 void Board::lettersManip(coord inates, char letter) {
     _letters[inates.vLine][inates.hCollumn] = letter;
 }
 
 void Board::addWord(codedWord word) {
     _words.push_back(word);
+}
+
+bool Board::wordSpaces(codedWord word) {
+    if(word.orientation == "V") {
+
+        for (int i = 0; i < word.word.size(); i++) {
+            if (i == 0 &&
+                (getIndex(word.firstCoord).vLine - 1 <= _vDimension - 1 && getIndex(word.firstCoord).vLine - 1 >= 0)) {
+                if (_letters[getIndex(word.firstCoord).vLine + i - 1][getIndex(word.firstCoord).hCollumn] != ' ')
+                    return false;
+            }
+
+            if (i == (word.word.size() - 1) && (getIndex(word.firstCoord).vLine + i + 1 <= _vDimension - 1 &&
+                                                getIndex(word.firstCoord).vLine + i + 1 >= 0)) {
+                if (_letters[getIndex(word.firstCoord).vLine + i + 1][getIndex(word.firstCoord).hCollumn] != ' ')
+                    return false;
+            }
+
+            if (_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn] != word.word[i]) {
+                if (getIndex(word.firstCoord).hCollumn + 1 <= _hDimension - 1 &&
+                    getIndex(word.firstCoord).hCollumn + 1 >= 0) {
+                    if (_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn + 1] != ' ')
+                        return false;
+                }
+
+                if (getIndex(word.firstCoord).hCollumn - 1 <= _hDimension - 1 &&
+                    getIndex(word.firstCoord).hCollumn - 1 >= 0) {
+                    if (_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn - 1] != ' ')
+                        return false;
+
+                }
+            }
+        }
+    }
+
+    if(word.orientation == "H") {
+        for (int i = 0; i < word.word.size(); i++) {
+            if (i == 0 &&
+                (getIndex(word.firstCoord).hCollumn - 1 <= _hDimension - 1 && getIndex(word.firstCoord).hCollumn - 1 >= 0)) {
+                if (_letters[getIndex(word.firstCoord).vLine][getIndex(word.firstCoord).hCollumn + i - 1] != ' ')
+                    return false;
+            }
+
+            if (i == (word.word.size() - 1) && (getIndex(word.firstCoord).hCollumn + i + 1 <= _hDimension - 1 &&
+                                                getIndex(word.firstCoord).hCollumn + i + 1 >= 0)) {
+                if (_letters[getIndex(word.firstCoord).vLine][getIndex(word.firstCoord).hCollumn + i + 1] != ' ')
+                    return false;
+            }
+
+            if (_letters[getIndex(word.firstCoord).vLine][getIndex(word.firstCoord).hCollumn + i] != word.word[i]) {
+                if (getIndex(word.firstCoord).vLine + 1 <= _vDimension - 1 &&
+                    getIndex(word.firstCoord).vLine + 1 >= 0) {
+                    if (_letters[getIndex(word.firstCoord).vLine + 1][getIndex(word.firstCoord).hCollumn + i] != ' ')
+                        return false;
+                }
+
+                if (getIndex(word.firstCoord).vLine - 1 <= _vDimension - 1 &&
+                    getIndex(word.firstCoord).vLine - 1 >= 0) {
+                    if (_letters[getIndex(word.firstCoord).vLine - 1][getIndex(word.firstCoord).hCollumn + i] != ' ')
+                        return false;
+
+                }
+            }
+        }
+    }
+    return true;
 }

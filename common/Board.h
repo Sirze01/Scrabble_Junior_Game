@@ -36,6 +36,7 @@ public:
     bool goodIntersects(codedWord);
     void lettersManip(coord inates, char letter);
     void addWord(codedWord word);
+    bool wordSpaces(codedWord word);
 
 private:
     std::vector<std::vector<bool>> _highlights;
