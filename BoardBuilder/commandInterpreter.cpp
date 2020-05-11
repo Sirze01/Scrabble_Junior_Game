@@ -10,8 +10,8 @@ commandInterpreter::commandInterpreter() {
 
 commandInterpreter::commandInterpreter(std::string command) {
     std::string cmd = command.substr(0, command.find(' '));
-    command.erase(0, cmd.size() + 1);
-    _modifiers = command;
+    command.erase(0, cmd.size());
+    _modifiers = command.substr(command.find_first_of(' ') + 1);
     if (cmd == "dict")
         _command = "dict";
 
@@ -43,8 +43,8 @@ void commandInterpreter::edit(std::string command) {
     _command = "";
     _modifiers = "";
     std::string cmd = command.substr(0, command.find(' '));
-    command = command.erase(0, command.find(' ') + 1);
-    _modifiers = command;
+    command.erase(0, cmd.size());
+    _modifiers = command.substr(command.find_first_of(' ') + 1);
     if (cmd == "dict")
         _command = "dict";
 
@@ -348,6 +348,7 @@ bool commandInterpreter::cmdAdd(int &last) {
         return false;
     }
 
+    bool retValue = true;
     codedWord newEntry;
     if(!_modifiers.empty()){
         newEntry.firstCoord = _modifiers.substr(0,2);
@@ -420,65 +421,65 @@ bool commandInterpreter::cmdAdd(int &last) {
     for(auto &letter : newEntry.orientation) letter = toupper(letter);
     for(auto &letter : newEntry.word) letter = toupper(letter);
 
-    if (_board.boardBounds(_board.getIndex(newEntry.firstCoord), newEntry.orientation, newEntry.word.size())){
-        if(_board.goodIntersects(newEntry)){
-            /*// Binary search
-            bool inDict = false;
-            int first = 0, final = _dict.size() - 1, middle;
-            for(auto &letter : newEntry.word) letter = tolower(letter);
-            while (!inDict && first <= final){
-                middle = (first + final) / 2;
-                if (newEntry.word == _dict[middle]){
-                    inDict = true;
-                }
-                else if(_dict[middle] > newEntry.word)
-                    final = middle - 1;
-                else
-                    final = middle + 1;
-            }
-            for(auto &letter : newEntry.word) letter = toupper(letter);
-            if (inDict){
-                coord temp = _board.getIndex(newEntry.firstCoord);
-                int v, h;
-                v = temp.vLine;
-                h = temp.hCollumn;
-                if (newEntry.orientation == "V"){
-                    for(int i = 0; i < newEntry.word.size(); i++){
-                        temp.vLine = v + i;
-                        _board.lettersManip(temp, newEntry.word[i]);
-                     }
-                }
-                else{
-                    for(int i = 0; i < newEntry.word.size(); i++){
-                        temp.hCollumn = h + i;
-                        _board.lettersManip(temp, newEntry.word[i]);
-                    }
-                }
-                _board.addWord(newEntry);
-                _board.show();
-            }
-            else{
-                last = -2;
-                std::cout <<stringWriter(100, "The word you chose isn't in the dictionary",
-                                         BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
-                return false;
-            }*/
-
-    }
-        else{
-            last = -2;
-            std::cout <<stringWriter(100, "The word you're trying to add intersects with another in the wrong letter",
-                    BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
-            return false;
+    // Binary search
+    bool inDict = false;
+    int first = 0, final = _dict.size() - 1, middle;
+    for(auto &letter : newEntry.word) letter = tolower(letter);
+    while (!inDict && first <= final){
+        middle = (first + final) / 2;
+        if (newEntry.word == _dict[middle].substr(0, _dict[middle].size() - 1)){
+            inDict = true;
         }
+        else if(_dict[middle].compare(newEntry.word) > 0)
+            final = middle - 1;
+        else
+            first = middle + 1;
     }
-    else {
+    for(auto &letter : newEntry.word) letter = toupper(letter);
+    if (!inDict){
+        last = -2;
+        std::cout <<stringWriter(100, "The word you chose isn't in the dictionary",
+                                 BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
+        retValue = false;
+    }
+
+    if (!(_board.boardBounds(_board.getIndex(newEntry.firstCoord), newEntry.orientation, newEntry.word.size()))){
         last = -2;
         std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Word is out of range! Try another one." << std::endl;
-        return false;
+        retValue = false;
+    }
+    else if(!(_board.goodIntersects(newEntry))){
+        last = -2;
+        std::cout <<stringWriter(100, "The word you're trying to add intersects with another in the wrong letter",
+                                 BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
+        retValue = false;
     }
 
-    return true;
+
+
+
+
+    if(retValue){
+        coord temp = _board.getIndex(newEntry.firstCoord);
+        int v, h;
+        v = temp.vLine;
+        h = temp.hCollumn;
+        if (newEntry.orientation == "V"){
+            for(int i = 0; i < newEntry.word.size(); i++){
+                temp.vLine = v + i;
+                _board.lettersManip(temp, newEntry.word[i]);
+            }
+        }
+        else{
+            for(int i = 0; i < newEntry.word.size(); i++){
+                temp.hCollumn = h + i;
+                _board.lettersManip(temp, newEntry.word[i]);
+            }
+        }
+        _board.addWord(newEntry);
+        _board.show();
+    }
+    return retValue;
 }
 
 
