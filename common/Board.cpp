@@ -169,19 +169,18 @@ coord Board::getIndex(std::string position) const {
 	return coordinates;
 }
 
-/*bool Board::fileExport(std::string filename) const {
-	std::string line;
-	std::ofstream file(filename);
-	if (file.is_open()) {
-		file << _hDimension << 'x' << _vDimension << '\n';
-		for (auto line : _words) {
-			file << line << '\n';
-		}
-		return true;
-	}
-	std::cerr << "Could not write to file." << std::endl;
-	return false;
- */
+bool Board::fileExport(std::string filename) const {
+    std::ofstream file(filename);
+    if (file.is_open()) {
+        file << _vDimension << 'x' << _hDimension << '\n';
+        for (auto line : _words) {
+            file << line.firstCoord << ' ' << line.orientation << ' ' << line.word << '\n';
+        }
+        return true;
+    }
+    std::cerr << "Could not write to file." << std::endl;
+    return false;
+}
 
 bool Board::highlight(int color, int vIndex, int hIndex) {
 	if (vIndex >= (int)_vDimension || hIndex >= (int)_hDimension) return false;

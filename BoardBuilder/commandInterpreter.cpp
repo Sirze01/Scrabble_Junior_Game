@@ -141,6 +141,8 @@ bool commandInterpreter::interpret(int &last) {
         cmdExit(last);
     }
 
+    else
+        last = -3;
     return !_command.empty();
 }
 
