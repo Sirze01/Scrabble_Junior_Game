@@ -445,9 +445,6 @@ bool commandInterpreter::cmdAdd(int &last) {
     }
 
 
-
-
-
     if(retValue){
         coord temp = _board.getIndex(newEntry.firstCoord);
         int v, h;
@@ -472,7 +469,9 @@ bool commandInterpreter::cmdAdd(int &last) {
 }
 
 
+
 bool commandInterpreter::cmdExport() {
+    _board.fileExport((_name + ".txt"));
     return true;
 }
 
