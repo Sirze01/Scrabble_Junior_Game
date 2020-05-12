@@ -181,6 +181,7 @@ bool commandInterpreter::cmdDict() {
     if (file.is_open()) {
         while(getline(file, line)){
             if(line.size() > 1){
+                std::string aaa = stripSpecialChars(line);
                 _dict.push_back(stripSpecialChars(line));
             }
         }
@@ -420,10 +421,10 @@ bool commandInterpreter::cmdAdd(int &last) {
     newEntry.firstCoord[0] = toupper(newEntry.firstCoord[0]);
     newEntry.firstCoord[1] = tolower(newEntry.firstCoord[1]);
     for(auto &letter : newEntry.orientation) letter = toupper(letter);
-    for(auto &letter : newEntry.word) letter = toupper(letter);
+    for(auto &letter : newEntry.word) letter = tolower(letter);
 
     // Binary search
-    bool inDict = std::binary_search(_dict.cbegin(), _dict.cend(), newEntry.word);
+    bool inDict = std::binary_search(_dict.begin(), _dict.end(), newEntry.word);
     for(auto &letter : newEntry.word) letter = toupper(letter);
     if (!inDict){
         last = -2;
