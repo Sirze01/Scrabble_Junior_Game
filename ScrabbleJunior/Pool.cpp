@@ -31,6 +31,5 @@ int Pool::getCurrentSize() const {
 }
 
 void Pool::shuffle() {
-	//shuffle pool for next take
 	std::shuffle(_letters.begin(), _letters.end(), RANDOM_GENERATOR);
 }

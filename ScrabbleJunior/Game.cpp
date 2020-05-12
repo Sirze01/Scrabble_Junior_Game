@@ -42,7 +42,7 @@ void Game::askCommand(int turnNumber) {
 	std::vector<std::string> coloredMessage;
 	int playerColor = _currentPlayer->getColor();
 
-	if (_currentPlayer->getMayPass() && !_currentPlayer->mayMove(_board, _pool)) { //passed before and can't move
+	if (_currentPlayer->getMayPass() && !_currentPlayer->mayMove(_board, _pool)) { //passed before and still can't move
 		if (turnNumber == 1) {
 			coloredMessage = {
 				_currentPlayer->getName() + ", you still cannot move.",
@@ -52,7 +52,7 @@ void Game::askCommand(int turnNumber) {
 		else return;
 	}
 
-	if (!_currentPlayer->getHandSize() && !coloredMessage.size()) { //player has nothing on hand
+	if (!_currentPlayer->getActualHandSize() && !coloredMessage.size()) { //player has nothing on hand
 		_currentPlayer->forcePass();
 		coloredMessage = {
 			_currentPlayer->getName() + ", you have nothing on your hand.",
@@ -65,10 +65,13 @@ void Game::askCommand(int turnNumber) {
 	for (;;) {
 
 		if (!coloredMessage.size()) {
+
 			commandPrompt = "(turn " + std::to_string(turnNumber) + ") " + _currentPlayer->getName() + ": ";
 			regularMessage = "", coloredMessage = {};
-			std::cout << "\n"; paddingAndTopic(playerColor);
+
+			paddingAndTopic(playerColor,true);
 			std::cout << commandPrompt;
+
 			std::getline(std::cin, input); cleanBuffer();
 			Command command(input);
 
@@ -196,20 +199,10 @@ bool Game::allPlayersMustPass() const {
 }
 
 bool Game::hasFinished() const {
-	if (_currentPlayer->mayMove(_board, _pool)) return false;
-	else if (allPlayersMustPass()) return true;
-
-	int maxLine = _board->getDimensions().vLine - 1;
-	int maxCol = _board->getDimensions().hCollumn - 1;
-	std::vector<std::vector<char>> letters = _board->getLetters();
-	std::vector<std::vector<bool>> highlights = _board->getHighlights();
-
-	for (int line = 0; line <= maxLine;++line) {
-		for (int col = 0;col <= maxCol;++col) {
-			if (letters.at(line).at(col) != ' '
-				&& !highlights.at(line).at(col)) return false;
-		}
+	for (auto& player : _players) {
+		if (player->mayMove(_board,_pool)) return false;
 	}
+
 	return true;
 }
 
@@ -223,7 +216,6 @@ int Game::getWinner() const {
 	int maxScore = 0; int currentWinner = -1;
 	for (int i = 0; i < _nPlayers;++i) {
 		int score = _players.at(i)->getScore();
-
 		if (score == maxScore) currentWinner = -1;
 		else if (score > maxScore) {
 			currentWinner = i;

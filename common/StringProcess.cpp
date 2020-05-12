@@ -27,8 +27,8 @@ std::string stripSpaces(std::string name) {
 std::string upperNameInitials(std::string name) {
     bool doUpper = true;
     for (size_t i = 0; i < name.length(); i++) {
-        if (doUpper && name.at(i) >= 'A' && name.at(i) <= 'Z') doUpper = false; //already uppercase
-        else if (doUpper && !(name.at(i) >= 'A' && name.at(i) <= 'Z')) {
+        if (doUpper && isupper(name.at(i))) doUpper = false; //already uppercase
+        else if (doUpper && !isupper(name.at(i))) {
             name.at(i) = toupper(name.at(i));
             doUpper = false;
         }
@@ -124,6 +124,7 @@ std::string smartCommandAdvice(std::string command) {
         processed += tolower(command.at(1));
         return "Did you attempt to play a tile on position " + processed +
                "? Please specify letter as in 'Yx <letter>'.";
+
     } else if (command.find("exchange") != std::string::npos) {
         return "Are you trying to exchange one of your tiles? Please specify letter as in 'exchange <letter>'.";
     } else {
@@ -132,14 +133,11 @@ std::string smartCommandAdvice(std::string command) {
 }
     
 bool isAlpha(std::string toTest) {
-    for(auto &letter : toTest){
-        if(!std::isalpha(letter))
-            return false;
-    }
+    for(auto &letter : toTest) if(!std::isalpha(letter)) return false;
     return true;
 }
 
 bool isDigit(std::string toTest) {
-    for (auto letter : toTest) if (!isdigit(letter)) return false;
+    for (auto &letter : toTest) if (!isdigit(letter)) return false;
     return true;
 }

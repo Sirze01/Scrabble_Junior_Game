@@ -25,7 +25,7 @@ public:
 	int getHandPosition(char letter) const;
 	int getExchangeCount() const;
 	coord getPossiblePos(const Board* board, const Pool* pool) const;
-	int getHandSize() const;
+	int getActualHandSize() const;
 private:
 	bool _mayPass;
 	int _exchangeCount;
