@@ -14,7 +14,7 @@ void openingMessage() {
     std::cout << std::endl;
     std::cout << std::string(1, '\n');
     std::cout << std::string(2, ' ');
-    for (int i = 0; i < (int) ((100 - message.size()) / 2); i++) { //size_t or cast to int to shut vs up
+    for (int i = 0; i < (int) ((100 - message.size()) / 2); i++) {
         std::cout << '-';
     }
     std::cout << message;
@@ -39,7 +39,10 @@ bool dialogue(int &last, commandInterpreter &aCommand){
         std::cout
                 << stringWriter(100, "Please choose a valid command. If you need help input 'help'.", 2);
     }
-    std::cout << std::string(2, ' ') << '(' << aCommand.boardName() << ") " << "Your input: ";
+    if(aCommand._dictBool and aCommand._state)
+        std::cout << std::string(2, ' ') << '(' << aCommand.boardName() << ") " << "Your input: ";
+    else
+        std::cout << std::string(2, ' ') << "Your input: ";
     std::string userInput;
     std::getline(std::cin, userInput);
     aCommand.edit(userInput);
@@ -55,8 +58,10 @@ bool openingDialogue(int &last) {
     }
     std::cout << std::string(2, ' ') << "Your input: ";
     std::string userInput;
+
     std::getline(std::cin, userInput);
     commandInterpreter command(userInput);
+
     bool temp = command.interpret(last);
     if (temp and (last != -1)) {
         bool validation;
@@ -64,7 +69,7 @@ bool openingDialogue(int &last) {
             do {
                 validation = dialogue(last, command);
             } while (!validation);
-        } while (!((last == -1) || (last == -4)));
+        } while (!(last == -1) && !(last == -4));
     }
 
     return temp;

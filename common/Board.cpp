@@ -62,13 +62,12 @@ Board::Board(std::string filename) {
 
 	if (file.is_open()) {
         getline(file, line);
-		line = stripSpaces(line);
-		//THIS NEEDS TO BE MORE FLEXIBLE!!
-        _vDimension = std::stoi(line.substr(0, 2));
-        _hDimension= std::stoi(line.substr(4,6));
-		//
-        _letters.resize(_vDimension);
 
+        _vDimension = std::stoi(line.substr(0, line.find_first_of(' ')));
+        line.erase(0, line.find_first_of(' ') + 3);
+        _hDimension= std::stoi(line);
+
+        _letters.resize(_vDimension);
         for (auto & _line : _letters){
             _line.resize(_hDimension);
             for(char & _letter : _line){
@@ -170,19 +169,18 @@ coord Board::getIndex(std::string position) const {
 	return coordinates;
 }
 
-/*bool Board::fileExport(std::string filename) const {
-	std::string line;
-	std::ofstream file(filename);
-	if (file.is_open()) {
-		file << _hDimension << 'x' << _vDimension << '\n';
-		for (auto line : _words) {
-			file << line << '\n';
-		}
-		return true;
-	}
-	std::cerr << "Could not write to file." << std::endl;
-	return false;
-}*/
+bool Board::fileExport(std::string filename) const {
+    std::ofstream file(filename);
+    if (file.is_open()) {
+        file << _vDimension << 'x' << _hDimension << '\n';
+        for (auto line : _words) {
+            file << line.firstCoord << ' ' << line.orientation << ' ' << line.word << '\n';
+        }
+        return true;
+    }
+    std::cerr << "Could not write to file." << std::endl;
+    return false;
+}
 
 bool Board::highlight(int color, int vIndex, int hIndex) {
 	if (vIndex >= (int)_vDimension || hIndex >= (int)_hDimension) return false;
@@ -247,10 +245,116 @@ coord Board::getDimensions() const {
 	return dimensions;
 }
 
+
+// Needs Testing - Reserved area :)
 bool Board::boardBounds(coord firstLetter, std::string orientation, int wordLen){
-    if((firstLetter.vLine > _vDimension) || (firstLetter.vLine < _vDimension))
+    if((firstLetter.vLine > _vDimension) || (firstLetter.vLine < 0))
         return false;
-    if((firstLetter.hCollumn > _hDimension) || (firstLetter.hCollumn < _hDimension))
+    if((firstLetter.hCollumn > _hDimension) || (firstLetter.hCollumn < 0))
         return false;
-	return true;
+
+    if(orientation == "V") {
+        if ((firstLetter.vLine + wordLen > _vDimension) || (firstLetter.vLine + wordLen < 0))
+            return false;
+    }
+
+    if(orientation == "H") {
+        if((firstLetter.hCollumn + wordLen > _hDimension) || (firstLetter.hCollumn + wordLen < 0))
+            return false;
+    }
+
+    return true;
+}
+
+bool Board::goodIntersects(codedWord word) {
+    bool valid = true;
+    if(word.orientation == "V") {
+        for(int i = 0; i < word.word.size(); i++){
+            if (_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn] != ' ')
+                if(_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn] != word.word[i])
+                    valid = false;
+        }
+    }
+    if(word.orientation == "H") {
+        for(int i = 0; i < word.word.size(); i++){
+            if (_letters[getIndex(word.firstCoord).vLine][getIndex(word.firstCoord).hCollumn + i] != ' ')
+                if(_letters[getIndex(word.firstCoord).vLine][getIndex(word.firstCoord).hCollumn + i] != word.word[i])
+                    valid = false;
+        }
+    }
+    return valid;
+}
+
+void Board::lettersManip(coord inates, char letter) { //setletter
+    _letters[inates.vLine][inates.hCollumn] = letter;
+}
+
+void Board::addWord(codedWord word) {
+    _words.push_back(word);
+}
+
+bool Board::wordSpaces(codedWord word) {
+    if(word.orientation == "V") {
+
+        for (int i = 0; i < word.word.size(); i++) {
+            if (i == 0 &&
+                (getIndex(word.firstCoord).vLine - 1 <= _vDimension - 1 && getIndex(word.firstCoord).vLine - 1 >= 0)) {
+                if (_letters[getIndex(word.firstCoord).vLine + i - 1][getIndex(word.firstCoord).hCollumn] != ' ')
+                    return false;
+            }
+
+            if (i == (word.word.size() - 1) && (getIndex(word.firstCoord).vLine + i + 1 <= _vDimension - 1 &&
+                                                getIndex(word.firstCoord).vLine + i + 1 >= 0)) {
+                if (_letters[getIndex(word.firstCoord).vLine + i + 1][getIndex(word.firstCoord).hCollumn] != ' ')
+                    return false;
+            }
+
+            if (_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn] != word.word[i]) {
+                if (getIndex(word.firstCoord).hCollumn + 1 <= _hDimension - 1 &&
+                    getIndex(word.firstCoord).hCollumn + 1 >= 0) {
+                    if (_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn + 1] != ' ')
+                        return false;
+                }
+
+                if (getIndex(word.firstCoord).hCollumn - 1 <= _hDimension - 1 &&
+                    getIndex(word.firstCoord).hCollumn - 1 >= 0) {
+                    if (_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn - 1] != ' ')
+                        return false;
+
+                }
+            }
+        }
+    }
+
+    if(word.orientation == "H") {
+        for (int i = 0; i < word.word.size(); i++) {
+            if (i == 0 &&
+                (getIndex(word.firstCoord).hCollumn - 1 <= _hDimension - 1 && getIndex(word.firstCoord).hCollumn - 1 >= 0)) {
+                if (_letters[getIndex(word.firstCoord).vLine][getIndex(word.firstCoord).hCollumn + i - 1] != ' ')
+                    return false;
+            }
+
+            if (i == (word.word.size() - 1) && (getIndex(word.firstCoord).hCollumn + i + 1 <= _hDimension - 1 &&
+                                                getIndex(word.firstCoord).hCollumn + i + 1 >= 0)) {
+                if (_letters[getIndex(word.firstCoord).vLine][getIndex(word.firstCoord).hCollumn + i + 1] != ' ')
+                    return false;
+            }
+
+            if (_letters[getIndex(word.firstCoord).vLine][getIndex(word.firstCoord).hCollumn + i] != word.word[i]) {
+                if (getIndex(word.firstCoord).vLine + 1 <= _vDimension - 1 &&
+                    getIndex(word.firstCoord).vLine + 1 >= 0) {
+                    if (_letters[getIndex(word.firstCoord).vLine + 1][getIndex(word.firstCoord).hCollumn + i] != ' ')
+                        return false;
+                }
+
+                if (getIndex(word.firstCoord).vLine - 1 <= _vDimension - 1 &&
+                    getIndex(word.firstCoord).vLine - 1 >= 0) {
+                    if (_letters[getIndex(word.firstCoord).vLine - 1][getIndex(word.firstCoord).hCollumn + i] != ' ')
+                        return false;
+
+                }
+            }
+        }
+    }
+    return true;
 }

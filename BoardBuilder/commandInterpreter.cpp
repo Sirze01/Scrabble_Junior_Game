@@ -10,9 +10,12 @@ commandInterpreter::commandInterpreter() {
 
 commandInterpreter::commandInterpreter(std::string command) {
     std::string cmd = command.substr(0, command.find(' '));
-    command.erase(0, cmd.size() + 1);
-    _modifiers = command;
-    if ((cmd == "new") or (cmd == "n"))
+    command.erase(0, cmd.size());
+    _modifiers = command.substr(command.find_first_of(' ') + 1);
+    if (cmd == "dict")
+        _command = "dict";
+
+    else if ((cmd == "new") or (cmd == "n"))
         _command = "new";
 
     else if ((cmd == "import") or (cmd == "i"))
@@ -39,10 +42,13 @@ commandInterpreter::commandInterpreter(std::string command) {
 void commandInterpreter::edit(std::string command) {
     _command = "";
     _modifiers = "";
-    std::string cmd = command.substr(0, command.find(' '));
-    command.erase(0, command.find(' ') + 1);
-    _modifiers = command;
-    if ((cmd == "new") or (cmd == "n"))
+    std::string cmd = command.substr(0, command.find(' ')); //stripspaces
+    command.erase(0, cmd.size());
+    _modifiers = command.substr(command.find_first_of(' ') + 1);
+    if (cmd == "dict")
+        _command = "dict";
+
+    else if ((cmd == "new") or (cmd == "n"))
         _command = "new";
 
     else if ((cmd == "import") or (cmd == "i"))
@@ -66,7 +72,7 @@ void commandInterpreter::edit(std::string command) {
 }
 
 
-std::string commandInterpreter::boardName() {
+std::string commandInterpreter::boardName() { //get; const
     return _name;
 }
 
@@ -77,8 +83,19 @@ std::string commandInterpreter::boardName() {
  * -4 delete
  * */
 bool commandInterpreter::interpret(int &last) {
+    //think last
+
+    if (_command == "dict"){
+        if (cmdDict())
+            last = 0;
+        else {
+            last = -3;
+            return false;
+        }
+
+    }
     if (_command == "new") {
-        if (cmdNew() == true)
+        if (cmdNew())
             last = 0;
         else{
             last = -3;
@@ -87,7 +104,7 @@ bool commandInterpreter::interpret(int &last) {
     }
 
     else if (_command == "import") {
-        if (cmdImport() == true)
+        if (cmdImport())
             last = 0;
         else{
             last = -3;
@@ -96,16 +113,15 @@ bool commandInterpreter::interpret(int &last) {
     }
 
     else if (_command == "add") {
-        if (cmdAdd() == true)
+        if (cmdAdd(last))
             last = 0;
         else{
-            last = -3;
             return false;
         }
     }
 
     else if (_command == "export"){
-            if(cmdExport() == true)
+            if(cmdExport())
                 last = 0;
             else{
             last = -3;
@@ -126,6 +142,8 @@ bool commandInterpreter::interpret(int &last) {
         cmdExit(last);
     }
 
+    else
+        last = -3;
     return !_command.empty();
 }
 
@@ -146,9 +164,63 @@ void commandInterpreter::cmdHelp() {
     std::cout << stringWriter(100, "exit - Quit the program", 2);
 }
 
+// testing
+bool commandInterpreter::cmdDict() {
+    if (_dictBool && _state) {
+        std::cout << std::string(outPadding, ' ') << "Cannot change dicts. You already chose one for this board" << std::endl;
+        return false;
+    }
+
+    if(_modifiers.empty()){
+        std::cout << std::string(1, '\n');
+        std::cout << stringWriter(100, "Input the file you want to import: ", 2);
+        std::cout << std::string(2, ' ') << "Path: ";
+        std::getline(std::cin, _modifiers);
+    }
+    std::string line;
+    std::ifstream file;
+    file.open(_modifiers, std::ios_base::binary);
+
+    //only one for
+    if (file.is_open()) {
+        while(getline(file, line)){
+            if(line.size() > 1){
+                _dict.push_back(line);
+            }
+        }
+        file.close();
+    }
+    else{
+        bool exists = false;
+        while (!exists) {
+            std::cout << '\n' << std::string(2, ' ') << "Cannot open file, try another file" << std::endl;
+            std::cout << std::string(2, ' ') << "Path: ";
+            std::getline(std::cin, _modifiers);
+            std::ifstream file;
+            file.open(_modifiers, std::ios_base::binary);
+            exists = file.is_open();
+        }
+
+        while(getline(file, line)){
+            if(line.size() > 1){
+                _dict.push_back(line);
+            }
+        }
+        file.close();
+    }
+
+    _dictBool = true;
+    std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Dictionary loaded\n" << std::endl;
+    return true;
+}
+
 
 bool commandInterpreter::cmdNew() {
-    if (_state) {
+    if (!_dictBool) {
+        std::cout << std::string(outPadding, ' ') << "Cannot create a new board. You haven't added a dictionary" << std::endl;
+        return false;
+    }
+    if (_state) { //if (_openBoard)
         std::cout << std::string(outPadding, ' ') << "Cannot create a new board. You already have one open" << std::endl;
         return false;
     }
@@ -168,8 +240,10 @@ bool commandInterpreter::cmdNew() {
         std::getline(std::cin, _modifiers);
     }
     else {
-        if (_modifiers.find_first_of(' ') !=_modifiers.find_last_of(' '))
+        //think about stripSpaces
+        if (_modifiers.find_first_of(' ') !=_modifiers.find_last_of(' ')) //tenss
             return false;
+
         hTemp = _modifiers;
         _modifiers = hTemp.substr(0, hTemp.find_first_of(' '));
         hTemp.erase(0, hTemp.find_first_of(' '));
@@ -203,7 +277,7 @@ bool commandInterpreter::cmdNew() {
             }
         }
 
-        if(_modifiers.find('x') != _modifiers.npos){
+        if(_modifiers.find('x') != std::string::npos){
             vTemp = _modifiers.substr(0, _modifiers.find('x'));
             hTemp = _modifiers.substr(_modifiers.find('x') +1);
         }
@@ -230,18 +304,44 @@ bool commandInterpreter::cmdNew() {
 
 
 bool commandInterpreter::cmdImport() {
-    if (_state)
+    if (!_dictBool) {
+        std::cout << std::string(outPadding, ' ') << "Cannot create a new board. You haven't added a dictionary" << std::endl;
         return false;
+    }
+    if (_state){
+        std::cout << std::string(outPadding, ' ') << "Cannot create a new board. You already have one open"
+                  << std::endl;
+        return false;
+    }
     if(!_modifiers.empty()){
         std::string temp;
         temp = _modifiers;
-        _modifiers = _modifiers.substr(0, temp.find_first_of(' '));
+        _modifiers = _modifiers.substr(0, temp.find_first_of(' ')); //spaces
         temp.erase(0, temp.find_first_of(' '));
         if (!temp.empty())
             _name = temp.substr(1);
 
     }
-    else{
+    else {
+        for (;;) {
+            std::cout << std::string(1, '\n');
+            std::cout << stringWriter(100, "Input the file you want to import: ", 2);
+            std::cout << std::string(2, ' ') << "Path: ";
+            std::getline(std::cin, _modifiers);
+
+            std::ifstream file;
+            file.open(_modifiers, std::ios::in);
+
+            if (!file.is_open()) {
+                std::cout << '\n' << std::string(2, ' ') << "Cannot open file, try another file." << std::endl;
+                continue;
+            }
+            else break;
+        }
+    }
+
+    /*
+        else{
     std::cout << std::string(1, '\n');
     std::cout << stringWriter(100, "Input the file you want to import: ", 2);
     std::cout << std::string(2, ' ') << "Path: ";
@@ -249,6 +349,7 @@ bool commandInterpreter::cmdImport() {
     }
     std::ifstream file;
     file.open(_modifiers, std::ios::in);
+
     if (!file.is_open()) {
         bool exists = false;
         while (!exists) {
@@ -260,9 +361,12 @@ bool commandInterpreter::cmdImport() {
             exists = file.is_open();
         }
     }
+    */
+
     Board newBoard(_modifiers);
     _board = newBoard;
-    if(_name.empty()) {
+
+    if(_name.empty()) { //_boardName
         std::cout << '\n' << std::string(2, ' ') << "Insert the name of your board." << std::endl;
         std::cout << std::string(2, ' ') << "Board name: ";
         std::getline(std::cin, _name);
@@ -272,76 +376,167 @@ bool commandInterpreter::cmdImport() {
     return true;
 }
 
-
-bool commandInterpreter::cmdAdd() {
+/*
+ * Needs to check if the word already exists in the board and ask for confirmation
+ */
+bool commandInterpreter::cmdAdd(int &last) {
     if (!_state) {
-        std::cout
-                << stringWriter(100, "You need to be editing a board to run this command. Import or create a new one!",
-                                2);
+        std::cout << stringWriter(100, "You need to be editing a board to run this command. Import or create a new one!", 2);
         return false;
     }
 
+    bool retValue = true; //
     codedWord newEntry;
+
     if(!_modifiers.empty()){
         newEntry.firstCoord = _modifiers.substr(0,2);
-        _modifiers.erase(0, 2);
-        if(!((newEntry.firstCoord.size() == 2) && isAlpha(newEntry.firstCoord)))
+        _modifiers.erase(0, 2); //wut - coordinates
+        if(!((newEntry.firstCoord.size() == 2) && isAlpha(newEntry.firstCoord))){
+            last = -3;
             return false;
-        if(!_modifiers.empty()) {
-            newEntry.orientation = _modifiers.substr(1, 1);
-            _modifiers.erase(0, 2);
-            if(!((newEntry.orientation.size() == 1) && ((newEntry.orientation == "H") || (newEntry.orientation == "V") ||
-                                                        (newEntry.orientation == "h") || (newEntry.orientation == "v"))))
-                return false;
         }
         if(!_modifiers.empty()) {
-            newEntry.word = _modifiers.substr(1);
-            if(!isAlpha(newEntry.word))
+            newEntry.orientation = _modifiers.substr(1, 1);
+            _modifiers.erase(0, 2); // space, orientation
+            if(!((newEntry.orientation.size() == 1) && ((newEntry.orientation == "H") || (newEntry.orientation == "V") || //toupper = "H"
+                                                        (newEntry.orientation == "h") || (newEntry.orientation == "v")))){
+                last = -3;
                 return false;
+            }
+        }
+        if(!_modifiers.empty()) { //if theres word
+            newEntry.word = _modifiers.substr(1);
+            if(!isAlpha(newEntry.word)) {
+                last = -3;
+                return false;
+            }
         }
     }
 
     if(newEntry.firstCoord.empty()){
+        int count = 0;
         do {
-            std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the coordinates to the first letter of the word"
+            if (count)
+                std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Your input is invalid, try again" << std::endl;
+            else
+                std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the coordinates to the first letter of the word"
                       << std::endl;
+
+            count++;
             std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Coordinate: ";
             getline(std::cin, newEntry.firstCoord);
         } while (!((newEntry.firstCoord.size() == 2) && isAlpha(newEntry.firstCoord)));
     }
 
     if(newEntry.orientation.empty()){
+        int temp = 0;
         do {
-            std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the desired orientation" << std::endl;
+            if(temp)
+                std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Your input is invalid, try again" << std::endl;
+            else
+                std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the desired orientation" << std::endl;
+            temp++;
             std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Orientation: ";
-            getline(std::cin, newEntry.firstCoord);
+            getline(std::cin, newEntry.orientation);
         } while (!((newEntry.orientation.size() == 1) && ((newEntry.orientation == "H") ||
         (newEntry.orientation == "V") || (newEntry.orientation == "h") || (newEntry.orientation == "v"))));
     }
 
-
     if(newEntry.word.empty()){
+        int temp = 0;
         do {
-            std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the word you want to place" << std::endl;
+            if(temp)
+                std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Your input is invalid, try again" << std::endl;
+            else
+                std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the word you want to place" << std::endl;
+            temp++;
             std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Word: ";
-            getline(std::cin, newEntry.firstCoord);
+            getline(std::cin, newEntry.word);
         } while (!isAlpha(newEntry.word));
     }
 
+    newEntry.firstCoord[0] = toupper(newEntry.firstCoord[0]);
+    newEntry.firstCoord[1] = tolower(newEntry.firstCoord[1]);
+    for(auto &letter : newEntry.orientation) letter = toupper(letter);
+    for(auto &letter : newEntry.word) letter = toupper(letter);
+
+    // Binary search - use std::
+    bool inDict = false;
+    int first = 0, final = _dict.size() - 1, middle;
+    for(auto &letter : newEntry.word) letter = tolower(letter);
+
+    while (!inDict && first <= final){
+        middle = (first + final) / 2;
+        if (newEntry.word == stripSpecialChars(_dict[middle])){
+            inDict = true;
+        }
+        else if(_dict[middle].compare(newEntry.word) > 0)
+            final = middle - 1;
+        else
+            first = middle + 1;
+    }
+
+    for(auto &letter : newEntry.word) letter = toupper(letter);
+
+    if (!inDict){ //think about removing retvalue
+        last = -2;
+        std::cout <<stringWriter(100, "The word you chose isn't in the dictionary",
+                                 BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
+        retValue = false;
+    }
+
+    if (!(_board.boardBounds(_board.getIndex(newEntry.firstCoord), newEntry.orientation, newEntry.word.size()))){
+        last = -2;
+        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Word is out of range! Try another one." << std::endl;
+        retValue = false;
+    }
+    else if(!(_board.goodIntersects(newEntry))) {
+        last = -2;
+        std::cout << stringWriter(100, "The word you're trying to add intersects with another in the wrong letter",
+                                  BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
+        retValue = false;
+    }
+    else if(!(_board.wordSpaces(newEntry))){
+        last = -2;
+        std::cout << stringWriter(100, "The word you're trying to add doesn't fit in that space",
+                                  BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
+        retValue = false;
+    }
 
 
-    return true;
+    if(retValue){
+        coord temp = _board.getIndex(newEntry.firstCoord);
+        int v, h;
+        v = temp.vLine;
+        h = temp.hCollumn;
+        if (newEntry.orientation == "V"){
+            for(int i = 0; i < newEntry.word.size(); i++){
+                temp.vLine = v + i;
+                _board.lettersManip(temp, newEntry.word[i]);
+            }
+        }
+        else{
+            for(int i = 0; i < newEntry.word.size(); i++){
+                temp.hCollumn = h + i;
+                _board.lettersManip(temp, newEntry.word[i]);
+            }
+        }
+        _board.addWord(newEntry);
+        _board.show();
+    }
+
+    return retValue;
 }
 
 
-bool commandInterpreter::cmdExport() {
+bool commandInterpreter::cmdExport() { //wut
     return true;
 }
 
 
 void commandInterpreter::cmdDelete(int &last) {
     std::cout << "  Board deleted" << std::endl;
-    last = -4;
+    last = -4; //seterror
 }
 
 

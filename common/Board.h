@@ -33,6 +33,10 @@ public:
     std::vector<std::vector<bool>> getHighlights() const;
     coord getDimensions() const;
     bool boardBounds(coord firstLetter, std::string orientation = "H", int wordLen = 0);
+    bool goodIntersects(codedWord);
+    void lettersManip(coord inates, char letter);
+    void addWord(codedWord word);
+    bool wordSpaces(codedWord word);
 
 private:
     std::vector<std::vector<bool>> _highlights;
