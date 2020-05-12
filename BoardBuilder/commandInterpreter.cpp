@@ -1,5 +1,6 @@
 #include "commandInterpreter.h"
 #include "../common/ConsoleSetup.h"
+#include <algorithm>
 const int outPadding = 2;
 
 commandInterpreter::commandInterpreter() {
@@ -180,7 +181,7 @@ bool commandInterpreter::cmdDict() {
     if (file.is_open()) {
         while(getline(file, line)){
             if(line.size() > 1){
-                _dict.push_back(line);
+                _dict.push_back(stripSpecialChars(line));
             }
         }
         file.close();
@@ -422,19 +423,7 @@ bool commandInterpreter::cmdAdd(int &last) {
     for(auto &letter : newEntry.word) letter = toupper(letter);
 
     // Binary search
-    bool inDict = false;
-    int first = 0, final = _dict.size() - 1, middle;
-    for(auto &letter : newEntry.word) letter = tolower(letter);
-    while (!inDict && first <= final){
-        middle = (first + final) / 2;
-        if (newEntry.word == _dict[middle].substr(0, _dict[middle].size() - 1)){
-            inDict = true;
-        }
-        else if(_dict[middle].compare(newEntry.word) > 0)
-            final = middle - 1;
-        else
-            first = middle + 1;
-    }
+    bool inDict = std::binary_search(_dict.cbegin(), _dict.cend(), newEntry.word);
     for(auto &letter : newEntry.word) letter = toupper(letter);
     if (!inDict){
         last = -2;
