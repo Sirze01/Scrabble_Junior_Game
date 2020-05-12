@@ -9,3 +9,4 @@ std::string stringWriter(int text_width, std::string text, int padding);
 std::string stripCommandBloat(std::string name);
 std::string smartCommandAdvice(std::string command);
 bool isAlpha(std::string toTest);
+bool isDigit(std::string toTest);
