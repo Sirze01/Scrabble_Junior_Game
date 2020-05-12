@@ -180,8 +180,9 @@ bool Board::fileExport(std::string filename) const {
 
         file << std::string(2, '\n');
         file << std::string(BOARD_TOP_PADDING,'\n') << LEFT_PADDING_STR;
+        file << ' ';
         for (int i = 0; i < _hDimension; i++) {
-            file << "  " << alphabet.at(i);
+            file << " " << alphabet.at(i);
         }
         file << std::endl;
         for (int i = 0; i < _vDimension; i++) {

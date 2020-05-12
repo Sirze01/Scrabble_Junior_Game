@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
-#include <functional>
 #include <fstream>
 #include "Pool.h"
 #include "Player.h"
@@ -27,8 +26,7 @@ void getReady() {
 	askEnter();
 }
 
-int askPlayFirst(const Board* board, int nPlayers, std::vector<std::string> playerNames, std::vector<int> playerColors,
-	std::function<void(const Board*)> clear) {
+int askPlayFirst(int boardWidth, int boardHeight, int nPlayers, std::vector<std::string> playerNames, std::vector<int> playerColors) {
 
 	std::function<void(int, int)> write = [&](int line, int col) {
 		std::cout << "|Choose one of the players";
@@ -43,19 +41,13 @@ int askPlayFirst(const Board* board, int nPlayers, std::vector<std::string> play
 		}
 	};
 
-	clear(board);
-	writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, write);
+	writeCardView(boardHeight, boardWidth, write);
 
 	std::string playerName;
 	for (;;) {
 		paddingAndTopic(WHITE,true); std::cout << "Who should go first? ";
 		std::getline(std::cin, playerName); cleanBuffer();
 		playerName = stripSpaces(playerName);
-
-		if (playerName == "clear") {
-			clear(board); writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, write);
-			continue;
-		}
 
 		if (playerName == "random") {
 			std::uniform_int_distribution<int> distribution{ 0, nPlayers - 1 };
@@ -83,7 +75,7 @@ bool exists(std::string filename) {
 	return !(!file);
 }
 
-std::string askBoardFileName(const Board* board, std::function<void(const Board*)> clear) {
+std::string askBoardFileName(int boardWidth, int boardHeight) {
 
 	std::function<void(int, int)> write = [&](int line, int col) {
 		std::cout << "|Tip";
@@ -95,48 +87,36 @@ std::string askBoardFileName(const Board* board, std::function<void(const Board*
 		std::cout << "|to create your own board!";
 	};
 
-	clear(board);
-	writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, write);
-	std::string fileName;
+
+	writeCardView(boardHeight, boardWidth, write);
+	std::string filename;
 
 	for (;;) {
 		paddingAndTopic(WHITE,true); std::cout << "Import board from file: ";
 
-		std::getline(std::cin, fileName); cleanBuffer();
-
-		if (fileName == "clear") {
-			clear(board); writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, write);
-			continue;
-		}
-
-		if (fileName == "") {
+		std::getline(std::cin, filename); cleanBuffer();
+		if (filename == "") {
 			paddingAndTopic(RED,true); std::cout << "Empty filenames are invalid. Please try again.\n";
 		}
-		else if (!exists(fileName)) {
+		else if (!exists(filename)) {
 			paddingAndTopic(RED,true); std::cout << "We could not find that file. Please try again.\n";
 		}
 		else {
-			Board testBoard(fileName);
+			Board testBoard(filename);
 			if (testBoard.getNonEmptyChars().size() < 7 * 4) {
 				std::string userAns;
+				paddingAndTopic(RED, true); std::cout << "That board hasn't got enough letters to create a fair 4 player game.\n";
+				paddingAndTopic(RED, false); std::cout << "Are you sure you want to proceed? ";
 
 				for (;;) {
-					paddingAndTopic(WHITE, true); std::cout << "That board hasn't got enough letters to create a fair 4 player game.\n";
-					paddingAndTopic(WHITE, false); std::cout << "Are you sure you want to proceed? ";
 					std::getline(std::cin, userAns); cleanBuffer();
 					userAns = stripSpaces(userAns);
-
-					if (userAns == "clear") {
-						clear(board); writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, write);
-						continue;
-					}
-
 					for (auto& i : userAns)i = tolower(i);
 
-					if (userAns == "yes" || userAns == "y") return fileName;
+					if (userAns == "yes" || userAns == "y") return filename;
 					if (userAns == "no" || userAns == "n") break;
 					else {
-						paddingAndTopic(RED, true); std::cout << "Please answer 'yes' or 'no'.\n";
+						paddingAndTopic(RED, true); std::cout << "Please answer 'yes' or 'no': ";
 						continue;
 					}
 				}
@@ -146,17 +126,13 @@ std::string askBoardFileName(const Board* board, std::function<void(const Board*
 		}
 	}
 
-	return fileName;
+	return filename;
 }
 
-PlayerData askPlayer(int position, const Board *board,
-	std::vector<std::string> forbiddenNames, std::vector<int> forbiddenColors,
-	std::function<void(const Board*)> clear) {
-
+PlayerData askPlayer(int position, int boardWidth, int boardHeight, std::vector<std::string> forbiddenNames, std::vector<int> forbiddenColors) {
 	std::string name, colorName;
 	int color = WHITE;
 	position++;
-	clear(board);
 
 	std::function<void(int, int)> write = [&](int line, int col) {
 		std::vector<int> colors = { RED,GREEN,BLUE,PINK,ORANGE };
@@ -183,10 +159,6 @@ PlayerData askPlayer(int position, const Board *board,
 			paddingAndTopic(RED, true); std::cout << "That is a reserved keyword. Please choose a different name.\n";
 			continue;
 		}
-		else if (name == "clear") {
-			clear(board);
-			continue;
-		}
 
 		name = upperNameInitials(name);
 
@@ -205,7 +177,7 @@ PlayerData askPlayer(int position, const Board *board,
 		else break;
 	}
 
-	writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, write);
+	writeCardView(boardHeight, boardWidth, write);
 
 	for (;;) { //ask color
 
@@ -214,11 +186,6 @@ PlayerData askPlayer(int position, const Board *board,
 		colorName = stripSpecialChars(colorName);
 		colorName = stripSpaces(colorName);
 		for (auto& i : colorName) i = tolower(i);
-
-		if (colorName == "clear") {
-			clear(board); writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, write);
-			continue;
-		}
 
 		if (colorName == "red") color = RED;
 		else if (colorName == "green") color = GREEN;
@@ -239,30 +206,21 @@ PlayerData askPlayer(int position, const Board *board,
 	return { name,color };
 }
 
-int askNumberOfPlayers(const Board* board, std::function<void(const Board*)> clear) {
-	clear(board);
-	std::string input;
+int askNumberOfPlayers() {
+	int nPlayers = 2;
 
 	for (;;) {
-		paddingAndTopic(WHITE, true); std::cout << "Number of players: ";
-		std::getline(std::cin, input); cleanBuffer();
-		input = stripSpaces(input);
-
-		if (input == "clear") {
-			clear(board);
-			continue;
+		paddingAndTopic(WHITE,true); std::cout << "Number of players: ";
+		if (!(std::cin >> nPlayers) || nPlayers > 4 || nPlayers < 2) {
+			cleanBuffer();
+			paddingAndTopic(RED, true);
+			std::cout << "Please input a number between 2 and 4.\n";
 		}
-
-		else {
-			if (!isDigit(input) || std::stoi(input) > 4 || std::stoi(input) < 2) {
-				paddingAndTopic(RED, true);
-				std::cout << "Please input a number between 2 and 4.\n";
-			}
-			else break;
-		}
+		else break;
 	}
 
-	return std::stoi(input);
+	askEnter();
+	return nPlayers;
 }
 
 void printIntro(Board* introBoard) {
@@ -273,7 +231,6 @@ void printIntro(Board* introBoard) {
 	"We hope you'll have a great time with us.",
 	"\n",
 	"Throughout the game, type 'help' to view the available commands.",
-	"Type 'clear' to erase command history and reload in case of issues."
 	"\n",
 	"Press enter to create a new game!",
 	"\n"
@@ -291,7 +248,7 @@ int main()
 {
 	setupConsole();
 
-	auto clearAndShowBoard = [](const Board* board) {
+	auto clearAndShowBoard = [](Board* board) {
 		clearConsole();
 		board->show();
 	};
@@ -310,18 +267,22 @@ int main()
 
 	printIntro(&introBoard);
 
-	std::string filename = askBoardFileName(&introBoard, clearAndShowBoard);
+	clearAndShowBoard(&introBoard);
+	std::string filename = askBoardFileName(introBoard.getDimensions().hCollumn, introBoard.getDimensions().vLine);
 	Board gameBoard(filename);
 
-	nPlayers = askNumberOfPlayers(&gameBoard, clearAndShowBoard);
+	clearAndShowBoard(&gameBoard);
+	nPlayers = askNumberOfPlayers();
 
 	for (int i = 0; i < nPlayers; ++i) {
-		PlayerData player = askPlayer(i, &gameBoard, playerNames, playerColors, clearAndShowBoard);
+		clearAndShowBoard(&gameBoard);
+		PlayerData player = askPlayer(i, gameBoard.getDimensions().hCollumn, gameBoard.getDimensions().vLine, playerNames, playerColors);
 		playerNames.push_back(player.name);
 		playerColors.push_back(player.color);
 	}
 
-	int first = askPlayFirst(&gameBoard, nPlayers, playerNames, playerColors, clearAndShowBoard);
+	clearAndShowBoard(&gameBoard);
+	int first = askPlayFirst(gameBoard.getDimensions().hCollumn, gameBoard.getDimensions().vLine, nPlayers, playerNames, playerColors);
 
 	Game my_game(&gameBoard, playerNames, playerColors, first);
 

@@ -359,10 +359,7 @@ void Game::end() const {
 
 	paddingAndTopic(WHITE, true); std::cout << "THE GAME HAS ENDED!\n";
 
-	if (allPlayersMustPass()) {
-		paddingAndTopic(WHITE, true);
-		std::cout << "All players passed their moves.\n";
-	}
+	if (allPlayersMustPass()) paddingAndTopic(WHITE, true); std::cout << "All players passed their moves.\n";
 
 	paddingAndTopic(color, true);
 	if (hasWinner()) std::cout << _players.at(winner)->getName() << " won with brilliancy!\n";
