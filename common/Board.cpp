@@ -75,7 +75,7 @@ Board::Board(std::string filename) {
             }
         }
 
-        while(getline(file, line)){
+        while(getline(file, line) && line != "#####END_OF_BOARD#####"){
             codedWord entry;
             entry.firstCoord = line.substr(0, 2);
             entry.orientation = line.at(3);
@@ -172,14 +172,35 @@ coord Board::getIndex(std::string position) const {
 bool Board::fileExport(std::string filename) const {
     std::ofstream file(filename);
     if (file.is_open()) {
-        file << _vDimension << 'x' << _hDimension << '\n';
+        file << _vDimension << " x " << _hDimension << '\n';
         for (auto line : _words) {
             file << line.firstCoord << ' ' << line.orientation << ' ' << line.word << '\n';
         }
+        file << "#####END_OF_BOARD#####\n";
+
+        file << std::string(2, '\n');
+        file << std::string(BOARD_TOP_PADDING,'\n') << LEFT_PADDING_STR;
+        for (int i = 0; i < _hDimension; i++) {
+            file << "  " << alphabet.at(i);
+        }
+        file << std::endl;
+        for (int i = 0; i < _vDimension; i++) {
+            file << LEFT_PADDING_STR;
+            file << std::string(1,toupper(alphabet.at(i)));
+            for (int j = 0; j < _hDimension; j++) {
+                file << ' ';
+                file << _letters[i][j];
+            }
+            file << " ";
+            file << std::endl;
+        }
+
         return true;
     }
+    else{
     std::cerr << "Could not write to file." << std::endl;
     return false;
+    }
 }
 
 bool Board::highlight(int color, int vIndex, int hIndex) {

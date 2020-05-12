@@ -530,6 +530,7 @@ bool commandInterpreter::cmdAdd(int &last) {
 
 
 bool commandInterpreter::cmdExport() { //wut
+    _board.fileExport((_name + ".txt"));
     return true;
 }
 
