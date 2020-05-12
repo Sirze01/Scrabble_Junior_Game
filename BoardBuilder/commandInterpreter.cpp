@@ -345,7 +345,9 @@ bool commandInterpreter::cmdImport() {
     return true;
 }
 
-
+/*
+ * Needs to check if the word already exists in the board and ask for confirmation
+ */
 bool commandInterpreter::cmdAdd(int &last) {
     if (!_state) {
         std::cout

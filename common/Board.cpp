@@ -181,7 +181,7 @@ coord Board::getIndex(std::string position) const {
 	}
 	std::cerr << "Could not write to file." << std::endl;
 	return false;
-}*/
+ */
 
 bool Board::highlight(int color, int vIndex, int hIndex) {
 	if (vIndex >= (int)_vDimension || hIndex >= (int)_hDimension) return false;
