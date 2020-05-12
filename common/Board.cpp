@@ -246,7 +246,7 @@ coord Board::getDimensions() const {
 }
 
 
-// Needs Testing - Reserved area
+// Needs Testing - Reserved area :)
 bool Board::boardBounds(coord firstLetter, std::string orientation, int wordLen){
     if((firstLetter.vLine > _vDimension) || (firstLetter.vLine < 0))
         return false;
@@ -285,7 +285,7 @@ bool Board::goodIntersects(codedWord word) {
     return valid;
 }
 
-void Board::lettersManip(coord inates, char letter) {
+void Board::lettersManip(coord inates, char letter) { //setletter
     _letters[inates.vLine][inates.hCollumn] = letter;
 }
 
