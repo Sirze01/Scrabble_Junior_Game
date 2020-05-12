@@ -67,7 +67,7 @@ bool openingDialogue(int &last) {
             do {
                 validation = dialogue(last, command);
             } while (!validation);
-        } while (!((last == -1) || (last == -4)));
+        } while (!(last == -1) && !(last == -4));
     }
 
     return temp;

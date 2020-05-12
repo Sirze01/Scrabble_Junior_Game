@@ -75,7 +75,7 @@ Board::Board(std::string filename) {
             }
         }
 
-        while(getline(file, line)){
+        while(getline(file, line) && line != "#####END_OF_BOARD#####"){
             codedWord entry;
             entry.firstCoord = line.substr(0, 2);
             entry.orientation = line.at(3);
@@ -197,8 +197,11 @@ bool Board::fileExport(std::string filename) const {
         }
         return true;
     }
-    std::cerr << "Could not write to file." << std::endl;
-    return false;
+
+    else {
+        std::cerr << "Could not write to file." << std::endl;
+        return false;
+    }
 }
 
 bool Board::highlight(int color, int vIndex, int hIndex) {

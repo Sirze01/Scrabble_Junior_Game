@@ -10,7 +10,7 @@ commandInterpreter::commandInterpreter() {
 
 
 commandInterpreter::commandInterpreter(std::string command) {
-    std::string cmd = command.substr(0, command.find(' '));
+    std::string cmd = command.substr(0, command.find(' ')); //stripspaces
     command.erase(0, cmd.size());
     _modifiers = command.substr(command.find_first_of(' ') + 1);
     if (cmd == "dict")
@@ -43,7 +43,7 @@ commandInterpreter::commandInterpreter(std::string command) {
 void commandInterpreter::edit(std::string command) {
     _command = "";
     _modifiers = "";
-    std::string cmd = command.substr(0, command.find(' '));
+    std::string cmd = command.substr(0, command.find(' ')); //stripspaces
     command.erase(0, cmd.size());
     _modifiers = command.substr(command.find_first_of(' ') + 1);
     if (cmd == "dict")
@@ -73,7 +73,7 @@ void commandInterpreter::edit(std::string command) {
 }
 
 
-std::string commandInterpreter::boardName() {
+std::string commandInterpreter::boardName() { //get; const
     return _name;
 }
 
@@ -468,7 +468,6 @@ bool commandInterpreter::cmdAdd(int &last) {
     }
     return retValue;
 }
-
 
 
 bool commandInterpreter::cmdExport() {
