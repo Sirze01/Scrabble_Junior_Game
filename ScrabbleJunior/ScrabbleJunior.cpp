@@ -267,9 +267,12 @@ int main()
 		introBoard = Board("intro_board.txt");
 	}
 
-	int nPlayers = 2; std::vector<std::string> playerNames; std::vector<int> playerColors;
+	int nPlayers;
+	std::vector<std::string> playerNames;
+	std::vector<int> playerColors;
 
-	printIntro(&introBoard); clearAndShowBoard(introBoard);
+	printIntro(&introBoard);
+	clearAndShowBoard(introBoard);
 
 	std::string filename = askBoardFileName(&introBoard);
 	Board gameBoard(filename);
