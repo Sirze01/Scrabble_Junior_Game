@@ -253,9 +253,9 @@ int main()
 {
 	setupConsole();
 
-	auto clearAndShowBoard = [](const Board& board) {
+	auto clearAndShowBoard = [](const Board *board) {
 		clearConsole();
-		board.show();
+		board->show();
 	};
 
 	Board introBoard;
@@ -272,21 +272,21 @@ int main()
 	std::vector<int> playerColors;
 
 	printIntro(&introBoard);
-	clearAndShowBoard(introBoard);
+	clearAndShowBoard(&introBoard);
 
 	std::string filename = askBoardFileName(&introBoard);
 	Board gameBoard(filename);
-	clearAndShowBoard(gameBoard);
+	clearAndShowBoard(&gameBoard);
 
 	nPlayers = askNumberOfPlayers(&gameBoard);
 
 	for (int i = 0; i < nPlayers; ++i) {
-		clearAndShowBoard(gameBoard);
+		clearAndShowBoard(&gameBoard);
 		PlayerData player = askPlayer(i, &gameBoard, playerNames, playerColors);
 		playerNames.push_back(player.name); playerColors.push_back(player.color);
 	}
 
-	clearAndShowBoard(gameBoard);
+	clearAndShowBoard(&gameBoard);
 	int first = askPlayFirst(&gameBoard, nPlayers, playerNames, playerColors);
 	Game my_game(&gameBoard, playerNames, playerColors, first);
 
