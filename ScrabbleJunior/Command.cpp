@@ -1,6 +1,4 @@
 #include "Command.h"
-#include "../common/StringProcess.h"
-#include "../common/Board.h"
 #include <string>
 
 Command::Command(std::string userInput) {
@@ -11,12 +9,11 @@ Command::Command(std::string userInput) {
 }
 
 bool Command::isMove() const {
-	if (_str.size() != 4) return false;
-	if (!(_str.at(0) >= 'a' && _str.at(0) <= 'z')) return false;
-	if (!(_str.at(1) >= 'a' && _str.at(0) <= 'z')) return false;
-	if (_str.at(2) != ' ') return false;
-	if (!(_str.at(3) >= 'a' && _str.at(3) <= 'z')) return false;
-	return true;
+	return (_str.size() == 4) &&
+	isalpha(_str.at(0)) &&
+	isalpha(_str.at(1)) &&
+	_str.at(2) == ' ' &&
+	isalpha(_str.at(3)) ;
 }
 
 coord Command::getMovePos(const Board *board) const {

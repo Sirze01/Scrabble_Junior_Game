@@ -1,6 +1,5 @@
 #include "Game.h"
 #include "../common/ConsoleSetup.h"
-#include "../common/StringProcess.h"
 
 Game::Game(Board* board, std::vector<std::string> playerNames, std::vector<int> playerForeColors, int firstToMove) {
 	_nPlayers = playerNames.size();

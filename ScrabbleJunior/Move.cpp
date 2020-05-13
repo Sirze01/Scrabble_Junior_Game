@@ -1,6 +1,5 @@
 #include "Move.h"
 #include "Command.h"
-#include "../common/Board.h"
 
 
 Move::Move(const Command *command, const Board *board) {
@@ -61,16 +60,14 @@ bool Move::execute(Player *player, Board *board, Pool *pool) {
 }
 
 bool Move::inBounds() const {
-	if (_posToMove.hCollumn > _maxCol) return false;
-	if (_posToMove.vLine > _maxLine) return false;
-	if (_posToMove.hCollumn < 0) return false;
-	if (_posToMove.vLine < 0) return false;
-	return true;
+	return _posToMove.hCollumn <= _maxCol &&
+    _posToMove.vLine <= _maxLine &&
+    _posToMove.hCollumn >= 0 &&
+    _posToMove.vLine >= 0;
 }
 
 bool Move::letterMatch() const {
-	if (_letter == ' ') return false;
-	return _letter == _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn);
+    return _letter != ' '  && _letter == _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn);
 }
 
 bool Move::singleCharWordOnLine() const {
@@ -81,7 +78,7 @@ bool Move::singleCharWordOnCol() const {
 	return startOnCol() && finishOnCol();
 }
 
-bool Move::startOnLine() const {
+bool Move::startOnLine() const { // Try to change them to one liners
 	if (_posToMove.hCollumn == 0) return true;
 	return _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn - 1) == ' ';
 }

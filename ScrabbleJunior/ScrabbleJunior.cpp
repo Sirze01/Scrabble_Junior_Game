@@ -1,16 +1,11 @@
-#include "Player.h"
-#include "../common/Board.h"
-#include "Command.h"
 #include "../common/ConsoleSetup.h"
-#include "Move.h"
 #include "Game.h"
 #include "Pool.h"
-#include "../common/StringProcess.h"
 #include <iostream>
 #include <string>
 #include <algorithm>
 #include <functional>
-#include <fstream>
+
 
 //for shuffle purposes
 unsigned const SEED = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
@@ -283,7 +278,8 @@ int main()
 	for (int i = 0; i < nPlayers; ++i) {
 		clearAndShowBoard(&gameBoard);
 		PlayerData player = askPlayer(i, &gameBoard, playerNames, playerColors);
-		playerNames.push_back(player.name); playerColors.push_back(player.color);
+		playerNames.push_back(player.name);
+		playerColors.push_back(player.color);
 	}
 
 	clearAndShowBoard(&gameBoard);
