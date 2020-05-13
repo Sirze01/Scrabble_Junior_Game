@@ -69,11 +69,8 @@ void cleanBuffer();
 void askEnter();
 
 void printBackColor(int backColor, const char c);
-void printBackColor(int backColor, std::string message);
 void printForeColor(int foreColor, const char c);
-void printForeColor(int foreColor, std::string message);
 void print(int foreColor, int backColor, const char c);
-void print(int foreColor, int backColor, std::string message);
 
 bool putCursorOnPos(int line, int col);
 void eraseLineToTheEnd();

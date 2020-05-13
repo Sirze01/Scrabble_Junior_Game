@@ -3,12 +3,11 @@
 #include <vector>
 #include <algorithm>
 
-std::string lowerCase(std::string command) {
-    for (auto& i : command) i = tolower(i);
-    return command;
+void lowerCase(std::string &command) {
+    for (auto& i : command) i = static_cast<char>(std::tolower(i));
 }
 
-std::string stripSpaces(std::string name) {
+void stripSpaces(std::string &name) {
     for (size_t i = 0; i < name.length(); i++) {
         if (name.at(i) == ' ') {
             if (i == name.length() - 1) {
@@ -21,30 +20,27 @@ std::string stripSpaces(std::string name) {
             }
         }
     }
-    return name;
 }
 
-std::string upperNameInitials(std::string name) {
+void upperNameInitials(std::string &name) {
     bool doUpper = true;
     for (size_t i = 0; i < name.length(); i++) {
         if (doUpper && isupper(name.at(i))) doUpper = false; //already uppercase
         else if (doUpper && !isupper(name.at(i))) {
-            name.at(i) = toupper(name.at(i));
+            name.at(i) = static_cast<char>(toupper(name.at(i)));
             doUpper = false;
         }
         else if (name.at(i) == ' ') doUpper = true;
     }
-    return name;
 }
 
-std::string stripSpecialChars(std::string name) {
+void stripSpecialChars(std::string &name) {
     std::string cleanStr;
     for (char c : name) {
         if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ') {
             cleanStr.push_back(c);
         }
     }
-    return cleanStr;
 }
 
 
@@ -54,7 +50,7 @@ std::string stripSpecialChars(std::string name) {
  * @param text       - Text to write
  * @param padding    - Spaces before the line
  * */
-std::string stringWriter(int text_width, std::string text, int padding = 0) {
+std::string stringWriter(size_t text_width, std::string text, int padding = 0) {
     size_t charNbr;
     std::string output_str;
 
@@ -102,26 +98,24 @@ std::string stringWriter(int text_width, std::string text, int padding = 0) {
     return output_str;
 }
 
-std::string stripCommandBloat(std::string command) {
-    //an experiment on smart command interpretation
+void stripCommandBloat(std::string &command) {
     std::string cleanCommand(command);
     std::vector<std::string> keywords = //careful not to interfere with board coords or reserved commands
     { "play","move","from","letter","check","get","position","board","load","save","write","show", "tile"};
 
-    for (std::string word : keywords) {
+    for (const std::string &word : keywords) {
         int pos = cleanCommand.find(word);
         if (cleanCommand.find(word) != std::string::npos) {
             cleanCommand.erase(pos, pos + word.size());
         }
     }
-    return cleanCommand;
 }
 
-std::string smartCommandAdvice(std::string command) {
+std::string smartCommandAdvice(const std::string &command) {
     if (command.size() == 2 && isalpha(command.at(0)) && isalpha(command.at(1))) {
         std::string processed;
-        processed += toupper(command.at(0));
-        processed += tolower(command.at(1));
+        processed += static_cast<char>(toupper(command.at(0)));
+        processed += static_cast<char>(tolower(command.at(1)));
         return "Did you attempt to play a tile on position " + processed +
                "? Please specify letter as in 'Yx <letter>'.";
 
@@ -132,12 +126,12 @@ std::string smartCommandAdvice(std::string command) {
     }
 }
     
-bool isAlpha(std::string toTest) {
-    for(auto &letter : toTest) if(!std::isalpha(letter)) return false;
+bool isAlpha(const std::string &toTest) {
+    for(const auto &letter : toTest) if(!std::isalpha(letter)) return false;
     return true;
 }
 
-bool isDigit(std::string toTest) {
-    for (auto &letter : toTest) if (!isdigit(letter)) return false;
+bool isDigit(const std::string &toTest) {
+    for (const auto &letter : toTest) if (!std::isdigit(letter)) return false;
     return true;
 }

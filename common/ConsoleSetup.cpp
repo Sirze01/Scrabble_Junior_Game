@@ -59,24 +59,12 @@ void printBackColor(int backColor, const char c) {
 	std::cout << "\033[48;5;" << backColor << "m" << c << "\033[0m";
 }
 
-void printBackColor(int backColor, std::string message) {
-	std::cout << "\033[48;5;" << backColor << "m" << message << "\033[0m";
-}
-
 void printForeColor(int foreColor, const char c) {
 	std::cout << "\033[38;5;" << foreColor << "m" << c << "\033[0m";
 }
 
-void printForeColor(int foreColor, std::string message) {
-	std::cout << "\033[38;1;" << foreColor << "m" << message << "\033[0m";
-}
-
 void print(int foreColor, int backColor, const char c) {
 	std::cout << "\033[38;5;" << foreColor << ";48;5;" << backColor << "m" << c << "\033[0m";
-}
-
-void print(int foreColor, int backColor, std::string message) {
-	std::cout << "\033[38;5;" << foreColor << ";48;5;" << backColor << "m" << message << "\033[0m";
 }
 
 bool putCursorOnPos(int line, int col) {
@@ -123,7 +111,7 @@ void writeCardView(int boardHeight, int boardWidth, std::function<void(int,int)>
 }
 
 void paddingAndTopic(int color, bool newLine) {
-	if (newLine) std::cout << "\n";
+	if (newLine) std::cout << std::endl;
 	std::cout << LEFT_PADDING_STR;
 	printForeColor(color, TOPIC);
 }

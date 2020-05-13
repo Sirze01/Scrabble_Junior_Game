@@ -9,13 +9,14 @@
 extern unsigned SEED;
 extern std::mt19937 RANDOM_GENERATOR;
 
-Player::Player(Pool *pool, std::string &name, int color) {
+Player::Player(Pool *pool, const std::string &name, int color) {
     int handSize = 7;
     _mayPass = 0;
     _score = 0;
     _color = color;
     _exchangeCount = 0;
-	_name = stripSpaces(name);
+    _name = name;
+	stripSpaces(_name);
     _hand.resize(handSize);
     pool->shuffle();
     while (handSize--) takeRandom(handSize,pool);
@@ -34,7 +35,7 @@ void Player::showHand(bool color) const {
         std::cout << "Nothing on hand";
         return;
     }
-    for (auto &i : _hand) {
+    for (const auto &i : _hand) {
         if (i == ' ') continue;
         else {
             if (color) print(WHITE, _color, i);
@@ -94,11 +95,11 @@ bool Player::hasOnHand(char letter) const {
 }
 
 bool Player::mayMove(const Board *board) const{
-    coord pos = getPossiblePos(board);
+    coord pos = getPossibleMovePos(board);
     return pos.hCollumn != -1 && pos.vLine != -1;
 }
 
-coord Player::getPossiblePos(const Board* board) const {
+coord Player::getPossibleMovePos(const Board* board) const {
     coord boardDim = board->getDimensions();
 
     for (int line = 0; line < boardDim.vLine; ++line) {

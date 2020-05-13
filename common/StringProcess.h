@@ -1,12 +1,14 @@
 #pragma once
 #include <string>
 
-std::string lowerCase(std::string command);
-std::string stripSpaces(std::string name);
-std::string upperNameInitials(std::string name);
-std::string stripSpecialChars(std::string name);
-std::string stringWriter(int text_width, std::string text, int padding);
-std::string stripCommandBloat(std::string name);
-std::string smartCommandAdvice(std::string command);
-bool isAlpha(std::string toTest);
-bool isDigit(std::string toTest);
+void lowerCase(std::string &command);
+void stripSpaces(std::string &name);
+void upperNameInitials(std::string &name);
+void stripSpecialChars(std::string &name);
+void stripCommandBloat(std::string& name);
+
+std::string stringWriter(size_t text_width, std::string text, int padding);
+std::string smartCommandAdvice(const std::string &command);
+
+bool isAlpha(const std::string &toTest);
+bool isDigit(const std::string &toTest);

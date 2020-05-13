@@ -41,7 +41,7 @@ int askPlayFirst(const Board* board, int nPlayers, std::vector<std::string> play
 	for (;;) {
 		paddingAndTopic(WHITE,true); std::cout << "Who should go first? ";
 		std::getline(std::cin, playerName); cleanBuffer();
-		playerName = stripSpaces(playerName);
+		stripSpaces(playerName);
 
 		if (playerName == "random") {
 			std::uniform_int_distribution<int> distribution{ 0, nPlayers - 1 };
@@ -53,7 +53,7 @@ int askPlayFirst(const Board* board, int nPlayers, std::vector<std::string> play
 			return randomPos;
 		}
 
-		playerName = upperNameInitials(playerName);
+		upperNameInitials(playerName);
 
 		for (int i = 0; i < nPlayers; ++i) {
 			if (playerName == playerNames.at(i)) return i;
@@ -108,8 +108,8 @@ std::string askBoardFileName(const Board* board) {
 					paddingAndTopic(WHITE, true); std::cout << "That board hasn't got enough letters to create a fair 4 player game.\n";
 					paddingAndTopic(WHITE, false); std::cout << "Are you sure you want to proceed? ";
 					std::getline(std::cin, userAns); cleanBuffer();
-					userAns = stripSpaces(userAns);
-					for (auto& i : userAns) i = (char) tolower(i);
+					stripSpaces(userAns);
+					for (auto& i : userAns) i = static_cast<char>(tolower(i));
 
 					if (userAns == "yes" || userAns == "y") return fileName;
 					if (userAns == "no" || userAns == "n") break;
@@ -152,14 +152,14 @@ PlayerData askPlayer(int position, const Board *board, std::vector<std::string> 
 	for (;;) { //ask name
 		paddingAndTopic(WHITE, true); std::cout << "Player " << position << " name: ";
 		std::getline(std::cin, name); cleanBuffer();
-		name = stripSpaces(name);
+		stripSpaces(name);
 
 		if (name == "random") {
 			paddingAndTopic(RED, true); std::cout << "That is a reserved keyword. Please choose a different name.\n";
 			continue;
 		}
 
-		name = upperNameInitials(name);
+		upperNameInitials(name);
 
 		if (name == "") {
 			paddingAndTopic(RED,true); std::cout << "We do not accept empty names!\n";
@@ -182,8 +182,9 @@ PlayerData askPlayer(int position, const Board *board, std::vector<std::string> 
 
 		paddingAndTopic(WHITE,true); std::cout << "Player " << position << " color: ";
 		std::getline(std::cin, colorName); cleanBuffer();
-		colorName = stripSpecialChars(colorName); colorName = stripSpaces(colorName);
-		for (auto& i : colorName) i = (char) tolower(i);
+		stripSpecialChars(colorName);
+		stripSpaces(colorName);
+		for (auto& i : colorName) i = static_cast<char>(tolower(i));
 
 		if (colorName == "red") color = RED;
 		else if (colorName == "green") color = GREEN;
@@ -291,5 +292,5 @@ int main()
 		my_game.nextTurn();
 	} while (!my_game.hasFinished());
 
-	my_game.end();
+	my_game.showEndMessage();
 }

@@ -1,14 +1,15 @@
 #include "Game.h"
 #include "../common/ConsoleSetup.h"
 
-Game::Game(Board* board, std::vector<std::string> &playerNames, std::vector<int> &playerForeColors, int firstToMove) {
+Game::Game(Board* board, const std::vector<std::string> &playerNames, const std::vector<int> &playerForeColors, int firstToMove) {
 	_nPlayers = playerNames.size();
 	_board = board;
 	_pool = new Pool(board);
 	_playerForeColors = playerForeColors;
 
 	for (int i = 0; i < _nPlayers;++i) {
-		_players.push_back(new Player(_pool, playerNames.at(i), playerForeColors.at(i)));
+		Player* player = new Player(_pool, playerNames.at(i), playerForeColors.at(i));
+		_players.push_back(player);
 	}
 
 	_currentPlayerPos = firstToMove % _nPlayers;
@@ -26,11 +27,11 @@ Game::~Game() {
 	}
 }
 
-void Game::showBoardAndCardView(const std::string &view, bool showInfo) const {
+void Game::showBoardAndCardView(const std::string &view, bool showTurnInfo) const {
 	clearConsole();
 	_board->show();
-	if (view == "hands") showHands(showInfo);
-	else showScores(showInfo);
+	if (view == "hands") showHands(showTurnInfo);
+	else showScores(showTurnInfo);
 }
 
 void Game::askCommand(int turnNumber) {
@@ -140,7 +141,7 @@ void Game::askCommand(int turnNumber) {
 				else if (command.isCheckPool()) showPool();
 				else if (command.isHelp()) showHelp();
 				else if (command.isHint()) {
-					coord pos = _currentPlayer->getPossiblePos(_board);
+					coord pos = _currentPlayer->getPossibleMovePos(_board);
 					if (pos.hCollumn == -1 || pos.vLine == -1) regularMessage = "Maybe you can't move right now...";
 					else {
 						regularMessage = "Look carefully at the board on position ";
@@ -339,7 +340,7 @@ std::string Game::getPlayerName(int playerPos) const {
 	else return _players.at(playerPos)->getName();
 }
 
-void Game::end() const {
+void Game::showEndMessage() const {
 	showBoardAndCardView("scores", false);
 
 	int color;
