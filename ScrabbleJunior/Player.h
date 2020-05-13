@@ -8,7 +8,7 @@
 
 class Player {
 public:
-	Player(Pool *pool, std::string name, int color);
+	Player(Pool *pool, std::string &name, int color);
 	int getScore() const;
 	std::string getName() const;
 	int getColor() const;
@@ -19,12 +19,12 @@ public:
 	void doNotPass();
 	bool exchange(char letter, Pool *pool);
 	bool takeRandom(int handPos, Pool *pool);
-	bool mayMove(const Board *board, const Pool *pool) const;
+	bool mayMove(const Board *board) const;
 	bool getMayPass() const;
 	bool hasOnHand(char letter) const;
 	int getHandPosition(char letter) const;
 	int getExchangeCount() const;
-	coord getPossiblePos(const Board* board, const Pool* pool) const;
+	coord getPossiblePos(const Board* board) const;
 	int getActualHandSize() const;
 private:
 	bool _mayPass;

@@ -23,7 +23,7 @@ coord Command::getMovePos(const Board *board) const {
 
 char Command::getMoveLetter() const {
 	if (!isMove()) return '?';
-	return toupper(_str.at(3));
+	return (char) toupper(_str.at(3));
 }
 
 std::string Command::getStr() const {
@@ -41,7 +41,7 @@ bool Command::isExchange(bool forceToken) const {
 
 char Command::getExchangeLetter() const {
 	if (!isExchange()) return '?';
-	return toupper(_str.at(_str.size() - 1));
+	return (char) toupper(_str.at(_str.size() - 1));
 }
 
 bool Command::isCheckHands() const {

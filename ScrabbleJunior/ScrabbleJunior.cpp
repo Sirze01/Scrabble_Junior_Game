@@ -109,7 +109,7 @@ std::string askBoardFileName(const Board* board) {
 					paddingAndTopic(WHITE, false); std::cout << "Are you sure you want to proceed? ";
 					std::getline(std::cin, userAns); cleanBuffer();
 					userAns = stripSpaces(userAns);
-					for (auto& i : userAns) i = tolower(i);
+					for (auto& i : userAns) i = (char) tolower(i);
 
 					if (userAns == "yes" || userAns == "y") return fileName;
 					if (userAns == "no" || userAns == "n") break;
@@ -183,7 +183,7 @@ PlayerData askPlayer(int position, const Board *board, std::vector<std::string> 
 		paddingAndTopic(WHITE,true); std::cout << "Player " << position << " color: ";
 		std::getline(std::cin, colorName); cleanBuffer();
 		colorName = stripSpecialChars(colorName); colorName = stripSpaces(colorName);
-		for (auto& i : colorName) i = tolower(i);
+		for (auto& i : colorName) i = (char) tolower(i);
 
 		if (colorName == "red") color = RED;
 		else if (colorName == "green") color = GREEN;
@@ -204,7 +204,7 @@ PlayerData askPlayer(int position, const Board *board, std::vector<std::string> 
 	return { name,color };
 }
 
-int askNumberOfPlayers(const Board* board) {
+int askNumberOfPlayers() {
 	std::string input; std::string errorMessage; int intInput;
 
 	for (;;) {
@@ -273,7 +273,7 @@ int main()
 	Board gameBoard(filename);
 	clearAndShowBoard(&gameBoard);
 
-	nPlayers = askNumberOfPlayers(&gameBoard);
+	nPlayers = askNumberOfPlayers();
 
 	for (int i = 0; i < nPlayers; ++i) {
 		clearAndShowBoard(&gameBoard);
