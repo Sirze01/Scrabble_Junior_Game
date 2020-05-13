@@ -258,18 +258,22 @@ int main()
 		board.show();
 	};
 
-	while (!exists("intro_board.txt")) {
-		std::cerr << "Could not find intro_board.txt in the project folder!\n";
-		askEnter();
+	Board introBoard;
+
+	if (!exists("intro_board.txt")) {
+		introBoard = Board();
+	}
+	else {
+		introBoard = Board("intro_board.txt");
 	}
 
-	Board introBoard("intro_board.txt");
 	int nPlayers = 2; std::vector<std::string> playerNames; std::vector<int> playerColors;
 
 	printIntro(&introBoard); clearAndShowBoard(introBoard);
 
 	std::string filename = askBoardFileName(&introBoard);
-	Board gameBoard(filename); clearAndShowBoard(gameBoard);
+	Board gameBoard(filename);
+	clearAndShowBoard(gameBoard);
 
 	nPlayers = askNumberOfPlayers(&gameBoard);
 
