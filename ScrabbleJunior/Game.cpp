@@ -201,7 +201,6 @@ bool Game::hasFinished() const {
 	for (auto& player : _players) {
 		if (player->mayMove(_board,_pool)) return false;
 	}
-
 	return true;
 }
 

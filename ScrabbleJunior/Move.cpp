@@ -78,24 +78,26 @@ bool Move::singleCharWordOnCol() const {
 	return startOnCol() && finishOnCol();
 }
 
-bool Move::startOnLine() const { // Try to change them to one liners
-	if (_posToMove.hCollumn == 0) return true;
-	return _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn - 1) == ' ';
+bool Move::startOnLine() const {
+	return _posToMove.hCollumn == 0 || _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn - 1) == ' ';
 }
 
 bool Move::startOnCol() const {
-	if (_posToMove.vLine == 0) return true;
-	return _boardLetters.at(_posToMove.vLine - 1).at(_posToMove.hCollumn) == ' ';
+	return _posToMove.vLine == 0 || _boardLetters.at(_posToMove.vLine - 1).at(_posToMove.hCollumn) == ' ';
 }
 
 
 bool Move::continueOnLine() const {
 	if (_posToMove.hCollumn == 0) return true;
+
 	bool continueWord = true;
 	for (int i = 1; _posToMove.hCollumn - i >= 0; ++i) {
 		if (!_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn - i)) {
-			if (_boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn - i) == ' ') break;
-			else if (_boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn - i) != ' ') {
+
+			if (_boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn - i) == ' ') {
+				break;
+			}
+			else {
 				continueWord = false;
 				break;
 			}
@@ -106,11 +108,15 @@ bool Move::continueOnLine() const {
 
 bool Move::continueOnCol() const {
 	if (_posToMove.vLine == 0) return true;
+
 	bool continueWord = true;
 	for (int i = 1; _posToMove.vLine - i >= 0; ++i) {
 		if (!_boardHighlights.at(_posToMove.vLine - i).at(_posToMove.hCollumn)) {
-			if (_boardLetters.at(_posToMove.vLine - i).at(_posToMove.hCollumn) == ' ') break;
-			else if (_boardLetters.at(_posToMove.vLine - i).at(_posToMove.hCollumn) != ' ') {
+
+			if (_boardLetters.at(_posToMove.vLine - i).at(_posToMove.hCollumn) == ' ') {
+				break;
+			}
+			else {
 				continueWord = false;
 				break;
 			}
@@ -121,11 +127,15 @@ bool Move::continueOnCol() const {
 
 bool Move::finishOnLine() const {
 	if (_posToMove.hCollumn == _maxCol) return true;
+
 	bool finishWord = true;
 	for (int i = 1; _posToMove.hCollumn + i <= _maxCol; ++i) {
 		if (!_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn + i)) {
-			if (_boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn + i) == ' ') break;
-			else if (_boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn + i) != ' ') {
+
+			if (_boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn + i) == ' ') {
+				break;
+			}
+			else {
 				finishWord = false;
 				break;
 			}
@@ -136,11 +146,15 @@ bool Move::finishOnLine() const {
 
 bool Move::finishOnCol() const {
 	if (_posToMove.vLine == _maxLine) return true;
+
 	bool finishWord = true;
 	for (int i = 1; _posToMove.vLine + i <= _maxLine; ++i) {
 		if (!_boardHighlights.at(_posToMove.vLine+i).at(_posToMove.hCollumn)) {
-			if (_boardLetters.at(_posToMove.vLine+i).at(_posToMove.hCollumn) == ' ') break;
-			else if (_boardLetters.at(_posToMove.vLine + i).at(_posToMove.hCollumn) != ' ') {
+
+			if (_boardLetters.at(_posToMove.vLine + i).at(_posToMove.hCollumn) == ' ') {
+				break;
+			}
+			else {
 				finishWord = false;
 				break;
 			}
