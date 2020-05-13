@@ -142,6 +142,9 @@ bool commandInterpreter::interpret(int &last) {
         cmdExit(last);
     }
 
+    if (_command.empty())
+        last = -3;
+    
     return !_command.empty();
 }
 
@@ -441,6 +444,12 @@ bool commandInterpreter::cmdAdd(int &last) {
     else if(!(_board.goodIntersects(newEntry))){
         last = -2;
         std::cout <<stringWriter(100, "The word you're trying to add intersects with another in the wrong letter",
+                                 BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
+        retValue = false;
+    }
+    else if (!(_board.wordSpaces(newEntry))){
+        last = -2;
+        std::cout <<stringWriter(100, "The word you're trying to add doesn't fit in that space",
                                  BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
         retValue = false;
     }

@@ -172,7 +172,7 @@ coord Board::getIndex(std::string position) const {
 bool Board::fileExport(std::string filename) const {
     std::ofstream file(filename);
     if (file.is_open()) {
-        file << _vDimension << 'x' << _hDimension << '\n';
+        file << _vDimension << " x " << _hDimension << '\n';
         for (auto line : _words) {
             file << line.firstCoord << ' ' << line.orientation << ' ' << line.word << '\n';
         }
