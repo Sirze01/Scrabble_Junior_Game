@@ -467,7 +467,8 @@ bool commandInterpreter::cmdAdd(int &last) {
 
     while (!inDict && first <= final){
         middle = (first + final) / 2;
-        if (newEntry.word == stripSpecialChars(_dict[middle])){
+        stripSpecialChars(_dict[middle]);
+        if (newEntry.word == _dict[middle]){
             inDict = true;
         }
         else if(_dict[middle].compare(newEntry.word) > 0)
@@ -510,13 +511,13 @@ bool commandInterpreter::cmdAdd(int &last) {
         v = temp.vLine;
         h = temp.hCollumn;
         if (newEntry.orientation == "V"){
-            for(int i = 0; i < newEntry.word.size(); i++){
+            for(size_t i = 0; i < newEntry.word.size(); i++){
                 temp.vLine = v + i;
                 _board.lettersManip(temp, newEntry.word[i]);
             }
         }
         else{
-            for(int i = 0; i < newEntry.word.size(); i++){
+            for(size_t i = 0; i < newEntry.word.size(); i++){
                 temp.hCollumn = h + i;
                 _board.lettersManip(temp, newEntry.word[i]);
             }
