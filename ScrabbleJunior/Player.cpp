@@ -6,9 +6,6 @@
 #include <chrono>
 #include "../common/ConsoleSetup.h"
 
-extern unsigned SEED;
-extern std::mt19937 RANDOM_GENERATOR;
-
 Player::Player(Pool *pool, const std::string &name, int color) {
     int handSize = 7;
     _mayPass = 0;
@@ -66,12 +63,11 @@ bool Player::takeRandom(int handPos, Pool *pool) {
     int maxPos = _hand.size() - 1;
 
     if (handPos > maxPos || handPos < 0) return false;
-    _hand.at(handPos) = ' ';
+
+    _hand.at(handPos) = ' '; //even if the pool is empty, remove from hand (endgame situations)
     if (!poolSize) return false;
 
-    std::uniform_int_distribution<int> distribution{ 0, poolSize -1};
-    int randomPoolPos = distribution(RANDOM_GENERATOR);
-
+    int randomPoolPos = randomBetween(0, poolSize - 1);
     _hand.at(handPos) = pool->getAllLetters().at(randomPoolPos);
     pool->take(randomPoolPos);
     return true;
@@ -89,7 +85,7 @@ int Player::getHandPosition(char letter) const {
 }
 
 bool Player::hasOnHand(char letter) const {
-    for (auto &i : _hand) {
+    for (const auto &i : _hand) {
         if (i == letter) return true;
     }
     return false;
@@ -107,7 +103,7 @@ coord Player::getPossibleMovePos(const Board* board) const {
         for (size_t col = 0; col < boardDim.hCollumn; ++col) {
             coord testPosition = { line,col };
             char letter = board->getLetters().at(line).at(col);
-            Move tryMove(testPosition, letter, board);
+            const Move tryMove(testPosition, letter, board);
 
             if (!tryMove.hasProblems(this)) return testPosition;
         }
@@ -137,7 +133,7 @@ void Player::doNotPass() {
 
 int Player::getActualHandSize() const {
     int count = 0;
-    for (auto &letter : _hand) {
+    for (const auto &letter : _hand) {
         if (letter != ' ') count++;
     }
     return count;

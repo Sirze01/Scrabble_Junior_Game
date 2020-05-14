@@ -3,6 +3,14 @@
 #include <vector>
 #include <algorithm>
 
+extern unsigned const SEED;
+extern std::mt19937 RANDOM_GENERATOR;
+
+int randomBetween(int lowerBound, int upperBound) {
+    std::uniform_int_distribution<int> distribution{ lowerBound, upperBound };
+    return distribution(RANDOM_GENERATOR);
+}
+
 void lowerCase(std::string &command) {
     for (auto& i : command) i = static_cast<char>(std::tolower(i));
 }

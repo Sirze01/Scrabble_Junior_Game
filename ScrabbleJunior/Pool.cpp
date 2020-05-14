@@ -4,7 +4,7 @@
 #include <algorithm>
 #include "../common/ConsoleSetup.h"
 
-extern unsigned SEED;
+extern unsigned const SEED;
 extern std::mt19937 RANDOM_GENERATOR;
 
 Pool::Pool(const Board *board) {
@@ -12,7 +12,7 @@ Pool::Pool(const Board *board) {
 }
 
 bool Pool::take(int pos) {
-	if (pos > getCurrentSize()) return false;
+	if (pos > getCurrentSize() || pos < 0) return false;
 	else _letters.erase(_letters.begin() + pos);
 	return true;
 }
