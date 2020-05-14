@@ -18,7 +18,7 @@ bool Command::isMove() const {
 }
 
 coord Command::getMovePos(const Board *board) const {
-	if (!isMove()) return { -1,-1 };
+	if (!isMove()) return { IMPOSSIBLE_MOVE_COORD, IMPOSSIBLE_MOVE_COORD };
 	return board->getIndex(_str.substr(0, 2));
 }
 

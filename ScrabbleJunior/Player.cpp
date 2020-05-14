@@ -97,7 +97,7 @@ bool Player::hasOnHand(char letter) const {
 
 bool Player::mayMove(const Board *board) const{
     coord pos = getPossibleMovePos(board);
-    return pos.hCollumn != -1 && pos.vLine != -1;
+    return pos.hCollumn != IMPOSSIBLE_MOVE_COORD && pos.vLine != IMPOSSIBLE_MOVE_COORD;
 }
 
 coord Player::getPossibleMovePos(const Board* board) const {
@@ -112,7 +112,7 @@ coord Player::getPossibleMovePos(const Board* board) const {
             if (!tryMove.hasProblems(this)) return testPosition;
         }
     }
-    return { -1,-1 };
+    return { IMPOSSIBLE_MOVE_COORD,IMPOSSIBLE_MOVE_COORD };
 }
 
 int Player::getColor() const {

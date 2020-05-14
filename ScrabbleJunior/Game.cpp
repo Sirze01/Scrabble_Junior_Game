@@ -137,7 +137,7 @@ void Game::askCommand(int turnNumber) {
 				else if (command.isHelp()) showHelp();
 				else if (command.isHint()) {
 					coord pos = _currentPlayer->getPossibleMovePos(_board);
-					if (pos.hCollumn == -1 || pos.vLine == -1) regularMessage = "Maybe you can't move right now...";
+					if (pos.hCollumn == IMPOSSIBLE_MOVE_COORD || pos.vLine == IMPOSSIBLE_MOVE_COORD) regularMessage = "Maybe you can't move right now...";
 					else {
 						regularMessage = "Look carefully at the board on position ";
 						regularMessage += (char)('A' + pos.vLine);

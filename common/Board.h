@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include "../common/StringProcess.h"
+#include "ConsoleSetup.h"
 
 struct coord{
     size_t vLine;
@@ -20,7 +21,7 @@ struct codedWord{
 
 class Board {
 public:
-	Board(size_t nLines = 10, size_t nColumns = 10);
+	Board(size_t nLines = BOARD_MIN_DIM, size_t nColumns = BOARD_MIN_DIM);
     Board(std::string filename);
     void show() const;
 	coord getIndex(std::string position) const;
@@ -31,13 +32,14 @@ public:
     std::vector<char> getNonEmptyChars() const;
     std::vector<std::vector<bool>> getHighlights() const;
     coord getDimensions() const;
-    bool boardBounds(coord firstLetter, std::string orientation = "H", int wordLen = 0);
+    bool boardBounds(coord firstLetter, char orientation = 'H', int wordLen = 0);
     bool goodIntersects(codedWord);
-    void lettersManip(coord inates, char letter);
+    void lettersManip(coord c, char letter);
     void addWord(codedWord word);
     bool wordSpaces(codedWord word);
 
 private:
+    void defaultInit(size_t nLines = BOARD_MIN_DIM, size_t nColumns = BOARD_MIN_DIM);
     std::vector<std::vector<bool>> _highlights;
     std::vector<std::vector<int>> _highlightColors;
     std::vector<std::vector<char>> _letters;

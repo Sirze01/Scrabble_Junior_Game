@@ -49,6 +49,10 @@ MAX_PLAYER_NAME_SIZE = 20;
 const int
 MAX_BOARD_LETTERS_WARNING = 4 * 7; //4 players, 7 letters in hand
 
+//impossible move result
+const size_t
+IMPOSSIBLE_MOVE_COORD = SIZE_MAX;
+
 const std::string
 LEFT_PADDING_STR(BOARD_LEFT_PADDING, ' ');
 

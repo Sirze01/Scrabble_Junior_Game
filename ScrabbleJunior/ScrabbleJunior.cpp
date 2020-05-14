@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <functional>
 
-
 //for shuffle purposes
 unsigned const SEED = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
 std::mt19937 RANDOM_GENERATOR(SEED);
@@ -17,7 +16,6 @@ struct PlayerData {
 };
 
 int askPlayFirst(const Board* board, int nPlayers, std::vector<std::string> playerNames, std::vector<int> playerColors) {
-
 	{
 		std::stringstream toWrite;
 		std::vector<std::string> sentences = {
@@ -71,20 +69,22 @@ bool exists(std::string filename) {
 }
 
 std::string askBoardFileName(const Board* board) {
+	{
+		std::stringstream toWrite;
+		std::vector<std::string> sentences = {
+			"|Tip\n\n",
+			"|You can use our companion\n",
+			"|Board Builder program\n",
+			"|to create your own board!\n"
+		};
 
-	std::stringstream toWrite;
-	std::vector<std::string> sentences = {
-		"|Tip\n\n",
-		"|You can use our companion\n",
-		"|Board Builder program\n",
-		"|to create your own board!\n"
-	};
+		for (std::string str : sentences) {
+			toWrite << str;
+		}
 
-	for (std::string str : sentences) {
-		toWrite << str;
+		writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, toWrite);
 	}
 
-	writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, toWrite);
 	std::string fileName;
 
 	for (;;) {
@@ -99,12 +99,12 @@ std::string askBoardFileName(const Board* board) {
 		}
 		else {
 			Board testBoard(fileName);
+
 			if (testBoard.getNonEmptyChars().size() < MAX_BOARD_LETTERS_WARNING) {
 				std::string userAns;
 
 				for (;;) {
-					paddingAndTopic(WHITE, true); std::cout << "That board hasn't got enough letters to create a fair 4 player game.\n";
-					paddingAndTopic(WHITE, false); std::cout << "Are you sure you want to proceed? ";
+					paddingAndTopic(RED, true); std::cout << "That board hasn't got enough letters to create a fair 4 player game. Proceed? ";
 					std::getline(std::cin, userAns); cleanBuffer();
 					stripSpaces(userAns);
 					for (auto& i : userAns) i = static_cast<char>(tolower(i));
@@ -250,27 +250,16 @@ int main()
 		board->show();
 	};
 
-	Board introBoard;
+	Board introBoard("intro_board.txt");
 
-	if (!exists("intro_board.txt")) {
-		introBoard = Board();
-	}
-	else {
-		introBoard = Board("intro_board.txt");
-	}
+	int nPlayers; std::vector<std::string> playerNames; std::vector<int> playerColors;
 
-	int nPlayers;
-	std::vector<std::string> playerNames;
-	std::vector<int> playerColors;
-
-	printIntro(&introBoard);
-	clearAndShowBoard(&introBoard);
+	printIntro(&introBoard); clearAndShowBoard(&introBoard);
 
 	std::string filename = askBoardFileName(&introBoard);
 	Board gameBoard(filename);
-	clearAndShowBoard(&gameBoard);
 
-	nPlayers = askNumberOfPlayers();
+	clearAndShowBoard(&gameBoard); nPlayers = askNumberOfPlayers();
 
 	for (int i = 0; i < nPlayers; ++i) {
 		clearAndShowBoard(&gameBoard);

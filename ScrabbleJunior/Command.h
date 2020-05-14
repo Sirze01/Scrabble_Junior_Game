@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include "../common/ConsoleSetup.h"
 #include "Player.h"
 #include "../common/Board.h"
 
