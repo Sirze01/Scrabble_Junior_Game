@@ -296,7 +296,7 @@ void Board::addWord(codedWord word) {
 bool Board::wordSpaces(codedWord word) {
     if(word.orientation == "V") {
 
-        for (int i = 0; i < word.word.size(); i++) {
+        for (size_t i = 0; i < word.word.size(); i++) {
             if (i == 0 &&
                 (getIndex(word.firstCoord).vLine - 1 <= _vDimension - 1 && getIndex(word.firstCoord).vLine - 1 >= 0)) {
                 if (_letters[getIndex(word.firstCoord).vLine + i - 1][getIndex(word.firstCoord).hCollumn] != ' ')

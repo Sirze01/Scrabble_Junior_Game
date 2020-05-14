@@ -42,7 +42,12 @@ BOARD_LEFT_PADDING = 2,
 BOARD_TOP_PADDING = 1,
 BOARD_BOTTOM_PADDING = 2,
 BOARD_MIN_DIM = 8,
-COMPACT_VIEW_MAX = 12;
+COMPACT_VIEW_MAX = 12,
+MAX_PLAYER_NAME_SIZE = 20;
+
+//unfair game warning
+const int
+MAX_BOARD_LETTERS_WARNING = 4 * 7; //4 players, 7 letters in hand
 
 const std::string
 LEFT_PADDING_STR(BOARD_LEFT_PADDING, ' ');
@@ -64,11 +69,8 @@ void cleanBuffer();
 void askEnter();
 
 void printBackColor(int backColor, const char c);
-void printBackColor(int backColor, std::string message);
 void printForeColor(int foreColor, const char c);
-void printForeColor(int foreColor, std::string message);
 void print(int foreColor, int backColor, const char c);
-void print(int foreColor, int backColor, std::string message);
 
 bool putCursorOnPos(int line, int col);
 void eraseLineToTheEnd();

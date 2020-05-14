@@ -1,22 +1,20 @@
 #include "Command.h"
-#include "../common/StringProcess.h"
-#include "../common/Board.h"
 #include <string>
 
-Command::Command(std::string userInput) {
-	_str = stripSpecialChars(userInput);
-	_str = lowerCase(_str);
-	_str = stripCommandBloat(_str);
-	_str = stripSpaces(_str);
+Command::Command(std::string &userInput) {
+	_str = userInput;
+	stripSpecialChars(_str);
+	lowerCase(_str);
+	stripCommandBloat(_str);
+	stripSpaces(_str);
 }
 
 bool Command::isMove() const {
-	if (_str.size() != 4) return false;
-	if (!(_str.at(0) >= 'a' && _str.at(0) <= 'z')) return false;
-	if (!(_str.at(1) >= 'a' && _str.at(0) <= 'z')) return false;
-	if (_str.at(2) != ' ') return false;
-	if (!(_str.at(3) >= 'a' && _str.at(3) <= 'z')) return false;
-	return true;
+	return (_str.size() == 4) &&
+		std::isalpha(_str.at(0)) &&
+		std::isalpha(_str.at(1)) &&
+		_str.at(2) == ' ' &&
+		std::isalpha(_str.at(3));
 }
 
 coord Command::getMovePos(const Board *board) const {
@@ -26,7 +24,7 @@ coord Command::getMovePos(const Board *board) const {
 
 char Command::getMoveLetter() const {
 	if (!isMove()) return '?';
-	return toupper(_str.at(3));
+	return static_cast<char>(toupper(_str.at(3)));
 }
 
 std::string Command::getStr() const {
@@ -39,12 +37,12 @@ bool Command::isExchange(bool forceToken) const {
 
 	return hasExchange
 		&& _str.size() == std::string("exchange").size() + 2
-		&& isalpha(_str.at(_str.size()-1));
+		&& std::isalpha(_str.at(_str.size()-1));
 }
 
 char Command::getExchangeLetter() const {
 	if (!isExchange()) return '?';
-	return toupper(_str.at(_str.size() - 1));
+	return static_cast<char>(toupper(_str.at(_str.size() - 1)));
 }
 
 bool Command::isCheckHands() const {
