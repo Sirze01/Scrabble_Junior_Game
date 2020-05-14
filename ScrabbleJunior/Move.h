@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Command.h"
 #include "Player.h"
 #include <ostream>
@@ -24,8 +25,8 @@ private:
 	bool singleCharWordOnCol() const;
 	coord _posToMove;
 	char _letter;
-	int _maxCol;
-	int _maxLine;
+	size_t _maxCol;
+	size_t _maxLine;
 	std::vector<std::vector<char>> _boardLetters;
 	std::vector<std::vector<bool>> _boardHighlights;
 };

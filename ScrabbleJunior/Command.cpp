@@ -18,7 +18,7 @@ bool Command::isMove() const {
 }
 
 coord Command::getMovePos(const Board *board) const {
-	if (!isMove()) return { -1,-1 };
+	if (!isMove()) return { IMPOSSIBLE_MOVE_COORD, IMPOSSIBLE_MOVE_COORD };
 	return board->getIndex(_str.substr(0, 2));
 }
 
@@ -54,7 +54,8 @@ bool Command::isCheckPool() const {
 }
 
 bool Command::isCheckScores() const {
-	return _str.find("score") != std::string::npos;
+	return _str.find("score") != std::string::npos
+		|| _str.find("point") != std::string::npos;
 }
 
 bool Command::isHelp() const {

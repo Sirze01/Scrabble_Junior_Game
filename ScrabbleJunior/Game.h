@@ -15,8 +15,7 @@ public:
 	void showBoardAndCardView(const std::string &view = "hands", bool showTurnInfo = true) const;
 	void askCommand(int turnNumber);
 	void nextTurn();
-	void showScores(bool showTurnInfo = true) const;
-	void showHands(bool showTurnInfo = true) const;
+	void showPlayerInfo(const std::string& info, bool showTurnInfo = true) const;
 	void showHelp() const;
 	void showPool() const;
 	bool hasFinished() const;

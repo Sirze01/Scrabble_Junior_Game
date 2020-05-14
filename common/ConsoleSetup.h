@@ -49,6 +49,10 @@ MAX_PLAYER_NAME_SIZE = 20;
 const int
 MAX_BOARD_LETTERS_WARNING = 4 * 7; //4 players, 7 letters in hand
 
+//impossible move result
+const size_t
+IMPOSSIBLE_MOVE_COORD = SIZE_MAX;
+
 const std::string
 LEFT_PADDING_STR(BOARD_LEFT_PADDING, ' ');
 
@@ -68,9 +72,9 @@ void clearConsole();
 void cleanBuffer();
 void askEnter();
 
-void printBackColor(int backColor, const char c);
-void printForeColor(int foreColor, const char c);
-void print(int foreColor, int backColor, const char c);
+void outputBackColor(std::ostream& toWrite, int backColor, const char c);
+void outputForeColor(std::ostream& toWrite, int foreColor, const char c);
+void outputBackForeColor(std::ostream &toWrite, int foreColor, int backColor, const char c);
 
 bool putCursorOnPos(int line, int col);
 void eraseLineToTheEnd();
@@ -78,7 +82,7 @@ void eraseEntireLine();
 void saveCurrentCursorPosition();
 void restoreSavedCursorPosition();
 
-void writeCardView(int boardHeight, int boardWidth, std::function<void(int,int)> write);
+void writeCardView(int boardHeight, int boardWidth, std::stringstream &toWrite);
 void eraseCardView(int boardDimension, int col);
 
 void paddingAndTopic(int color, bool newLine = false);

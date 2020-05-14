@@ -30,8 +30,7 @@ Game::~Game() {
 void Game::showBoardAndCardView(const std::string &view, bool showTurnInfo) const {
 	clearConsole();
 	_board->show();
-	if (view == "hands") showHands(showTurnInfo);
-	else showScores(showTurnInfo);
+	showPlayerInfo(view, showTurnInfo);
 }
 
 void Game::askCommand(int turnNumber) {
@@ -85,14 +84,10 @@ void Game::askCommand(int turnNumber) {
 						regularMessage += "Are you attempting to put a tile outside the board?";
 					}
 					else if (problemLevel == 2) {
-						regularMessage += "Is the letter ";
-						regularMessage += command.getMoveLetter();
-						regularMessage += " in that position?";
+						regularMessage += "Is the letter " + std::string(1,command.getMoveLetter()) + " in that position?";
 					}
 					else if (problemLevel == 3) {
-						regularMessage += "You do not have the letter ";
-						regularMessage += command.getMoveLetter();
-						regularMessage += " on hand.";
+						regularMessage += "You do not have the letter " + std::string(1,command.getMoveLetter()) + " on hand.";
 					}
 					else if (problemLevel == 4) {
 						regularMessage += "That position already has a tile.";
@@ -136,13 +131,13 @@ void Game::askCommand(int turnNumber) {
 					else showBoardAndCardView(); //exchange was successful
 				}
 
-				else if (command.isCheckHands()) showHands();
-				else if (command.isCheckScores()) showScores();
+				else if (command.isCheckHands()) showPlayerInfo("hands");
+				else if (command.isCheckScores()) showPlayerInfo("scores");
 				else if (command.isCheckPool()) showPool();
 				else if (command.isHelp()) showHelp();
 				else if (command.isHint()) {
 					coord pos = _currentPlayer->getPossibleMovePos(_board);
-					if (pos.hCollumn == -1 || pos.vLine == -1) regularMessage = "Maybe you can't move right now...";
+					if (pos.hCollumn == IMPOSSIBLE_MOVE_COORD || pos.vLine == IMPOSSIBLE_MOVE_COORD) regularMessage = "Maybe you can't move right now...";
 					else {
 						regularMessage = "Look carefully at the board on position ";
 						regularMessage += (char)('A' + pos.vLine);
@@ -225,60 +220,42 @@ int Game::getWinner() const {
 	return currentWinner;
 }
 
-void Game::showScores(bool showTurnInfo) const {
-	std::function<void(int, int)> write = [&](int line, int col) {
+void Game::showPlayerInfo(const std::string &info, bool showTurnInfo) const {
+	std::stringstream toWrite;
 
-		for (int i = 0; i < _nPlayers;++i) {
-			Player* player = _players.at(i);
+	for (int i = 0; i < _nPlayers;++i) {
+		Player* player = _players.at(i);
 
-			putCursorOnPos(line++, col);
-			printForeColor(player->getColor(), '|');
-			std::cout << player->getName();
-			if (showTurnInfo) {
-				if (i == _currentPlayerPos) std::cout << " - to play!";
-				else if (player->getMayPass()) std::cout << " - passed last turn";
-			}
-			std::cout << std::endl;
+		outputForeColor(toWrite, player->getColor(), '|');
+		toWrite << player->getName();
 
-			putCursorOnPos(line++, col);
-			printForeColor(player->getColor(), '|');
-			std::cout << player->getScore() << " points";
-
-			for (int j = 0; j < 5 - _nPlayers - _compactCardView; ++j) line++;
+		if (showTurnInfo) {
+			if (i == _currentPlayerPos) toWrite << " - to play!";
+			else if (player->getMayPass()) toWrite << " - passed last turn";
 		}
-	};
+		toWrite << "\n";
 
-	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, write);
-}
+		outputForeColor(toWrite, player->getColor(), '|');
 
-void Game::showHands(bool showTurnInfo) const {
-	std::function<void(int,int)> write = [&](int line, int col){
-		for (int i = 0; i < _nPlayers;++i) {
-			Player* player = _players.at(i);
-
-			putCursorOnPos(line++, col);
-			printForeColor(player->getColor(), '|');
-			std::cout << player->getName();
-			if (showTurnInfo) {
-				if (i == _currentPlayerPos) std::cout << " - to play!";
-				else if (player->getMayPass()) std::cout << " - passed last turn";
-			}
-			std::cout << std::endl;
-
-			putCursorOnPos(line++, col);
-			printForeColor(player->getColor(), '|');
-			if (i == _currentPlayerPos) player->showHand(true);
-			else player->showHand(false);
-
-			for (int j = 0; j < 5 - _nPlayers - _compactCardView; ++j) line++;
+		if (info == "hands") {
+			if (i == _currentPlayerPos) player->showHand(toWrite, true);
+			else player->showHand(toWrite, false);
 		}
-	};
+		else if (info == "scores"){
+			toWrite << player->getScore() << " points\n";
+		}
+		else {
+			toWrite << "No info requested\n";
+		}
 
-	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, write);
+		for (int j = 0; j < 5 - _nPlayers - _compactCardView; ++j) toWrite << "\n";
+	}
+
+	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, toWrite);
 }
 
 void Game::showHelp() const {
-	std::function<void(int, int)> write = [&](int line, int col) {
+	std::stringstream toWrite;
 		std::vector<std::string> intro =
 		{
 			"|Start or continue words with the tiles you have on hand.",
@@ -301,38 +278,32 @@ void Game::showHelp() const {
 
 		if (!_compactCardView) {
 			for (auto sentence : intro) {
-				std::cout << sentence << std::endl;
-				putCursorOnPos(line++, col);
+				toWrite << sentence << "\n";
 			}
 		}
 		for (auto sentence : commands) {
-			std::cout << sentence << std::endl;
-			putCursorOnPos(line++, col);
+			toWrite << sentence << "\n";
 		}
-	};
 
-	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, write);
+	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, toWrite);
 }
 
 void Game::showPool() const {
-	std::function<void(int, int)> write = [&](int line, int col) {
+	std::stringstream toWrite;
 
 		std::vector<char> letters = _pool->getAllLetters();
 		int size = letters.size();
 
-		std::cout << "|" << size << " letters on the pool";
-		putCursorOnPos(line++, col);
+		toWrite << "|" << size << " letters on the pool";
 
 		for (int i = 0; i < size;++i) {
 			if (i % 11 == 0) {
-				putCursorOnPos(line++, col);
-				std::cout << "|";
+				toWrite << "\n" << "|";
 			}
-			std::cout << letters.at(i) << " ";
+			toWrite << letters.at(i) << " ";
 		}
-	};
 
-	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, write);
+	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, toWrite);
 }
 
 std::string Game::getPlayerName(int playerPos) const {

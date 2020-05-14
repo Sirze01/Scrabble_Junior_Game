@@ -30,19 +30,20 @@ std::string Player::getName() const {
     return _name;
 }
 
-void Player::showHand(bool color) const {
+void Player::showHand(std::ostream &output, bool color) const {
     if (!getActualHandSize()) {
-        std::cout << "Nothing on hand";
+        output << "Nothing on hand\n";
         return;
     }
     for (const auto &i : _hand) {
         if (i == ' ') continue;
         else {
-            if (color) print(WHITE, _color, i);
-            else std::cout << i;
+            if (color) outputBackForeColor(output, WHITE, _color, i);
+            else output << i;
         }
-        std::cout << " ";
+        output << " ";
     }
+    output << "\n";
 }
 
 void Player::addScore() {
@@ -96,14 +97,14 @@ bool Player::hasOnHand(char letter) const {
 
 bool Player::mayMove(const Board *board) const{
     coord pos = getPossibleMovePos(board);
-    return pos.hCollumn != -1 && pos.vLine != -1;
+    return pos.hCollumn != IMPOSSIBLE_MOVE_COORD && pos.vLine != IMPOSSIBLE_MOVE_COORD;
 }
 
 coord Player::getPossibleMovePos(const Board* board) const {
     coord boardDim = board->getDimensions();
 
-    for (int line = 0; line < boardDim.vLine; ++line) {
-        for (int col = 0; col < boardDim.hCollumn; ++col) {
+    for (size_t line = 0; line < boardDim.vLine; ++line) {
+        for (size_t col = 0; col < boardDim.hCollumn; ++col) {
             coord testPosition = { line,col };
             char letter = board->getLetters().at(line).at(col);
             Move tryMove(testPosition, letter, board);
@@ -111,7 +112,7 @@ coord Player::getPossibleMovePos(const Board* board) const {
             if (!tryMove.hasProblems(this)) return testPosition;
         }
     }
-    return { -1,-1 };
+    return { IMPOSSIBLE_MOVE_COORD,IMPOSSIBLE_MOVE_COORD };
 }
 
 int Player::getColor() const {
