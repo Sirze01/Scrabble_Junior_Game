@@ -373,13 +373,15 @@ bool commandInterpreter::cmdAdd(int &last) {
     }
 
     bool retValue = true;
-    codedWord newEntry;
+    codedWord newEntry = {{SIZE_MAX, SIZE_MAX}, '\0', ""};
     if(!_modifiers.empty()){
-        newEntry.firstCoord = _modifiers.substr(0,2);
-        _modifiers.erase(0, 2);
-        if(!((newEntry.firstCoord.size() == 2) && isAlpha(newEntry.firstCoord))){
+        if(isAlpha(_modifiers.substr(0,2))){
+            if (!(_board.boardBounds({_board.getIndex(_modifiers.substr(0, 2)), '\0', ""}))) {
             last = -3;
             return false;
+            }
+            newEntry.firstCoord = {_board.getIndex(_modifiers.substr(0,2))};
+            _modifiers.erase(0,2);
         }
         if(!_modifiers.empty()) {
             newEntry.orientation = toupper(_modifiers.substr(1, 1).at(0));
@@ -398,23 +400,25 @@ bool commandInterpreter::cmdAdd(int &last) {
         }
     }
 
-    if(newEntry.firstCoord.empty()){
+
+    std::string userInput;
+    if(newEntry.firstCoord.vLine == SIZE_MAX && newEntry.firstCoord.hCollumn == SIZE_MAX){
         int temp = 0;
         do {
             if(temp)
                 std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Your input is invalid, try again" << std::endl;
             else
-                std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the coordinates to the first letter of the word"
+                std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the coordinates to the first letter of the word. Press e to quit"
                       << std::endl;
             temp++;
             std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Coordinate: ";
-            getline(std::cin, newEntry.firstCoord);
-        } while (!((newEntry.firstCoord.size() == 2) && isAlpha(newEntry.firstCoord)));
+            getline(std::cin, userInput);
+            //use strip spaces!!!
+        } while (!(isAlpha(userInput) && _board.boardBounds({_board.getIndex(userInput), '\0', ""})));
     }
 
     if(newEntry.orientation == '\0'){
         int temp = 0;
-        std::string wdtemp;
         do {
             if(temp)
                 std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Your input is invalid, try again" << std::endl;
@@ -422,9 +426,10 @@ bool commandInterpreter::cmdAdd(int &last) {
                 std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the desired orientation" << std::endl;
             temp++;
             std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Orientation: ";
-            getline(std::cin, wdtemp);
-            newEntry.orientation = toupper(wdtemp.substr(0).at(0));
-        } while (!(newEntry.orientation == 'H') || (newEntry.orientation == 'V'));
+            getline(std::cin, userInput);
+            // Strip Spaces
+            for(auto &letter: userInput) letter = toupper(letter);
+        } while (!(userInput.at(0) == 'H') || (userInput.at(0) == 'V'));
     }
 
     if(newEntry.word.empty()){
@@ -440,10 +445,8 @@ bool commandInterpreter::cmdAdd(int &last) {
         } while (!isAlpha(newEntry.word));
     }
 
-    newEntry.firstCoord[0] = toupper(newEntry.firstCoord[0]);
-    newEntry.firstCoord[1] = tolower(newEntry.firstCoord[1]);
-    for(auto &letter : newEntry.word) letter = tolower(letter);
 
+    for(auto &letter : newEntry.word) letter = tolower(letter);
     for (auto &entry : _board.getWords()){
         if (entry.word == newEntry.word){
             last = -3;
@@ -463,7 +466,7 @@ bool commandInterpreter::cmdAdd(int &last) {
         retValue = false;
     }
 
-    if (!(_board.boardBounds(_board.getIndex(newEntry.firstCoord), newEntry.orientation, newEntry.word.size()))){
+    if (!(_board.boardBounds(newEntry))){
         last = -2;
         std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Word is out of range! Try another one." << std::endl;
         retValue = false;
@@ -483,20 +486,14 @@ bool commandInterpreter::cmdAdd(int &last) {
 
 
     if(retValue){
-        coord temp = _board.getIndex(newEntry.firstCoord);
-        int v, h;
-        v = temp.vLine;
-        h = temp.hCollumn;
         if (newEntry.orientation == 'V'){
             for(int i = 0; i < newEntry.word.size(); i++){
-                temp.vLine = v + i;
-                _board.placeChar(temp, newEntry.word[i]);
+                _board.placeChar({newEntry.firstCoord.vLine + i, newEntry.firstCoord.hCollumn}, newEntry.word.at(i));
             }
         }
         else{
             for(int i = 0; i < newEntry.word.size(); i++){
-                temp.hCollumn = h + i;
-                _board.placeChar(temp, newEntry.word[i]);
+                _board.placeChar({newEntry.firstCoord.vLine, newEntry.firstCoord.hCollumn + i}, newEntry.word[i]);
             }
         }
         _board.addWord(newEntry);
@@ -504,6 +501,7 @@ bool commandInterpreter::cmdAdd(int &last) {
     }
     return retValue;
 }
+
 
 bool commandInterpreter::cmdRemove(int &last){
     if (!_state) {
@@ -516,41 +514,54 @@ bool commandInterpreter::cmdRemove(int &last){
     if(_modifiers.empty()) {
         std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Word: ";
         getline(std::cin, _modifiers);
-        for (auto &letter : _modifiers) letter = toupper(letter);
     }
 
-    codedWord wordToRemove = _board.findWord(_modifiers);
-    if( wordToRemove.word == "") {
+    for (auto &letter : _modifiers) letter = toupper(letter);
+
+    if(_board.wordExists(_modifiers)){
+        codedWord wordToRemove = *_board.findWord(_modifiers);
+        std::vector<coord> intersections = _board.checkIntersections(wordToRemove);
+        if (wordToRemove.orientation== 'V'){
+            for(int i = 0; i < wordToRemove.word.size(); i++){
+                coord current = {wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hCollumn};
+                if(intersections.empty()){
+                    _board.placeChar({wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hCollumn}, ' ');
+                }
+
+                else{
+                    if(std::find(intersections.begin(), intersections.end(), current) == intersections.end())
+                        _board.placeChar({wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hCollumn}, ' ');
+                    }
+                }
+            }
+
+        else{
+            for(int i = 0; i < wordToRemove.word.size(); i++){
+                coord current = {wordToRemove.firstCoord.vLine, wordToRemove.firstCoord.hCollumn + i};
+                if(intersections.empty()){
+                    _board.placeChar({wordToRemove.firstCoord.vLine, wordToRemove.firstCoord.hCollumn + i}, ' ');
+                }
+
+                else{
+                    if(std::find(intersections.begin(), intersections.end(), current) == intersections.end())
+                        _board.placeChar({wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hCollumn}, ' ');
+                }
+            }
+        }
+
+        _board.removeWord(wordToRemove);
+    }
+
+    else {
         last = -2;
         std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "The word you trying to remove doesn't exist, try again"
                   << std::endl;
         return false;
     }
-
-    if(_board.checkIntersection(wordToRemove)){
-
-    }
-    else{
-        coord temp = _board.getIndex(wordToRemove.firstCoord);
-        int v, h;
-        v = temp.vLine;
-        h = temp.hCollumn;
-        if (wordToRemove.orientation == 'V'){
-            for(int i = 0; i < wordToRemove.word.size(); i++){
-                temp.vLine = v + i;
-                _board.placeChar(temp, ' ');
-            }
-        }
-        else{
-            for(int i = 0; i < wordToRemove.word.size(); i++){
-                temp.hCollumn = h + i;
-                _board.placeChar(temp, ' ');
-            }
-        }
-    }
-    _board.removeWord(wordToRemove);
+    _board.show();
     return true;
 }
+
 
 bool commandInterpreter::cmdExport() const{
     _board.fileExport((_name + ".txt"));
