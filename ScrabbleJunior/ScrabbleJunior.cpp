@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <functional>
 
-//for shuffle purposes
+//for shuffle purposes - should only be defined once
 unsigned const SEED = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
 std::mt19937 RANDOM_GENERATOR(SEED);
 
@@ -42,9 +42,7 @@ int askPlayFirst(const Board* board, int nPlayers, std::vector<std::string> play
 		stripSpaces(playerName);
 
 		if (playerName == "random") {
-			std::uniform_int_distribution<int> distribution{ 0, nPlayers - 1 };
-			int randomPos = distribution(RANDOM_GENERATOR);
-
+			int randomPos = randomBetween(0, nPlayers - 1);
 			paddingAndTopic(playerColors.at(randomPos), true); std::cout << playerNames.at(randomPos) << " won the draw.\n";
 			paddingAndTopic(playerColors.at(randomPos), false); std::cout << "Press enter to start!\n";
 			askEnter();
@@ -272,10 +270,13 @@ int main()
 	int first = askPlayFirst(&gameBoard, nPlayers, playerNames, playerColors);
 	Game my_game(&gameBoard, playerNames, playerColors, first);
 
-	do {
-		for (int moveNumber : {1, 2}) my_game.askCommand(moveNumber);
+	for (;;) {
+		my_game.askCommand(1);
+		if (my_game.hasFinished()) break;
+		my_game.askCommand(2);
+		if (my_game.hasFinished()) break;
 		my_game.nextTurn();
-	} while (!my_game.hasFinished());
+	};
 
 	my_game.showEndMessage();
 }

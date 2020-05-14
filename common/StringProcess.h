@@ -1,5 +1,9 @@
 #pragma once
 #include <string>
+#include <chrono>
+#include <random>
+
+int randomBetween(int lowerBound, int upperBound);
 
 void lowerCase(std::string &command);
 void stripSpaces(std::string &name);

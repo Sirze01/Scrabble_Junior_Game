@@ -34,22 +34,26 @@ void Game::showBoardAndCardView(const std::string &view, bool showTurnInfo) cons
 }
 
 void Game::askCommand(int turnNumber) {
-	bool ableToMove = _currentPlayer->mayMove(_board);
-	if (_currentPlayer->getMayPass() && ableToMove) _currentPlayer->doNotPass();
 	_currentPlayer->resetExchangeCount();
 
 	std::string commandPrompt, regularMessage, input;
 	std::vector<std::string> coloredMessage;
 	int playerColor = _currentPlayer->getColor();
 
-	if (_currentPlayer->getMayPass() && !ableToMove) { //passed before and still can't move
-		if (turnNumber == 1) {
-			coloredMessage = {
-				_currentPlayer->getName() + ", you still cannot move.",
-				"We will skip your turn automatically.",
-			};
+	if (_currentPlayer->getMayPass()) {
+		bool ableToMove = _currentPlayer->mayMove(_board);
+		if (ableToMove) {
+			_currentPlayer->doNotPass();
 		}
-		else return;
+		else {
+			if (turnNumber == 1) {
+				coloredMessage = {
+					_currentPlayer->getName() + ", you still cannot move.",
+					"We will skip your turn automatically.",
+				};
+			}
+			else return;
+		}
 	}
 
 	if (!_currentPlayer->getActualHandSize() && !coloredMessage.size()) { //player has nothing on hand
@@ -73,27 +77,31 @@ void Game::askCommand(int turnNumber) {
 			std::cout << commandPrompt;
 
 			std::getline(std::cin, input); cleanBuffer();
-			Command command(input);
+			const Command command(input);
 
 			if (command.isMove()) {
-				Move move(&command, _board);
+				const Move move(&command, _board);
 				int problemLevel = move.hasProblems(_currentPlayer);
 				if (problemLevel) {
 					regularMessage = "Could not play! ";
 					if (problemLevel == 1) {
-						regularMessage += "Are you attempting to put a tile outside the board?";
+						regularMessage += "You are attempting to put a tile outside the board.";
 					}
 					else if (problemLevel == 2) {
-						regularMessage += "Is the letter " + std::string(1,command.getMoveLetter()) + " in that position?";
+						regularMessage += "The letter ";
+						regularMessage += command.getMoveLetter();
+						regularMessage += " is not in that position.";
 					}
 					else if (problemLevel == 3) {
-						regularMessage += "You do not have the letter " + std::string(1,command.getMoveLetter()) + " on hand.";
+						regularMessage += "You do not have the letter ";
+						regularMessage += command.getMoveLetter();
+						regularMessage += " on hand.";
 					}
 					else if (problemLevel == 4) {
 						regularMessage += "That position already has a tile.";
 					}
 					else if (problemLevel == 5) {
-						regularMessage += "Are you actually starting or continuing a word?";
+						regularMessage += "You are not starting or continuing a word.";
 					}
 				}
 				else {
@@ -106,7 +114,7 @@ void Game::askCommand(int turnNumber) {
 
 				if (command.isExchange()) {
 					char token = command.getExchangeLetter();
-					if (ableToMove) {
+					if (_currentPlayer->mayMove(_board)) {
 						regularMessage = "You can not exchange when you have possible moves. Pay attention!";
 					}
 					else if (!_pool->getCurrentSize()) {
@@ -137,7 +145,9 @@ void Game::askCommand(int turnNumber) {
 				else if (command.isHelp()) showHelp();
 				else if (command.isHint()) {
 					coord pos = _currentPlayer->getPossibleMovePos(_board);
-					if (pos.hCollumn == IMPOSSIBLE_MOVE_COORD || pos.vLine == IMPOSSIBLE_MOVE_COORD) regularMessage = "Maybe you can't move right now...";
+					if (pos.hCollumn == IMPOSSIBLE_MOVE_COORD || pos.vLine == IMPOSSIBLE_MOVE_COORD) {
+						regularMessage = "Maybe you can't move right now...";
+					}
 					else {
 						regularMessage = "Look carefully at the board on position ";
 						regularMessage += (char)('A' + pos.vLine);
@@ -146,11 +156,11 @@ void Game::askCommand(int turnNumber) {
 					}
 				}
 				else if (command.isPass()) {
-					if (ableToMove) {
+					if (_currentPlayer->mayMove(_board)) {
 						regularMessage = "You cannot pass when you have possible moves. Look carefully!";
 					}
 					else if (_pool->getCurrentSize() && !_currentPlayer->getExchangeCount()) {
-						regularMessage = "The pool is not empty. Please try to exchange a letter before passing.";
+						regularMessage = "The pool is not empty. Try to exchange a letter before passing.";
 					}
 					else {
 						_currentPlayer->forcePass();
@@ -188,14 +198,14 @@ void Game::nextTurn() {
 }
 
 bool Game::allPlayersMustPass() const {
-	for (Player* player : _players) {
+	for (const Player* player : _players) {
 		if (!player->getMayPass()) return false;
 	}
 	return true;
 }
 
 bool Game::hasFinished() const {
-	for (auto& player : _players) {
+	for (const auto& player : _players) {
 		if (player->mayMove(_board)) return false;
 	}
 	return true;
@@ -224,7 +234,7 @@ void Game::showPlayerInfo(const std::string &info, bool showTurnInfo) const {
 	std::stringstream toWrite;
 
 	for (int i = 0; i < _nPlayers;++i) {
-		Player* player = _players.at(i);
+		const Player* player = _players.at(i);
 
 		outputForeColor(toWrite, player->getColor(), '|');
 		toWrite << player->getName();
@@ -277,11 +287,11 @@ void Game::showHelp() const {
 		};
 
 		if (!_compactCardView) {
-			for (auto sentence : intro) {
+			for (const auto &sentence : intro) {
 				toWrite << sentence << "\n";
 			}
 		}
-		for (auto sentence : commands) {
+		for (const auto &sentence : commands) {
 			toWrite << sentence << "\n";
 		}
 
@@ -314,11 +324,10 @@ std::string Game::getPlayerName(int playerPos) const {
 void Game::showEndMessage() const {
 	showBoardAndCardView("scores", false);
 
-	int color;
+	int color = WHITE;
 	int winner = getWinner();
 
 	if (hasWinner()) color = _players.at(winner)->getColor();
-	else color = WHITE;
 
 	paddingAndTopic(WHITE, true); std::cout << "THE GAME HAS ENDED!\n";
 
