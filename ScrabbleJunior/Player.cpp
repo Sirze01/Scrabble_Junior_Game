@@ -30,19 +30,20 @@ std::string Player::getName() const {
     return _name;
 }
 
-void Player::showHand(bool color) const {
+void Player::showHand(std::ostream &output, bool color) const {
     if (!getActualHandSize()) {
-        std::cout << "Nothing on hand";
+        output << "Nothing on hand\n";
         return;
     }
     for (const auto &i : _hand) {
         if (i == ' ') continue;
         else {
-            if (color) print(WHITE, _color, i);
-            else std::cout << i;
+            if (color) outputBackForeColor(output, WHITE, _color, i);
+            else output << i;
         }
-        std::cout << " ";
+        output << " ";
     }
+    output << "\n";
 }
 
 void Player::addScore() {

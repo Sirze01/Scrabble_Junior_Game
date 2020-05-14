@@ -18,28 +18,28 @@ struct PlayerData {
 
 int askPlayFirst(const Board* board, int nPlayers, std::vector<std::string> playerNames, std::vector<int> playerColors) {
 
-	std::function<void(int, int)> write = [&](int line, int col) {
+	{
+		std::stringstream toWrite;
 		std::vector<std::string> sentences = {
-			"|Choose one of the players",
-			"|or type 'random' to randomize.",
-			" " };
+			"|Choose one of the players\n",
+			"|or type 'random' to randomize.\n\n",
+		};
 
 		for (auto& i : sentences) {
-			std::cout << i; putCursorOnPos(line++, col);
+			toWrite << i;
 		}
 
 		for (int i = 0; i < nPlayers; ++i) {
-			putCursorOnPos(line++, col);
-			printForeColor(playerColors.at(i), '|');
-			std::cout << "-> " << playerNames.at(i);
+			outputForeColor(toWrite, playerColors.at(i), '|');
+			toWrite << "-> " << playerNames.at(i) << "\n";
 		}
-	};
 
-	writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, write);
+		writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, toWrite);
+	}
 
 	std::string playerName;
 	for (;;) {
-		paddingAndTopic(WHITE,true); std::cout << "Who should go first? ";
+		paddingAndTopic(WHITE, true); std::cout << "Who should go first? ";
 		std::getline(std::cin, playerName); cleanBuffer();
 		stripSpaces(playerName);
 
@@ -59,7 +59,7 @@ int askPlayFirst(const Board* board, int nPlayers, std::vector<std::string> play
 			if (playerName == playerNames.at(i)) return i;
 		}
 
-		paddingAndTopic(RED,true); std::cout << "We could not find a player with that exact name. Please try again.\n";
+		paddingAndTopic(RED, true); std::cout << "We could not find a player with that exact name. Please try again.\n";
 	}
 
 	return 0;
@@ -72,32 +72,30 @@ bool exists(std::string filename) {
 
 std::string askBoardFileName(const Board* board) {
 
-	std::function<void(int, int)> write = [&](int line, int col) {
-		std::vector<std::string> sentences = {
-			"|Tip",
-			" ",
-			"|You can use our companion",
-			"|Board Builder program",
-			"|to create your own board!"
-		};
-
-		for (std::string str : sentences) {
-			std::cout << str; putCursorOnPos(line++, col);
-		}
+	std::stringstream toWrite;
+	std::vector<std::string> sentences = {
+		"|Tip\n\n",
+		"|You can use our companion\n",
+		"|Board Builder program\n",
+		"|to create your own board!\n"
 	};
 
-	writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, write);
+	for (std::string str : sentences) {
+		toWrite << str;
+	}
+
+	writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, toWrite);
 	std::string fileName;
 
 	for (;;) {
-		paddingAndTopic(WHITE,true); std::cout << "Import board from file: ";
+		paddingAndTopic(WHITE, true); std::cout << "Import board from file: ";
 		std::getline(std::cin, fileName); cleanBuffer();
 
 		if (fileName == "") {
-			paddingAndTopic(RED,true); std::cout << "Empty filenames are invalid. Please try again.\n";
+			paddingAndTopic(RED, true); std::cout << "Empty filenames are invalid. Please try again.\n";
 		}
 		else if (!exists(fileName)) {
-			paddingAndTopic(RED,true); std::cout << "We could not find that file. Please try again.\n";
+			paddingAndTopic(RED, true); std::cout << "We could not find that file. Please try again.\n";
 		}
 		else {
 			Board testBoard(fileName);
@@ -127,26 +125,11 @@ std::string askBoardFileName(const Board* board) {
 	return fileName;
 }
 
-PlayerData askPlayer(int position, const Board *board, std::vector<std::string> forbiddenNames, std::vector<int> forbiddenColors) {
+PlayerData askPlayer(int position, const Board* board, std::vector<std::string> forbiddenNames, std::vector<int> forbiddenColors) {
 
 	std::string name, colorName;
 	int color = WHITE;
 	position++;
-
-	std::function<void(int, int)> write = [&](int line, int col) {
-		std::vector<int> colors = { RED,GREEN,BLUE,PINK,ORANGE };
-		std::vector<std::string> colorNames = { "RED","GREEN","BLUE","PINK","ORANGE" };
-
-		std::cout << "|" << colors.size() - forbiddenColors.size() << " colors available";
-		line++;
-
-		for (size_t i = 0; i < colors.size(); ++i) {
-			if (std::find(forbiddenColors.begin(), forbiddenColors.end(), colors.at(i)) != forbiddenColors.end()) continue;
-			putCursorOnPos(line++, col);
-			printForeColor(colors.at(i), TOPIC);
-			std::cout << "-> " << colorNames.at(i);
-		}
-	};
 
 
 	for (;;) { //ask name
@@ -162,25 +145,38 @@ PlayerData askPlayer(int position, const Board *board, std::vector<std::string> 
 		upperNameInitials(name);
 
 		if (name == "") {
-			paddingAndTopic(RED,true); std::cout << "We do not accept empty names!\n";
+			paddingAndTopic(RED, true); std::cout << "We do not accept empty names!\n";
 		}
 		else if (name.size() > MAX_PLAYER_NAME_SIZE) {
-			paddingAndTopic(RED,true); std::cout << "Please do not input large names!\n";
+			paddingAndTopic(RED, true); std::cout << "Please do not input large names!\n";
 		}
 		else if (!isAlpha(name)) {
 			paddingAndTopic(RED, true); std::cout << "Please do not use digits or special characters.\n";
 		}
 		else if (std::find(forbiddenNames.begin(), forbiddenNames.end(), name) != forbiddenNames.end()) {
-			paddingAndTopic(RED,true); std::cout << "Another player has already chosen that name. Try again.\n";
+			paddingAndTopic(RED, true); std::cout << "Another player has already chosen that name. Try again.\n";
 		}
 		else break;
 	}
 
-	writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, write);
+	{
+		std::stringstream toWrite;
+		std::vector<int> colors = { RED,GREEN,BLUE,PINK,ORANGE };
+		std::vector<std::string> colorNames = { "RED","GREEN","BLUE","PINK","ORANGE" };
+
+		toWrite << "|" << colors.size() - forbiddenColors.size() << " colors available\n\n";
+
+		for (size_t i = 0; i < colors.size(); ++i) {
+			if (std::find(forbiddenColors.begin(), forbiddenColors.end(), colors.at(i)) != forbiddenColors.end()) continue;
+			outputForeColor(toWrite, colors.at(i), TOPIC);
+			toWrite << "-> " << colorNames.at(i) << "\n";
+		}
+		writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, toWrite);
+	}
 
 	for (;;) { //ask color
 
-		paddingAndTopic(WHITE,true); std::cout << "Player " << position << " color: ";
+		paddingAndTopic(WHITE, true); std::cout << "Player " << position << " color: ";
 		std::getline(std::cin, colorName); cleanBuffer();
 		stripSpecialChars(colorName);
 		stripSpaces(colorName);
@@ -192,12 +188,12 @@ PlayerData askPlayer(int position, const Board *board, std::vector<std::string> 
 		else if (colorName == "pink") color = PINK;
 		else if (colorName == "orange") color = ORANGE;
 		else {
-			paddingAndTopic(RED,true); std::cout << "We did not recognize that color. Please try again.\n";
+			paddingAndTopic(RED, true); std::cout << "We did not recognize that color. Please try again.\n";
 			continue;
 		}
 
 		if (std::find(forbiddenColors.begin(), forbiddenColors.end(), color) != forbiddenColors.end()) {
-			paddingAndTopic(RED,true); std::cout << "Another player has already chosen that color. Try again.\n";
+			paddingAndTopic(RED, true); std::cout << "Another player has already chosen that color. Try again.\n";
 		}
 		else break;
 	}
@@ -212,19 +208,19 @@ int askNumberOfPlayers() {
 		paddingAndTopic(WHITE, true); std::cout << "Number of players: ";
 		std::getline(std::cin, input); cleanBuffer();
 
-			if (!isDigit(input)) {
-				errorMessage = "Please input a valid number.";
-			}
-			else {
-				intInput = std::stoi(input);
-				if (intInput < 2 || intInput > 4) {
-					errorMessage = "This game can only be played by 2 to 4 players.";
-				}
-				else break;
-			}
-
-			paddingAndTopic(RED, true); std::cout << errorMessage << "\n";
+		if (!isDigit(input)) {
+			errorMessage = "Please input a valid number.";
 		}
+		else {
+			intInput = std::stoi(input);
+			if (intInput < 2 || intInput > 4) {
+				errorMessage = "This game can only be played by 2 to 4 players.";
+			}
+			else break;
+		}
+
+		paddingAndTopic(RED, true); std::cout << errorMessage << "\n";
+	}
 
 	return intInput;
 }
@@ -238,7 +234,7 @@ void printIntro(Board* introBoard) {
 	"Press enter to create a new game!",
 	};
 
-	for (auto &sentence : sentences) {
+	for (auto& sentence : sentences) {
 		paddingAndTopic(BLUE, true); std::cout << sentence;
 	}
 
@@ -249,7 +245,7 @@ int main()
 {
 	setupConsole();
 
-	auto clearAndShowBoard = [](const Board *board) {
+	auto clearAndShowBoard = [](const Board* board) {
 		clearConsole();
 		board->show();
 	};

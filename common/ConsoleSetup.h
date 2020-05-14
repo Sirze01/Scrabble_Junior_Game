@@ -68,9 +68,9 @@ void clearConsole();
 void cleanBuffer();
 void askEnter();
 
-void printBackColor(int backColor, const char c);
-void printForeColor(int foreColor, const char c);
-void print(int foreColor, int backColor, const char c);
+void outputBackColor(std::ostream& toWrite, int backColor, const char c);
+void outputForeColor(std::ostream& toWrite, int foreColor, const char c);
+void outputBackForeColor(std::ostream &toWrite, int foreColor, int backColor, const char c);
 
 bool putCursorOnPos(int line, int col);
 void eraseLineToTheEnd();
@@ -78,7 +78,7 @@ void eraseEntireLine();
 void saveCurrentCursorPosition();
 void restoreSavedCursorPosition();
 
-void writeCardView(int boardHeight, int boardWidth, std::function<void(int,int)> write);
+void writeCardView(int boardHeight, int boardWidth, std::stringstream &toWrite);
 void eraseCardView(int boardDimension, int col);
 
 void paddingAndTopic(int color, bool newLine = false);

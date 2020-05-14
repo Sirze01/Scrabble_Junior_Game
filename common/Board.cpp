@@ -129,24 +129,24 @@ Board::Board(std::string filename) {
 }
 
 void Board::show() const { //Prototype function (needs styling)
-	auto darkSpace = []() {printBackColor(DARK_GREY, ' '); };
+	auto darkSpace = []() {outputBackColor(std::cout, DARK_GREY, ' '); };
 
     std::cout << std::string(BOARD_TOP_PADDING,'\n') << LEFT_PADDING_STR;
 
 	darkSpace();
 	for (int i = 0; i < _hDimension; i++) {
-		darkSpace(); printBackColor(DARK_GREY, alphabet.at(i));
+		darkSpace(); outputBackColor(std::cout, DARK_GREY, alphabet.at(i));
 		//std::cout << " " << alphabet.at(i);
 	}
 	//std::cout << std::endl;
 	darkSpace(); darkSpace(); std::cout << std::endl;
 	for (int i = 0; i < _vDimension; i++) {
 		std::cout << LEFT_PADDING_STR;
-		printBackColor(DARK_GREY,toupper(alphabet.at(i)));
+		outputBackColor(std::cout, DARK_GREY,toupper(alphabet.at(i)));
 		for (int j = 0; j < _hDimension; j++) {
 			std::cout << ' ';
 			if (getHighlights().at(i).at(j)) {
-				print(WHITE, _highlightColors.at(i).at(j), _letters.at(i).at(j));
+				outputBackForeColor(std::cout, WHITE, _highlightColors.at(i).at(j), _letters.at(i).at(j));
 			}
 			else std::cout << _letters[i][j];
 		}

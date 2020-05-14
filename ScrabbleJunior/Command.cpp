@@ -54,7 +54,8 @@ bool Command::isCheckPool() const {
 }
 
 bool Command::isCheckScores() const {
-	return _str.find("score") != std::string::npos;
+	return _str.find("score") != std::string::npos
+		|| _str.find("point") != std::string::npos;
 }
 
 bool Command::isHelp() const {

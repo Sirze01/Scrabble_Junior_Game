@@ -12,7 +12,7 @@ public:
 	int getScore() const;
 	std::string getName() const;
 	int getColor() const;
-	void showHand(bool color = true) const;
+	void showHand(std::ostream& output, bool color) const;
 	void addScore();
 	void resetExchangeCount();
 	void forcePass();
