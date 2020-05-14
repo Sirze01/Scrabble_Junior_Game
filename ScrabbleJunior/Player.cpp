@@ -103,8 +103,8 @@ bool Player::mayMove(const Board *board) const{
 coord Player::getPossibleMovePos(const Board* board) const {
     coord boardDim = board->getDimensions();
 
-    for (int line = 0; line < boardDim.vLine; ++line) {
-        for (int col = 0; col < boardDim.hCollumn; ++col) {
+    for (size_t line = 0; line < boardDim.vLine; ++line) {
+        for (size_t col = 0; col < boardDim.hCollumn; ++col) {
             coord testPosition = { line,col };
             char letter = board->getLetters().at(line).at(col);
             Move tryMove(testPosition, letter, board);

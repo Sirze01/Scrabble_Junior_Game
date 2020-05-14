@@ -3,54 +3,28 @@
 
 const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
-Board::Board() {
-    _hDimension = 10;
-    _vDimension = 10;
+Board::Board(size_t nLines, size_t nColumns) {
+    _vDimension = nLines;
+    _hDimension = nColumns;
     _letters.resize(_vDimension);
-    for (size_t i = 0; i < _letters.size(); i++){
-        _letters[i].resize(_hDimension);
-        for(size_t j = 0; j < _letters[i].size(); j++){
-            _letters[i][j] = ' ';
+    for (auto& _letter : _letters) {
+        _letter.resize(_hDimension);
+        for (char& j : _letter) {
+            j = ' ';
         }
     }
 
     _highlights.resize(_vDimension);
     for(auto &line : _highlights){
         line.resize(_hDimension);
-        for(int i = 0; i < _hDimension; i++)
+        for(size_t i = 0; i < _hDimension; i++)
             line[i] = false;
     }
 
     _highlightColors.resize(_vDimension);
     for(auto &line : _highlightColors){
         line.resize(_hDimension);
-        for(int i = 0; i < _hDimension; i++)
-            line[i] = RED;
-    }
-}
-
-Board::Board(int nLines, int nCollumns) {
-	_vDimension = nLines;
-	_hDimension = nCollumns;
-	_letters.resize(_vDimension);
-	for (auto& _letter : _letters) {
-		_letter.resize(_hDimension);
-		for (char& j : _letter) {
-			j = ' ';
-		}
-	}
-
-    _highlights.resize(_vDimension);
-    for(auto &line : _highlights){
-        line.resize(_hDimension);
-        for(int i = 0; i < _hDimension; i++)
-            line[i] = false;
-    }
-
-    _highlightColors.resize(_vDimension);
-    for(auto &line : _highlightColors){
-        line.resize(_hDimension);
-        for(int i = 0; i < _hDimension; i++)
+        for(size_t i = 0; i < _hDimension; i++)
             line[i] = RED;
     }
 }
@@ -116,14 +90,14 @@ Board::Board(std::string filename) {
     _highlights.resize(_vDimension);
     for(auto &line : _highlights){
         line.resize(_hDimension);
-        for(int i = 0; i < _hDimension; i++)
+        for(size_t i = 0; i < _hDimension; i++)
             line[i] = false;
     }
 
     _highlightColors.resize(_vDimension);
     for(auto &line : _highlightColors){
         line.resize(_hDimension);
-        for(int i = 0; i < _hDimension; i++)
+        for(size_t i = 0; i < _hDimension; i++)
             line[i] = RED;
     }
 }
@@ -134,16 +108,16 @@ void Board::show() const { //Prototype function (needs styling)
     std::cout << std::string(BOARD_TOP_PADDING,'\n') << LEFT_PADDING_STR;
 
 	darkSpace();
-	for (int i = 0; i < _hDimension; i++) {
+	for (size_t i = 0; i < _hDimension; i++) {
 		darkSpace(); outputBackColor(std::cout, DARK_GREY, alphabet.at(i));
 		//std::cout << " " << alphabet.at(i);
 	}
 	//std::cout << std::endl;
 	darkSpace(); darkSpace(); std::cout << std::endl;
-	for (int i = 0; i < _vDimension; i++) {
+	for (size_t i = 0; i < _vDimension; i++) {
 		std::cout << LEFT_PADDING_STR;
 		outputBackColor(std::cout, DARK_GREY,toupper(alphabet.at(i)));
-		for (int j = 0; j < _hDimension; j++) {
+		for (size_t j = 0; j < _hDimension; j++) {
 			std::cout << ' ';
 			if (getHighlights().at(i).at(j)) {
 				outputBackForeColor(std::cout, WHITE, _highlightColors.at(i).at(j), _letters.at(i).at(j));
@@ -153,7 +127,7 @@ void Board::show() const { //Prototype function (needs styling)
 		std::cout << " "; darkSpace(); std::cout << std::endl;
 	}
 	std::cout << LEFT_PADDING_STR;
-	for (int i = 0; i <= 2 * _hDimension + 2; i++) darkSpace();
+	for (size_t i = 0; i <= 2 * _hDimension + 2; i++) darkSpace();
 
 	//make room for card view
 	// PLEASE DO NOT TOUCH ON THIS!! IF YOU NEED TO CHANGE THESE SPACES, INCLUDE A DEFAULT ARGUMENT FOR IT
@@ -192,6 +166,7 @@ bool Board::highlight(int color, int vIndex, int hIndex) {
 	return true;
 }
 
+//Check for allways true conditions
 void Board::highlightFinishedWord(int color, int vIndex, int hIndex) {
 	std::vector<std::vector<int>> tempCol, tempLine;
 	coord dim = getDimensions();
@@ -199,7 +174,7 @@ void Board::highlightFinishedWord(int color, int vIndex, int hIndex) {
 
 	for (int cof : {-1, 1}) {
 		successOnCol = true; tempCol = _highlightColors;
-		for (size_t line = vIndex + cof; line >= 0 && line < dim.vLine; line+=cof) {
+		for (size_t line = vIndex + cof; line < dim.vLine; line+=cof) {
 			if (_highlights.at(line).at(hIndex)) {
 				tempCol.at(line).at(hIndex) = color;
 			}
@@ -211,7 +186,7 @@ void Board::highlightFinishedWord(int color, int vIndex, int hIndex) {
 		if (successOnCol) _highlightColors = tempCol;
 
 		successOnLine = true; tempLine = _highlightColors;
-		for (size_t col = hIndex + cof; col >= 0 && col < dim.hCollumn; col+=cof) {
+		for (size_t col = hIndex + cof; col < dim.hCollumn; col+=cof) {
 			if (_highlights.at(vIndex).at(col)) {
 				tempLine.at(vIndex).at(col) = color;
 			}
@@ -248,18 +223,18 @@ coord Board::getDimensions() const {
 
 // Needs Testing - Reserved area :)
 bool Board::boardBounds(coord firstLetter, std::string orientation, int wordLen){
-    if((firstLetter.vLine > _vDimension) || (firstLetter.vLine < 0))
+    if(firstLetter.vLine > _vDimension)
         return false;
-    if((firstLetter.hCollumn > _hDimension) || (firstLetter.hCollumn < 0))
+    if(firstLetter.hCollumn > _hDimension)
         return false;
 
     if(orientation == "V") {
-        if ((firstLetter.vLine + wordLen > _vDimension) || (firstLetter.vLine + wordLen < 0))
+        if (firstLetter.vLine + wordLen > _vDimension)
             return false;
     }
 
     if(orientation == "H") {
-        if((firstLetter.hCollumn + wordLen > _hDimension) || (firstLetter.hCollumn + wordLen < 0))
+        if(firstLetter.hCollumn + wordLen > _hDimension)
             return false;
     }
 
@@ -297,8 +272,7 @@ bool Board::wordSpaces(codedWord word) {
     if(word.orientation == "V") {
 
         for (size_t i = 0; i < word.word.size(); i++) {
-            if (i == 0 &&
-                (getIndex(word.firstCoord).vLine - 1 <= _vDimension - 1 && getIndex(word.firstCoord).vLine - 1 >= 0)) {
+            if (i == 0 && (getIndex(word.firstCoord).vLine - 1 <= _vDimension - 1)) {
                 if (_letters[getIndex(word.firstCoord).vLine + i - 1][getIndex(word.firstCoord).hCollumn] != ' ')
                     return false;
             }
@@ -309,14 +283,12 @@ bool Board::wordSpaces(codedWord word) {
             }
 
             if (_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn] != word.word[i]) {
-                if (getIndex(word.firstCoord).hCollumn + 1 <= _hDimension - 1 &&
-                    getIndex(word.firstCoord).hCollumn + 1 >= 0) {
+                if (getIndex(word.firstCoord).hCollumn + 1 <= _hDimension - 1) {
                     if (_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn + 1] != ' ')
                         return false;
                 }
 
-                if (getIndex(word.firstCoord).hCollumn - 1 <= _hDimension - 1 &&
-                    getIndex(word.firstCoord).hCollumn - 1 >= 0) {
+                if (getIndex(word.firstCoord).hCollumn - 1 <= _hDimension - 1) {
                     if (_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn - 1] != ' ')
                         return false;
 
@@ -327,8 +299,7 @@ bool Board::wordSpaces(codedWord word) {
 
     if(word.orientation == "H") {
         for (size_t i = 0; i < word.word.size(); i++) {
-            if (i == 0 &&
-                (getIndex(word.firstCoord).hCollumn - 1 <= _hDimension - 1 && getIndex(word.firstCoord).hCollumn - 1 >= 0)) {
+            if (i == 0 && (getIndex(word.firstCoord).hCollumn - 1 <= _hDimension - 1)) {
                 if (_letters[getIndex(word.firstCoord).vLine][getIndex(word.firstCoord).hCollumn + i - 1] != ' ')
                     return false;
             }
@@ -339,14 +310,12 @@ bool Board::wordSpaces(codedWord word) {
             }
 
             if (_letters[getIndex(word.firstCoord).vLine][getIndex(word.firstCoord).hCollumn + i] != word.word[i]) {
-                if (getIndex(word.firstCoord).vLine + 1 <= _vDimension - 1 &&
-                    getIndex(word.firstCoord).vLine + 1 >= 0) {
+                if (getIndex(word.firstCoord).vLine + 1 <= _vDimension - 1) {
                     if (_letters[getIndex(word.firstCoord).vLine + 1][getIndex(word.firstCoord).hCollumn + i] != ' ')
                         return false;
                 }
 
-                if (getIndex(word.firstCoord).vLine - 1 <= _vDimension - 1 &&
-                    getIndex(word.firstCoord).vLine - 1 >= 0) {
+                if (getIndex(word.firstCoord).vLine - 1 <= _vDimension - 1) {
                     if (_letters[getIndex(word.firstCoord).vLine - 1][getIndex(word.firstCoord).hCollumn + i] != ' ')
                         return false;
 

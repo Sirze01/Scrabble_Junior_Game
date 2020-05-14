@@ -20,8 +20,7 @@ struct codedWord{
 
 class Board {
 public:
-    Board();
-	Board(int nLines, int nCollumns);
+	Board(size_t nLines = 10, size_t nColumns = 10);
     Board(std::string filename);
     void show() const;
 	coord getIndex(std::string position) const;
