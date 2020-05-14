@@ -25,6 +25,9 @@ commandInterpreter::commandInterpreter(std::string command) {
     else if ((cmd == "add") or (cmd == "a"))
         _command = "add";
 
+    else if ((cmd == "remove") or (cmd == "r"))
+        _command = "remove";
+
     else if ((cmd == "export") or (cmd == "e"))
         _command = "export";
 
@@ -57,6 +60,9 @@ void commandInterpreter::edit(std::string command) {
 
     else if ((cmd == "add") or (cmd == "a"))
         _command = "add";
+
+    else if ((cmd == "remove") or (cmd == "r"))
+        _command = "remove";
 
     else if ((cmd == "export") or (cmd == "e"))
         _command = "export";
@@ -120,6 +126,14 @@ bool commandInterpreter::interpret(int &last) {
         }
     }
 
+    else if (_command == "remove") {
+        if (cmdRemove(last))
+            last = 0;
+        else{
+            return false;
+        }
+    }
+
     else if (_command == "export"){
             if(cmdExport())
                 last = 0;
@@ -149,7 +163,7 @@ bool commandInterpreter::interpret(int &last) {
 }
 
 
-void commandInterpreter::cmdHelp() {
+void commandInterpreter::cmdHelp() const{
     std::cout << std::string(2, '\n');
     std::cout << stringWriter(100, "### Help Page - List of all available commands", 2);
     std::cout << std::string(1, '\n');
@@ -224,7 +238,6 @@ bool commandInterpreter::cmdNew() {
     std::string userInput;
 
 
-
     if (_modifiers.empty()) {
         std::cout << std::string(1, '\n');
         std::cout << stringWriter(100, "What dimensions should the board be? (Height x Width)", 2);
@@ -285,6 +298,12 @@ bool commandInterpreter::cmdNew() {
         std::getline(std::cin, userInput);
         _name = userInput;
     }
+
+    if (std::stoi(vTemp) > _board.getAlphabet().size() || std::stoi(hTemp) > _board.getAlphabet().size()){
+        std::cout << std::string(1, '\n') << "The board you're trying to create is just too big. Create one up to 26x26" << std::endl;
+        return false;
+    }
+
 
     Board newBoard(std::stoi(vTemp), std::stoi(hTemp));
     _board = newBoard;
@@ -363,10 +382,9 @@ bool commandInterpreter::cmdAdd(int &last) {
             return false;
         }
         if(!_modifiers.empty()) {
-            newEntry.orientation = _modifiers.substr(1, 1);
+            newEntry.orientation = toupper(_modifiers.substr(1, 1).at(0));
             _modifiers.erase(0, 2);
-            if(!((newEntry.orientation.size() == 1) && ((newEntry.orientation == "H") || (newEntry.orientation == "V") ||
-                                                        (newEntry.orientation == "h") || (newEntry.orientation == "v")))){
+            if(!((newEntry.orientation == 'H') || (newEntry.orientation == 'V'))){
                 last = -3;
                 return false;
             }
@@ -394,8 +412,9 @@ bool commandInterpreter::cmdAdd(int &last) {
         } while (!((newEntry.firstCoord.size() == 2) && isAlpha(newEntry.firstCoord)));
     }
 
-    if(newEntry.orientation.empty()){
+    if(newEntry.orientation == '\0'){
         int temp = 0;
+        std::string wdtemp;
         do {
             if(temp)
                 std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Your input is invalid, try again" << std::endl;
@@ -403,9 +422,9 @@ bool commandInterpreter::cmdAdd(int &last) {
                 std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the desired orientation" << std::endl;
             temp++;
             std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Orientation: ";
-            getline(std::cin, newEntry.orientation);
-        } while (!((newEntry.orientation.size() == 1) && ((newEntry.orientation == "H") ||
-        (newEntry.orientation == "V") || (newEntry.orientation == "h") || (newEntry.orientation == "v"))));
+            getline(std::cin, wdtemp);
+            newEntry.orientation = toupper(wdtemp.substr(0).at(0));
+        } while (!(newEntry.orientation == 'H') || (newEntry.orientation == 'V'));
     }
 
     if(newEntry.word.empty()){
@@ -423,8 +442,16 @@ bool commandInterpreter::cmdAdd(int &last) {
 
     newEntry.firstCoord[0] = toupper(newEntry.firstCoord[0]);
     newEntry.firstCoord[1] = tolower(newEntry.firstCoord[1]);
-    for(auto &letter : newEntry.orientation) letter = toupper(letter);
     for(auto &letter : newEntry.word) letter = tolower(letter);
+
+    for (auto &entry : _board.getWords()){
+        if (entry.word == newEntry.word){
+            last = -3;
+            std::cout << stringWriter(100, "The word you're trying to add is already in the board",
+                                                 BOARD_LEFT_PADDING) << std::endl;
+            return false;
+        }
+    }
 
     // Binary search
     bool inDict = std::binary_search(_dict.begin(), _dict.end(), newEntry.word);
@@ -441,7 +468,7 @@ bool commandInterpreter::cmdAdd(int &last) {
         std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Word is out of range! Try another one." << std::endl;
         retValue = false;
     }
-    else if(!(_board.goodIntersects(newEntry))){
+    else if(!(_board.checkIntersection(newEntry))){
         last = -2;
         std::cout <<stringWriter(100, "The word you're trying to add intersects with another in the wrong letter",
                                  BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
@@ -460,16 +487,16 @@ bool commandInterpreter::cmdAdd(int &last) {
         int v, h;
         v = temp.vLine;
         h = temp.hCollumn;
-        if (newEntry.orientation == "V"){
+        if (newEntry.orientation == 'V'){
             for(int i = 0; i < newEntry.word.size(); i++){
                 temp.vLine = v + i;
-                _board.lettersManip(temp, newEntry.word[i]);
+                _board.placeChar(temp, newEntry.word[i]);
             }
         }
         else{
             for(int i = 0; i < newEntry.word.size(); i++){
                 temp.hCollumn = h + i;
-                _board.lettersManip(temp, newEntry.word[i]);
+                _board.placeChar(temp, newEntry.word[i]);
             }
         }
         _board.addWord(newEntry);
@@ -478,8 +505,54 @@ bool commandInterpreter::cmdAdd(int &last) {
     return retValue;
 }
 
+bool commandInterpreter::cmdRemove(int &last){
+    if (!_state) {
+        std::cout
+                << stringWriter(100, "You need to be editing a board to run this command. Import or create a new one!",
+                                2);
+        return false;
+    }
 
-bool commandInterpreter::cmdExport() {
+    if(_modifiers.empty()) {
+        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Word: ";
+        getline(std::cin, _modifiers);
+        for (auto &letter : _modifiers) letter = toupper(letter);
+    }
+
+    codedWord wordToRemove = _board.findWord(_modifiers);
+    if( wordToRemove.word == "") {
+        last = -2;
+        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "The word you trying to remove doesn't exist, try again"
+                  << std::endl;
+        return false;
+    }
+
+    if(_board.checkIntersection(wordToRemove)){
+
+    }
+    else{
+        coord temp = _board.getIndex(wordToRemove.firstCoord);
+        int v, h;
+        v = temp.vLine;
+        h = temp.hCollumn;
+        if (wordToRemove.orientation == 'V'){
+            for(int i = 0; i < wordToRemove.word.size(); i++){
+                temp.vLine = v + i;
+                _board.placeChar(temp, ' ');
+            }
+        }
+        else{
+            for(int i = 0; i < wordToRemove.word.size(); i++){
+                temp.hCollumn = h + i;
+                _board.placeChar(temp, ' ');
+            }
+        }
+    }
+    _board.removeWord(wordToRemove);
+    return true;
+}
+
+bool commandInterpreter::cmdExport() const{
     _board.fileExport((_name + ".txt"));
     return true;
 }

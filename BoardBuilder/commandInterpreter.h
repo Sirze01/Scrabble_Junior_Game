@@ -19,13 +19,15 @@ private:
     std::vector<std::string> _dict;
     std::string _name;
     Board _board;
-    void cmdHelp();
+    void cmdHelp() const;
     bool cmdDict();
     bool cmdNew();
     bool cmdImport();
     bool cmdAdd(int &last);
-    bool cmdExport();
+    bool cmdRemove(int &last);
+    bool cmdExport() const;
     void cmdDelete(int &last);
     void cmdExit(int &last);
+
 };
 

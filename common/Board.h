@@ -7,14 +7,15 @@
 #include "../common/StringProcess.h"
 
 struct coord{
-    int vLine;
-    int hCollumn;
+    size_t vLine;
+    size_t hCollumn;
 };
 
 struct codedWord{
     std::string firstCoord;
-    std::string orientation;
+    char orientation = '\0';
     std::string word;
+    std::vector<coord> intersections;
 
 };
 
@@ -32,13 +33,20 @@ public:
     std::vector<char> getNonEmptyChars() const;
     std::vector<std::vector<bool>> getHighlights() const;
     coord getDimensions() const;
-    bool boardBounds(coord firstLetter, std::string orientation = "H", int wordLen = 0);
-    bool goodIntersects(codedWord);
-    void lettersManip(coord inates, char letter);
+    bool boardBounds(coord firstLetter, char orientation = 'H', int wordLen = 0);
+    void placeChar(coord inates, char character);
     void addWord(codedWord word);
     bool wordSpaces(codedWord word);
+    std::string getAlphabet() const;
+    std::vector<codedWord> getWords() const;
+    //Testing
+    void removeWord(codedWord word);
+    codedWord findWord (std::string word) const;
+    void removeLetter(coord inates, char letter);
+    bool checkIntersection(codedWord);
 
 private:
+    std::string _alphabet = "abcdefghijklmnopqrstuvwxyz";
     std::vector<std::vector<bool>> _highlights;
     std::vector<std::vector<int>> _highlightColors;
     std::vector<std::vector<char>> _letters;
