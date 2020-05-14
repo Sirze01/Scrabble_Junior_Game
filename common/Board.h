@@ -7,8 +7,8 @@
 #include "../common/StringProcess.h"
 
 struct coord{
-    int vLine;
-    int hCollumn;
+    size_t vLine;
+    size_t hCollumn;
 };
 
 struct codedWord{
@@ -43,7 +43,7 @@ private:
     std::vector<std::vector<int>> _highlightColors;
     std::vector<std::vector<char>> _letters;
     std::vector<codedWord> _words;
-    int _vDimension;
-    int _hDimension;
+    size_t _vDimension;
+    size_t _hDimension;
 };
 
