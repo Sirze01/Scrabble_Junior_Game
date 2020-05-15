@@ -6,13 +6,14 @@
 #include <chrono>
 #include "../common/ConsoleSetup.h"
 
-Player::Player(Pool *pool, const std::string &name, int color) {
+Player::Player(Pool *pool, const std::string &name, int color, bool isBot) {
     int handSize = 7;
-    _mayPass = 0;
+    _hasPassed = 0;
     _score = 0;
     _color = color;
     _exchangeCount = 0;
     _name = name;
+    _isBot = isBot;
 	stripSpaces(_name);
     _hand.resize(handSize);
     pool->shuffle();
@@ -28,16 +29,13 @@ std::string Player::getName() const {
 }
 
 void Player::showHand(std::ostream &output, bool color) const {
-    if (!getActualHandSize()) {
+    if (!getHandSize()) {
         output << "Nothing on hand\n";
         return;
     }
     for (const auto &i : _hand) {
-        if (i == ' ') continue;
-        else {
-            if (color) outputBackForeColor(output, WHITE, _color, i);
-            else output << i;
-        }
+        if (color) outputBackForeColor(output, WHITE, _color, i);
+        else output << i;
         output << " ";
     }
     output << "\n";
@@ -64,8 +62,11 @@ bool Player::takeRandom(int handPos, Pool *pool) {
 
     if (handPos > maxPos || handPos < 0) return false;
 
-    _hand.at(handPos) = ' '; //even if the pool is empty, remove from hand (endgame situations)
-    if (!poolSize) return false;
+    //_hand.at(handPos) = SPACE; //even if the pool is empty, remove from hand (endgame situations)
+    if (!poolSize) {
+        _hand.erase(_hand.begin() + handPos);
+        return false;
+    }
 
     int randomPoolPos = randomBetween(0, poolSize - 1);
     _hand.at(handPos) = pool->getAllLetters().at(randomPoolPos);
@@ -98,11 +99,12 @@ bool Player::mayMove(const Board *board) const{
 
 coord Player::getPossibleMovePos(const Board* board) const {
     coord boardDim = board->getDimensions();
+    std::vector<std::vector<char>> boardLetters = board->getLetters();
 
     for (size_t line = 0; line < boardDim.vLine; ++line) {
         for (size_t col = 0; col < boardDim.hCollumn; ++col) {
             coord testPosition = { line,col };
-            char letter = board->getLetters().at(line).at(col);
+            char letter = boardLetters.at(line).at(col);
             const Move tryMove(testPosition, letter, board);
 
             if (!tryMove.hasProblems(this)) return testPosition;
@@ -119,22 +121,26 @@ int Player::getExchangeCount() const {
     return _exchangeCount;
 }
 
-bool Player::getMayPass() const {
-    return _mayPass;
+bool Player::getHasPassed() const {
+    return _hasPassed;
 }
 
 void Player::forcePass() {
-    _mayPass = true;
+    _hasPassed = true;
 }
 
 void Player::doNotPass() {
-    _mayPass = false;
+    _hasPassed = false;
 }
 
-int Player::getActualHandSize() const {
-    int count = 0;
-    for (const auto &letter : _hand) {
-        if (letter != ' ') count++;
-    }
-    return count;
+int Player::getHandSize() const {
+    return _hand.size();
+}
+
+bool Player::isBot() const {
+    return _isBot;
+}
+
+std::vector<char> Player::getHand() const {
+    return _hand;
 }

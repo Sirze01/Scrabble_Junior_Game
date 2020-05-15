@@ -13,7 +13,7 @@ bool Command::isMove() const {
 	return (_str.size() == 4) &&
 		std::isalpha(_str.at(0)) &&
 		std::isalpha(_str.at(1)) &&
-		_str.at(2) == ' ' &&
+		_str.at(2) == SPACE &&
 		std::isalpha(_str.at(3));
 }
 

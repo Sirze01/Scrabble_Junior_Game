@@ -1,15 +1,8 @@
 #include "../common/StringProcess.h"
+#include "../common/ConsoleSetup.h"
 #include <string>
 #include <vector>
 #include <algorithm>
-
-extern unsigned const SEED;
-extern std::mt19937 RANDOM_GENERATOR;
-
-int randomBetween(int lowerBound, int upperBound) {
-    std::uniform_int_distribution<int> distribution{ lowerBound, upperBound };
-    return distribution(RANDOM_GENERATOR);
-}
 
 void lowerCase(std::string &command) {
     for (auto& i : command) i = static_cast<char>(std::tolower(i));
@@ -17,12 +10,12 @@ void lowerCase(std::string &command) {
 
 void stripSpaces(std::string &name) {
     for (size_t i = 0; i < name.length(); i++) {
-        if (name.at(i) == ' ') {
+        if (name.at(i) == SPACE) {
             if (i == name.length() - 1) {
                 name.erase(i, 1);
                 break;
             }
-            else if (i == 0 || name.at(i + 1) == ' ') {
+            else if (i == 0 || name.at(i + 1) == SPACE) {
                 name.erase(i, 1);
                 i--;
             }
@@ -38,17 +31,18 @@ void upperNameInitials(std::string &name) {
             name.at(i) = static_cast<char>(toupper(name.at(i)));
             doUpper = false;
         }
-        else if (name.at(i) == ' ') doUpper = true;
+        else if (name.at(i) == SPACE) doUpper = true;
     }
 }
 
-void stripSpecialChars(std::string &name) {
+void stripSpecialChars(std::string &name, bool acceptDigits) {
     std::string cleanStr;
-    for (char c : name) {
-        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ') {
+    for (const char &c : name) {
+        if (std::isalpha(c) || c == SPACE || (acceptDigits && std::isdigit(c))) {
             cleanStr.push_back(c);
         }
     }
+    name = cleanStr;
 }
 
 
@@ -63,7 +57,7 @@ std::string stringWriter(size_t text_width, std::string text, int padding = 0) {
     std::string output_str;
 
     while (!text.empty()) {
-        output_str += std::string(padding, ' ');
+        output_str += std::string(padding, SPACE);
         if (text.size() <= text_width) {
             output_str += (text + '\n');
             text.erase(0, text.size());
@@ -72,7 +66,7 @@ std::string stringWriter(size_t text_width, std::string text, int padding = 0) {
 
         charNbr = text_width - 1;
         if (text.at(charNbr) == '.' || text.at(charNbr) == ',' || text.at(charNbr) == '!' || text.at(charNbr) == '?' ||
-            text.at(charNbr) == ';' || text.at(charNbr) == ' ') {
+            text.at(charNbr) == ';' || text.at(charNbr) == SPACE) {
             output_str += (text.substr(0, charNbr + 1) + '\n');
             text.erase(0, charNbr + 1);
             continue;
@@ -80,7 +74,7 @@ std::string stringWriter(size_t text_width, std::string text, int padding = 0) {
 
 
         if (isalnum(charNbr)) {
-            if (text.at(charNbr + 1) == ' ') {
+            if (text.at(charNbr + 1) == SPACE) {
                 output_str += (text.substr(0, charNbr + 1) + '\n');
                 text.erase(0, charNbr + 1);
                 text.erase(0, 1);
@@ -134,12 +128,20 @@ std::string smartCommandAdvice(const std::string &command) {
     }
 }
     
-bool isAlpha(const std::string &toTest) {
-    for(const auto &letter : toTest) if(!std::isalpha(letter)) return false;
-    return true;
+bool isAlpha(const std::string &toTest, bool acceptSpaces) {
+    for (const auto& letter : toTest) {
+        if (!std::isalpha(letter)) {
+            if (letter == SPACE) {
+                if (acceptSpaces) continue;
+                else return false;
+            }
+            else return false;
+        }
+    }
+    return toTest.size();
 }
 
 bool isDigit(const std::string &toTest) {
     for (const auto &letter : toTest) if (!std::isdigit(letter)) return false;
-    return true;
+    return toTest.size();
 }

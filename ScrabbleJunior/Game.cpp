@@ -1,14 +1,16 @@
 #include "Game.h"
 #include "../common/ConsoleSetup.h"
 
-Game::Game(Board* board, const std::vector<std::string> &playerNames, const std::vector<int> &playerForeColors, int firstToMove) {
+Game::Game(Board* board, const std::vector<std::string> &playerNames,
+	const std::vector<int> &playerForeColors, const std::vector<bool> botFlags, int firstToMove) {
+
 	_nPlayers = playerNames.size();
 	_board = board;
 	_pool = new Pool(board);
 	_playerForeColors = playerForeColors;
 
 	for (int i = 0; i < _nPlayers;++i) {
-		Player* player = new Player(_pool, playerNames.at(i), playerForeColors.at(i));
+		Player* player = new Player(_pool, playerNames.at(i), playerForeColors.at(i), botFlags.at(i));
 		_players.push_back(player);
 	}
 
@@ -34,21 +36,52 @@ void Game::showBoardAndCardView(const std::string &view, bool showTurnInfo) cons
 }
 
 void Game::askCommand(int turnNumber) {
-	_currentPlayer->resetExchangeCount();
 
-	std::string commandPrompt, regularMessage, input;
 	std::vector<std::string> coloredMessage;
 	int playerColor = _currentPlayer->getColor();
+	std::string name = _currentPlayer->getName();
 
-	if (_currentPlayer->getMayPass()) {
+	if (_currentPlayer->isBot()) {
+
+		if (!(_currentPlayer->getHasPassed() && turnNumber == 2) && _currentPlayer->getHandSize() && _pool->getCurrentSize() && !_currentPlayer->mayMove(_board)) {
+			int handPos = randomBetween(0, _currentPlayer->getHandSize() - 1);
+			char letter = _currentPlayer->getHand().at(handPos);
+			_currentPlayer->exchange(letter, _pool); //try to exchange one letter silently
+			char newLetter = _currentPlayer->getHand().at(handPos);
+			coloredMessage.push_back(name + " exchanged letter " + std::string(1,letter) + " from the pool and got letter " + std::string(1,newLetter) + ".");
+			coloredMessage.push_back(std::string(1,SPACE));
+		}
+
+		if (_currentPlayer->mayMove(_board)) {
+			showBoardAndCardView();
+			if (_currentPlayer->getHasPassed()) _currentPlayer->doNotPass();
+			const coord pos = _currentPlayer->getPossibleMovePos(_board);
+			char letter = _board->getLetters().at(pos.vLine).at(pos.hCollumn);
+			const Move move(pos, letter, _board);
+			move.execute(_currentPlayer,_board,_pool);
+			coloredMessage.push_back(name + " will play " + _board->getPositionString(pos) + std::string(1,SPACE) + std::string(1,letter) + ".");
+		}
+		else {
+			_currentPlayer->forcePass();
+			if (turnNumber == 1) {
+				showBoardAndCardView();
+				coloredMessage.push_back(name + " cannot move and thus will pass his move.");
+			}
+			else return;
+		}
+	}
+
+	_currentPlayer->resetExchangeCount();
+
+	if (_currentPlayer->getHasPassed() && !_currentPlayer->isBot()) {
 		bool ableToMove = _currentPlayer->mayMove(_board);
 		if (ableToMove) {
 			_currentPlayer->doNotPass();
 		}
 		else {
-			if (turnNumber == 1) {
+			if (turnNumber == 1 && !coloredMessage.size()) {
 				coloredMessage = {
-					_currentPlayer->getName() + ", you still cannot move.",
+					name + ", you still cannot move.",
 					"We will skip your turn automatically.",
 				};
 			}
@@ -56,21 +89,22 @@ void Game::askCommand(int turnNumber) {
 		}
 	}
 
-	if (!_currentPlayer->getActualHandSize() && !coloredMessage.size()) { //player has nothing on hand
+	if (!_currentPlayer->getHandSize() && !coloredMessage.size()) { //player has nothing on hand
 		_currentPlayer->forcePass();
 		coloredMessage = {
-			_currentPlayer->getName() + ", you have nothing on your hand.",
+			name + ", you have nothing on your hand.",
 			"Your turn will be skipped as long as you cannot move."
 		};
 	}
 
-	showBoardAndCardView();
+	if (!_currentPlayer->isBot()) showBoardAndCardView();
+	std::string commandPrompt, regularMessage, input;
 
 	for (;;) {
 
-		if (!coloredMessage.size()) {
+		if (!coloredMessage.size() && !_currentPlayer->isBot()) {
 
-			commandPrompt = "(turn " + std::to_string(turnNumber) + ") " + _currentPlayer->getName() + ": ";
+			commandPrompt = "(turn " + std::to_string(turnNumber) + ") " + name + ": ";
 			regularMessage = "", coloredMessage = {};
 
 			paddingAndTopic(playerColor,true);
@@ -149,10 +183,7 @@ void Game::askCommand(int turnNumber) {
 						regularMessage = "Maybe you can't move right now...";
 					}
 					else {
-						regularMessage = "Look carefully at the board on position ";
-						regularMessage += (char)('A' + pos.vLine);
-						regularMessage += (char)('a' + pos.hCollumn);
-						regularMessage += "...";
+						regularMessage = "Look carefully at the board on position " + _board->getPositionString(pos) + "...";
 					}
 				}
 				else if (command.isPass()) {
@@ -181,9 +212,15 @@ void Game::askCommand(int turnNumber) {
 		if (coloredMessage.size()) {
 			coloredMessage.push_back("Press enter to continue. ");
 			std::cout << "\n";
-			for (auto i : coloredMessage) {
-				paddingAndTopic(playerColor, false);
-				std::cout << i << "\n";
+			for (const auto &i : coloredMessage) {
+				if (i == std::string(1, SPACE)) {
+					std::cout << "\n";
+					continue;
+				}
+				else {
+					paddingAndTopic(playerColor, false);
+					std::cout << i << "\n";
+				}
 			}
 			askEnter();
 			return;
@@ -199,12 +236,13 @@ void Game::nextTurn() {
 
 bool Game::allPlayersMustPass() const {
 	for (const Player* player : _players) {
-		if (!player->getMayPass()) return false;
+		if (!player->getHasPassed()) return false;
 	}
 	return true;
 }
 
 bool Game::hasFinished() const {
+	if (allHighlighted()) return true;
 	for (const auto& player : _players) {
 		if (player->mayMove(_board)) return false;
 	}
@@ -241,7 +279,7 @@ void Game::showPlayerInfo(const std::string &info, bool showTurnInfo) const {
 
 		if (showTurnInfo) {
 			if (i == _currentPlayerPos) toWrite << " - to play!";
-			else if (player->getMayPass()) toWrite << " - passed last turn";
+			else if (player->getHasPassed()) toWrite << " - passed last turn";
 		}
 		toWrite << "\n";
 
@@ -342,4 +380,19 @@ void Game::showEndMessage() const {
 
 	paddingAndTopic(WHITE, true); std::cout << "Press enter twice to exit.\n";
 	int i = 2; while (i--) askEnter();
+}
+
+bool Game::allHighlighted() const {
+	coord boardDim = _board->getDimensions();
+	std::vector<std::vector<char>> boardLetters = _board->getLetters();
+	std::vector<std::vector<bool>> boardHighlights = _board->getHighlights();
+
+	for (size_t line = 0; line < boardDim.vLine; ++line) {
+		for (size_t col = 0; col < boardDim.hCollumn; ++col) {
+			char letter = boardLetters.at(line).at(col);
+			if (letter == SPACE) continue;
+			if (!boardHighlights.at(line).at(col)) return false;
+		}
+	}
+	return true;
 }

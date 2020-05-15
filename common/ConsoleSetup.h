@@ -33,7 +33,9 @@
 
 #endif
 
-const char TOPIC = '|';
+const char
+TOPIC = '|',
+SPACE = ' ';
 
 //card view
 const int
@@ -54,7 +56,7 @@ const size_t
 IMPOSSIBLE_MOVE_COORD = SIZE_MAX;
 
 const std::string
-LEFT_PADDING_STR(BOARD_LEFT_PADDING, ' ');
+LEFT_PADDING_STR(BOARD_LEFT_PADDING, SPACE);
 
 //define 8-bit colors
 constexpr int

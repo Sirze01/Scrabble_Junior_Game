@@ -67,7 +67,7 @@ bool Move::inBounds() const {
 }
 
 bool Move::letterMatch() const {
-    return _letter != ' '  && _letter == _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn);
+    return _letter != SPACE  && _letter == _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn);
 }
 
 bool Move::singleCharWordOnLine() const {
@@ -79,11 +79,11 @@ bool Move::singleCharWordOnCol() const {
 }
 
 bool Move::startOnLine() const {
-	return _posToMove.hCollumn == 0 || _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn - 1) == ' ';
+	return _posToMove.hCollumn == 0 || _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn - 1) == SPACE;
 }
 
 bool Move::startOnCol() const {
-	return _posToMove.vLine == 0 || _boardLetters.at(_posToMove.vLine - 1).at(_posToMove.hCollumn) == ' ';
+	return _posToMove.vLine == 0 || _boardLetters.at(_posToMove.vLine - 1).at(_posToMove.hCollumn) == SPACE;
 }
 
 
@@ -109,10 +109,10 @@ bool Move::wordCompletionOnCol(int cof) const {
 	else if (cof != -1 && cof != 1) return false;
 
 	bool completion = true; int line = _posToMove.vLine;
-	for (int i = line + cof; i >= 0 && i <= _maxLine; i+=cof) {
+	for (int i = line + cof; i >= 0 && i <= static_cast<int>(_maxLine); i+=cof) {
 		if (!_boardHighlights.at(i).at(_posToMove.hCollumn)) {
 
-			if (_boardLetters.at(i).at(_posToMove.hCollumn) == ' ') {
+			if (_boardLetters.at(i).at(_posToMove.hCollumn) == SPACE) {
 				break;
 			}
 			else {
@@ -130,10 +130,10 @@ bool Move::wordCompletionOnLine(int cof) const {
 	else if (cof != -1 && cof != 1) return false;
 
 	bool completion = true; int col = _posToMove.hCollumn;
-	for (int i = col + cof; i >= 0 && i <= _maxCol; i += cof) {
+	for (int i = col + cof; i >= 0 && i <= static_cast<int>(_maxCol); i += cof) {
 		if (!_boardHighlights.at(_posToMove.vLine).at(i)) {
 
-			if (_boardLetters.at(_posToMove.vLine).at(i) == ' ') {
+			if (_boardLetters.at(_posToMove.vLine).at(i) == SPACE) {
 				break;
 			}
 			else {
