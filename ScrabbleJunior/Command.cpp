@@ -1,8 +1,7 @@
 #include "Command.h"
 #include <string>
 
-Command::Command(std::string &userInput) {
-	_str = userInput;
+Command::Command(const std::string& userInput) : _str{ userInput } {
 	stripSpecialChars(_str);
 	lowerCase(_str);
 	stripCommandBloat(_str);
@@ -17,13 +16,11 @@ bool Command::isMove() const {
 		std::isalpha(_str.at(3));
 }
 
-coord Command::getMovePos(const Board *board) const {
-	if (!isMove()) return { IMPOSSIBLE_MOVE_COORD, IMPOSSIBLE_MOVE_COORD };
-	return board->getIndex(_str.substr(0, 2));
+coord Command::getMovePos(const Board &board) const {
+	return board.getIndex(_str.substr(0, 2));
 }
 
 char Command::getMoveLetter() const {
-	if (!isMove()) return '?';
 	return static_cast<char>(toupper(_str.at(3)));
 }
 
@@ -35,13 +32,13 @@ bool Command::isExchange(bool forceToken) const {
 	bool hasExchange = _str.find("exchange") != std::string::npos;
 	if (!forceToken) return hasExchange;
 
+	//must be of the form 'exchange <letter>'
 	return hasExchange
 		&& _str.size() == std::string("exchange").size() + 2
 		&& std::isalpha(_str.at(_str.size()-1));
 }
 
 char Command::getExchangeLetter() const {
-	if (!isExchange()) return '?';
 	return static_cast<char>(toupper(_str.at(_str.size() - 1)));
 }
 

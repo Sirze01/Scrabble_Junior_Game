@@ -12,19 +12,14 @@ int randomBetween(int lowerBound, int upperBound) {
 	return distribution(RANDOM_GENERATOR);
 }
 
-Pool::Pool(const Board *board) {
-	_letters = board->getNonEmptyChars();
+Pool::Pool(const Board &board) : _letters{board.getNonEmptyChars()} {}
+
+void Pool::take(int pos) {
+	_letters.erase(_letters.begin() + pos);
 }
 
-bool Pool::take(int pos) {
-	if (pos > getCurrentSize() || pos < 0) return false;
-	else _letters.erase(_letters.begin() + pos);
-	return true;
-}
-
-bool Pool::include(char letter) {
+void Pool::include(char letter) {
 	_letters.push_back(letter);
-	return true;
 }
 
 std::vector<char> Pool::getAllLetters() const {

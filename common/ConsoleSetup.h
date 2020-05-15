@@ -35,7 +35,8 @@
 
 const char
 TOPIC = '|',
-SPACE = ' ';
+SPACE = ' ',
+ARROW = '>';
 
 //card view
 const int

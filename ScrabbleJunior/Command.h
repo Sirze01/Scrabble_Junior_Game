@@ -8,8 +8,8 @@
 
 class Command {
 public:
-	Command(std::string &userInput);
-    coord getMovePos(const Board *board) const;
+	Command(const std::string &userInput);
+    coord getMovePos(const Board &board) const;
 	char getMoveLetter() const;
 	char getExchangeLetter() const;
 	std::string getStr() const;

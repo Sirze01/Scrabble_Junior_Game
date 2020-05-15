@@ -1,33 +1,28 @@
 #include "Move.h"
 #include "Command.h"
 
-
-Move::Move(const Command *command, const Board *board) {
-	_posToMove = command->getMovePos(board);
-	_letter = command->getMoveLetter();
-	_maxCol = board->getDimensions().hColumn - 1;
-	_maxLine = board->getDimensions().vLine - 1;
-	_boardLetters = board->getLetters();
-	_boardHighlights = board->getHighlights();
+Move::Move(const Command &command, const Board &board):
+	_maxCol{ board.getDimensions().hColumn - 1 }, _maxLine{board.getDimensions().vLine - 1 },
+	_boardLetters{ board.getLetters() }, _boardHighlights{ board.getHighlights() },
+	_posToMove{ command.getMovePos(board) }, _letter{ command.getMoveLetter() }
+{
 }
 
-Move::Move(const coord pos, char letter, const Board *board) {
-	_posToMove = pos;
-	_letter = letter;
-	_maxCol = board->getDimensions().hColumn - 1;
-	_maxLine = board->getDimensions().vLine - 1;
-	_boardLetters = board->getLetters();
-	_boardHighlights = board->getHighlights();
+Move::Move(const coord &pos, char letter, const Board &board) :
+	_maxCol{ board.getDimensions().hColumn - 1 }, _maxLine{ board.getDimensions().vLine - 1 },
+	_boardLetters{ board.getLetters() }, _boardHighlights{ board.getHighlights() },
+	_posToMove{ pos }, _letter{ letter }
+{
 }
 
-int Move::hasProblems(const Player *player) const {
+int Move::hasProblems(const Player &player) const {
 	if (!inBounds()) {
 		return 1;
 	}
 	if (!letterMatch()) {
 		return 2;
 	}
-	if (!player->hasOnHand(_letter)) {
+	if (!player.hasOnHand(_letter)) {
 		return 3;
 	}
 	if (_boardHighlights.at(_posToMove.vLine).at(_posToMove.hColumn)) {
@@ -40,23 +35,19 @@ int Move::hasProblems(const Player *player) const {
 	return 5;
 }
 
-bool Move::execute(Player *player, Board *board, Pool *pool, bool checkValidity) const {
-	if (checkValidity && hasProblems(player)) return false;
+void Move::execute(Player &player, Board &board, Pool &pool) const {
+	int color = player.getColor();
+	board.highlight(color, _posToMove.vLine, _posToMove.hColumn);
 
-	int color = player->getColor();
-	board->highlight(color, _posToMove.vLine, _posToMove.hColumn);
+	player.takeRandom(player.getHandPosition(_letter),pool);
 
-	player->takeRandom(player->getHandPosition(_letter),pool);
+	auto scoreAction = [&]() { 	//add scores and highlight ("territory dominance" feature)
+		player.addScore();
+		board.highlightFinishedWord(player.getColor(), _posToMove.vLine, _posToMove.hColumn);
+	};
 	
-	//add scores and highlight ("territory dominance" feature)
-	if ( (continueOnLine() && finishOnLine() && !singleCharWordOnLine())
-		|| (continueOnCol() && finishOnCol() && !singleCharWordOnCol()) ) {
-		player->addScore();
-		board->highlightFinishedWord(player->getColor(), _posToMove.vLine, _posToMove.hColumn);
-	}
-
-	player->resetExchangeCount();
-	return true;
+	if (continueOnLine() && finishOnLine() && !singleCharWordOnLine()) scoreAction();
+	if (continueOnCol() && finishOnCol() && !singleCharWordOnCol()) scoreAction();
 }
 
 bool Move::inBounds() const {

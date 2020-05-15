@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <functional>
 
-
 //for shuffle purposes - should only be defined once
 unsigned const SEED = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
 std::mt19937 RANDOM_GENERATOR(SEED);
@@ -17,24 +16,25 @@ struct PlayerData {
 	bool isBot;
 };
 
-int askPlayFirst(const Board* board, int nPlayers, std::vector<std::string> playerNames, std::vector<int> playerColors) {
+int askPlayFirst(const Board &board, int nPlayers,
+	const std::vector<std::string> &playerNames, const std::vector<int> &playerColors) {
 	{
 		std::stringstream toWrite;
 		std::vector<std::string> sentences = {
-			"|Choose one of the players\n",
-			"|or type 'random' to randomize.\n\n",
+			"Choose one of the players\n",
+			"or type 'random' to randomize.\n\n",
 		};
 
-		for (auto& i : sentences) {
-			toWrite << i;
+		for (const auto& i : sentences) {
+			toWrite << TOPIC << i;
 		}
 
 		for (int i = 0; i < nPlayers; ++i) {
-			outputForeColor(toWrite, playerColors.at(i), '|');
-			toWrite << "-> " << playerNames.at(i) << "\n";
+			outputForeColor(toWrite, playerColors.at(i), TOPIC);
+			toWrite << ARROW << SPACE << playerNames.at(i) << "\n";
 		}
 
-		writeCardView(board->getDimensions().vLine, board->getDimensions().hColumn, toWrite);
+		writeCardView(board.getDimensions().vLine, board.getDimensions().hColumn, toWrite);
 	}
 
 	std::string playerName;
@@ -63,26 +63,26 @@ int askPlayFirst(const Board* board, int nPlayers, std::vector<std::string> play
 	return 0;
 }
 
-bool exists(std::string filename) {
+bool exists(const std::string &filename) {
 	std::ifstream file(filename);
 	return file.is_open();
 }
 
-std::string askBoardFileName(const Board* board) {
+std::string askBoardFileName(const Board &board) {
 	{
 		std::stringstream toWrite;
 		std::vector<std::string> sentences = {
-			"|Tip\n\n",
-			"|You can use our companion\n",
-			"|Board Builder program\n",
-			"|to create your own board!\n"
+			"Tip\n\n",
+			"You can use our companion\n",
+			"Board Builder program\n",
+			"to create your own board!\n"
 		};
 
 		for (std::string str : sentences) {
-			toWrite << str;
+			toWrite << TOPIC << str;
 		}
 
-		writeCardView(board->getDimensions().vLine, board->getDimensions().hColumn, toWrite);
+		writeCardView(board.getDimensions().vLine, board.getDimensions().hColumn, toWrite);
 	}
 
 	std::string fileName;
@@ -124,7 +124,8 @@ std::string askBoardFileName(const Board* board) {
 	return fileName;
 }
 
-PlayerData askPlayer(int position, const Board* board, std::vector<std::string> forbiddenNames, std::vector<int> forbiddenColors) {
+PlayerData askPlayer(int position, const Board& board,
+	const std::vector<std::string> &forbiddenNames, const std::vector<int> &forbiddenColors) {
 
 	std::string name, colorName;
 	bool isBot = false;
@@ -134,12 +135,12 @@ PlayerData askPlayer(int position, const Board* board, std::vector<std::string> 
 	{
 		std::stringstream toWrite;
 		std::vector<std::string> sentences = {
-			"|If you want this player to be a bot\n",
-			"|include 'Computer' or 'Bot' in his name.\n"
+			"If you want this player to be a bot\n",
+			"include 'Computer' or 'Bot' in his name.\n"
 		};
 
-		for (const auto& sentence : sentences) toWrite << sentence;
-		writeCardView(board->getDimensions().vLine, board->getDimensions().hColumn, toWrite);
+		for (const auto& sentence : sentences) toWrite << TOPIC << sentence;
+		writeCardView(board.getDimensions().vLine, board.getDimensions().hColumn, toWrite);
 	}
 
 	for (;;) { //ask name
@@ -180,14 +181,14 @@ PlayerData askPlayer(int position, const Board* board, std::vector<std::string> 
 		std::vector<int> colors = { RED,GREEN,BLUE,PINK,ORANGE };
 		std::vector<std::string> colorNames = { "RED","GREEN","BLUE","PINK","ORANGE" };
 
-		toWrite << "|" << colors.size() - forbiddenColors.size() << " colors available\n\n";
+		toWrite << TOPIC << colors.size() - forbiddenColors.size() << " colors available\n\n";
 
 		for (size_t i = 0; i < colors.size(); ++i) {
 			if (std::find(forbiddenColors.begin(), forbiddenColors.end(), colors.at(i)) != forbiddenColors.end()) continue;
 			outputForeColor(toWrite, colors.at(i), TOPIC);
-			toWrite << "-> " << colorNames.at(i) << "\n";
+			toWrite << ARROW << SPACE << colorNames.at(i) << "\n";
 		}
-		writeCardView(board->getDimensions().vLine, board->getDimensions().hColumn, toWrite);
+		writeCardView(board.getDimensions().vLine, board.getDimensions().hColumn, toWrite);
 	}
 
 
@@ -218,7 +219,7 @@ PlayerData askPlayer(int position, const Board* board, std::vector<std::string> 
 }
 
 int askNumberOfPlayers() {
-	std::string input; std::string errorMessage; int intInput;
+	std::string input; std::string errorMessage; int intInput = 0;
 
 	for (;;) {
 		paddingAndTopic(WHITE, true); std::cout << "Number of players: ";
@@ -242,8 +243,8 @@ int askNumberOfPlayers() {
 	return intInput;
 }
 
-void printIntro(Board* introBoard) {
-	introBoard->show();
+void printIntro(const Board& introBoard) {
+	introBoard.show();
 
 	std::vector<std::string> sentences = {
 	"Welcome to our Scrabble Junior Game!",
@@ -262,9 +263,9 @@ int main()
 {
 	setupConsole();
 
-	auto clearAndShowBoard = [](Board* board) {
+	auto clearAndShowBoard = [](Board& board) {
 		clearConsole();
-		board->show();
+		board.show();
 	};
 
 	Board introBoard("intro_board.txt");
@@ -274,25 +275,25 @@ int main()
 	std::vector<int> playerColors;
 	std::vector<bool> botFlags;
 
-	printIntro(&introBoard); clearAndShowBoard(&introBoard);
+	printIntro(introBoard); clearAndShowBoard(introBoard);
 
-	std::string filename = askBoardFileName(&introBoard);
+	std::string filename = askBoardFileName(introBoard);
 	Board gameBoard(filename);
 
-	clearAndShowBoard(&gameBoard); nPlayers = askNumberOfPlayers();
+	clearAndShowBoard(gameBoard); nPlayers = askNumberOfPlayers();
 
 	for (int i = 0; i < nPlayers; ++i) {
-		clearAndShowBoard(&gameBoard);
-		PlayerData player = askPlayer(i, &gameBoard, playerNames, playerColors);
+		clearAndShowBoard(gameBoard);
+		PlayerData player = askPlayer(i, gameBoard, playerNames, playerColors);
 		playerNames.push_back(player.name);
 		playerColors.push_back(player.color);
 		botFlags.push_back(player.isBot);
 	}
 
 	
-	clearAndShowBoard(&gameBoard);
-	int first = askPlayFirst(&gameBoard, nPlayers, playerNames, playerColors);
-	Game my_game(&gameBoard, playerNames, playerColors, botFlags, first);
+	clearAndShowBoard(gameBoard);
+	int first = askPlayFirst(gameBoard, nPlayers, playerNames, playerColors);
+	Game my_game(gameBoard, playerNames, playerColors, botFlags, first);
 
 	for (;;) {
 		my_game.askCommand(1);

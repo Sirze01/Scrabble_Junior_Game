@@ -6,17 +6,12 @@
 #include <chrono>
 #include "../common/ConsoleSetup.h"
 
-Player::Player(Pool *pool, const std::string &name, int color, bool isBot) {
+Player::Player(Pool &pool, const std::string &name, int color, bool isBot):
+    _name{ name }, _hasPassed{ false }, _score{ 0 }, _color{ color }, _exchangeCount{ 0 }, _isBot{ isBot }
+{
+    pool.shuffle();
     int handSize = 7;
-    _hasPassed = 0;
-    _score = 0;
-    _color = color;
-    _exchangeCount = 0;
-    _name = name;
-    _isBot = isBot;
-	stripSpaces(_name);
     _hand.resize(handSize);
-    pool->shuffle();
     while (handSize--) takeRandom(handSize,pool);
 }
 
@@ -36,7 +31,7 @@ void Player::showHand(std::ostream &output, bool color) const {
     for (const auto &i : _hand) {
         if (color) outputBackColor(output, _color, i);
         else output << i;
-        output << " ";
+        output << SPACE;
     }
     output << "\n";
 }
@@ -45,32 +40,29 @@ void Player::addScore() {
     _score++;
 }
 
-bool Player::exchange(char letter, Pool* pool) {
-    if (!pool->getCurrentSize()) return false;
+bool Player::exchange(char letter, Pool& pool) {
+    //if pool is empty, abort exchange operation
+    if (!pool.getCurrentSize()) return false;
 
     int handPos = getHandPosition(letter);
     if (!takeRandom(handPos, pool)) return false;
 
-    pool->include(letter);
+    pool.include(letter);
     _exchangeCount++;
     return true;
 }
 
-bool Player::takeRandom(int handPos, Pool *pool) {
-    int poolSize = pool->getCurrentSize();
-    int maxPos = _hand.size() - 1;
+bool Player::takeRandom(int handPos, Pool &pool) {
+    int poolSize = pool.getCurrentSize();
 
-    if (handPos > maxPos || handPos < 0) return false;
-
-    //_hand.at(handPos) = SPACE; //even if the pool is empty, remove from hand (endgame situations)
-    if (!poolSize) {
+    if (!poolSize) { //if pool is empty, remove from hand (endgame)
         _hand.erase(_hand.begin() + handPos);
         return false;
     }
 
     int randomPoolPos = randomBetween(0, poolSize - 1);
-    _hand.at(handPos) = pool->getAllLetters().at(randomPoolPos);
-    pool->take(randomPoolPos);
+    _hand.at(handPos) = pool.getAllLetters().at(randomPoolPos);
+    pool.take(randomPoolPos);
     return true;
 }
 
@@ -92,22 +84,22 @@ bool Player::hasOnHand(char letter) const {
     return false;
 }
 
-bool Player::mayMove(const Board *board) const{
+bool Player::mayMove(const Board &board) const{
     coord pos = getPossibleMovePos(board);
     return pos.hColumn != IMPOSSIBLE_MOVE_COORD && pos.vLine != IMPOSSIBLE_MOVE_COORD;
 }
 
-coord Player::getPossibleMovePos(const Board* board) const {
-    coord boardDim = board->getDimensions();
-    std::vector<std::vector<char>> boardLetters = board->getLetters();
+coord Player::getPossibleMovePos(const Board& board) const {
+    coord boardDim = board.getDimensions();
+    std::vector<std::vector<char>> boardLetters = board.getLetters();
 
     for (size_t line = 0; line < boardDim.vLine; ++line) {
         for (size_t col = 0; col < boardDim.hColumn; ++col) {
             coord testPosition = { line,col };
             char letter = boardLetters.at(line).at(col);
-            const Move tryMove(testPosition, letter, board);
+            const Move moveToTest(testPosition, letter, board);
 
-            if (!tryMove.hasProblems(this)) return testPosition;
+            if (!moveToTest.hasProblems(*this)) return testPosition;
         }
     }
     return { IMPOSSIBLE_MOVE_COORD,IMPOSSIBLE_MOVE_COORD };

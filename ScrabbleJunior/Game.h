@@ -9,9 +9,8 @@
 
 class Game{
 public:
-	Game(Board* board, const std::vector<std::string>& playerNames,
-		const std::vector<int>& playerForeColors, const std::vector<bool> botFlags, int firstToMove);
-	~Game();
+	Game(Board& board, const std::vector<std::string>& playerNames,
+		const std::vector<int>& playerForeColors, const std::vector<bool>& botFlags, int firstToMove);
     void showEndMessage() const;
 	void askCommand(int turnNumber);
 	void nextTurn();
@@ -31,9 +30,8 @@ private:
 	std::vector<int> _playerForeColors;
 	int _currentPlayerPos;
 	Player* _currentPlayer;
-	std::vector<Player*> _players;
-	Board* _board;
-	Pool* _pool;
+	std::vector<Player> _players;
+	Board& _board;
+	Pool _pool;
     bool _compactCardView;
 };
-
