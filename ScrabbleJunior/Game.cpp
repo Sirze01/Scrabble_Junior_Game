@@ -1,5 +1,7 @@
 #include "Game.h"
 #include "../common/ConsoleSetup.h"
+#include "../common/StringProcess.h"
+#include <windows.h>
 
 Game::Game(Board* board, const std::vector<std::string> &playerNames,
 	const std::vector<int> &playerForeColors, const std::vector<bool> botFlags, int firstToMove) {
@@ -37,75 +39,71 @@ void Game::showBoardAndCardView(const std::string &view, bool showTurnInfo) cons
 
 void Game::askCommand(int turnNumber) {
 
-	std::vector<std::string> coloredMessage;
+	_currentPlayer->resetExchangeCount();
+	bool ableToMove = _currentPlayer->mayMove(_board);
+
+	if (_currentPlayer->getHasPassed()) {
+		if (ableToMove) {
+			_currentPlayer->doNotPass();
+		}
+		else if (turnNumber == 2) {
+			return;
+		}
+	}
+
+	showBoardAndCardView();
+	std::stringstream coloredMessage;
 	int playerColor = _currentPlayer->getColor();
 	std::string name = _currentPlayer->getName();
 
 	if (_currentPlayer->isBot()) {
-
-		if (!(_currentPlayer->getHasPassed() && turnNumber == 2) && _currentPlayer->getHandSize() && _pool->getCurrentSize() && !_currentPlayer->mayMove(_board)) {
-			int handPos = randomBetween(0, _currentPlayer->getHandSize() - 1);
-			char letter = _currentPlayer->getHand().at(handPos);
-			_currentPlayer->exchange(letter, _pool); //try to exchange one letter silently
-			char newLetter = _currentPlayer->getHand().at(handPos);
-			coloredMessage.push_back(name + " exchanged letter " + std::string(1,letter) + " from the pool and got letter " + std::string(1,newLetter) + ".");
-			coloredMessage.push_back(std::string(1,SPACE));
-		}
-
-		if (_currentPlayer->mayMove(_board)) {
-			showBoardAndCardView();
-			if (_currentPlayer->getHasPassed()) _currentPlayer->doNotPass();
-			const coord pos = _currentPlayer->getPossibleMovePos(_board);
-			char letter = _board->getLetters().at(pos.vLine).at(pos.hColumn);
-			const Move move(pos, letter, _board);
-			move.execute(_currentPlayer,_board,_pool);
-			coloredMessage.push_back(name + " will play " + _board->getPositionString(pos) + std::string(1,SPACE) + std::string(1,letter) + ".");
-		}
-		else {
-			_currentPlayer->forcePass();
-			if (turnNumber == 1) {
-				showBoardAndCardView();
-				coloredMessage.push_back(name + " cannot move and thus will pass his move.");
+		for (;;) { //exits when move is valid or exchanged once
+			coloredMessage << "(turn " << turnNumber << ") ";
+			if (ableToMove) {
+				const coord pos = _currentPlayer->getPossibleMovePos(_board);
+				char letter = _board->getLetters().at(pos.vLine).at(pos.hColumn);
+				const Move move(pos, letter, _board);
+				move.execute(_currentPlayer, _board, _pool);
+				coloredMessage << name << " will play " << _board->getPositionString(pos) << SPACE << letter << ".\n";
+				break;
 			}
-			else return;
-		}
-	}
-
-	_currentPlayer->resetExchangeCount();
-
-	if (_currentPlayer->getHasPassed() && !_currentPlayer->isBot()) {
-		bool ableToMove = _currentPlayer->mayMove(_board);
-		if (ableToMove) {
-			_currentPlayer->doNotPass();
-		}
-		else {
-			if (turnNumber == 1 && !coloredMessage.size()) {
-				coloredMessage = {
-					name + ", you still cannot move.",
-					"We will skip your turn automatically.",
-				};
+			else if (!_currentPlayer->getExchangeCount() && _currentPlayer->getHandSize() && _pool->getCurrentSize()){
+				int handPos = randomBetween(0, _currentPlayer->getHandSize() - 1);
+				char oldLetter = _currentPlayer->getHand().at(handPos);
+				_currentPlayer->exchange(oldLetter, _pool);
+				char newLetter = _currentPlayer->getHand().at(handPos);
+				coloredMessage << " exchanged letter " << oldLetter << " from the pool and got letter " << newLetter << ".\n\n";
+				ableToMove = _currentPlayer->mayMove(_board);
 			}
-			else return;
+			else {
+				coloredMessage << name << " cannot move and thus will pass.\n";
+				_currentPlayer->forcePass();
+				break;
+			}
 		}
 	}
 
-	if (!_currentPlayer->getHandSize() && !coloredMessage.size()) { //player has nothing on hand
-		_currentPlayer->forcePass();
-		coloredMessage = {
-			name + ", you have nothing on your hand.",
-			"Your turn will be skipped as long as you cannot move."
-		};
+	else {
+		if (!ableToMove) {
+			if (_currentPlayer->getHasPassed()) {
+				coloredMessage << name << ", you still cannot move.\n" <<
+					"We will skip your turn automatically.\n";
+			}
+			else if (!_currentPlayer->getHandSize()) {
+				_currentPlayer->forcePass();
+				coloredMessage << name << ", you have nothing on your hand.\n" <<
+					"Your turn will be skipped as long as you cannot move.\n";
+			}
+		}
 	}
 
-	if (!_currentPlayer->isBot()) showBoardAndCardView();
-	std::string commandPrompt, regularMessage, input;
+	std::string commandPrompt, input;
 
 	for (;;) {
+		std::stringstream regularMessage;
 
-		if (!coloredMessage.size() && !_currentPlayer->isBot()) {
-
+		if (isEmpty(coloredMessage)) {
 			commandPrompt = "(turn " + std::to_string(turnNumber) + ") " + name + ": ";
-			regularMessage = "", coloredMessage = {};
 
 			paddingAndTopic(playerColor,true);
 			std::cout << commandPrompt;
@@ -117,30 +115,26 @@ void Game::askCommand(int turnNumber) {
 				const Move move(&command, _board);
 				int problemLevel = move.hasProblems(_currentPlayer);
 				if (problemLevel) {
-					regularMessage = "Could not play! ";
+					regularMessage << "Could not play! ";
 					if (problemLevel == 1) {
-						regularMessage += "You are attempting to put a tile outside the board.";
+						regularMessage << "You are attempting to put a tile outside the board.\n";
 					}
 					else if (problemLevel == 2) {
-						regularMessage += "The letter ";
-						regularMessage += command.getMoveLetter();
-						regularMessage += " is not in that position.";
+						regularMessage << "The letter " << command.getMoveLetter() << " is not in that position.\n";
 					}
 					else if (problemLevel == 3) {
-						regularMessage += "You do not have the letter ";
-						regularMessage += command.getMoveLetter();
-						regularMessage += " on hand.";
+						regularMessage << "You do not have the letter " << command.getMoveLetter() << " on hand.\n";
 					}
 					else if (problemLevel == 4) {
-						regularMessage += "That position already has a tile.";
+						regularMessage << "That position already has a tile.\n";
 					}
 					else if (problemLevel == 5) {
-						regularMessage += "You are not starting or continuing a word.";
+						regularMessage << "You are not starting or continuing a word.\n";
 					}
 				}
 				else {
 					move.execute(_currentPlayer, _board, _pool);
-					break;
+					return;
 				}
 			}
 
@@ -148,29 +142,26 @@ void Game::askCommand(int turnNumber) {
 
 				if (command.isExchange()) {
 					char token = command.getExchangeLetter();
-					if (_currentPlayer->mayMove(_board)) {
-						regularMessage = "You can not exchange when you have possible moves. Pay attention!";
+					if (ableToMove) {
+						regularMessage << "You can not exchange when you have possible moves. Pay attention!\n";
 					}
 					else if (!_pool->getCurrentSize()) {
 						_currentPlayer->forcePass();
-						coloredMessage = {
-						"The pool is empty.",
-						"Your turn will be skipped as long as you cannot move."
-						};
+						coloredMessage << "The pool is empty." << "\n" <<
+							"Your turn will be skipped as long as you cannot move.\n";
 					}
 					else if (_currentPlayer->getExchangeCount()) {
 						_currentPlayer->forcePass();
-						coloredMessage = {
-						"You already exchanged once and still cannot move.",
-						"Your turn will be skipped as long as you cannot move."
-						};
+						coloredMessage << "You already exchanged once and still cannot move." << "\n" <<
+							"Your turn will be skipped as long as you cannot move.\n";
 					}
 					else if (!_currentPlayer->exchange(token, _pool)) {
-						regularMessage = "Could not exchange. Have you got the letter ";
-						regularMessage += command.getExchangeLetter();
-						regularMessage += " on hand?";
+						regularMessage << "Could not exchange. Have you got the letter " << command.getExchangeLetter() << " on hand?\n";
 					}
-					else showBoardAndCardView(); //exchange was successful
+					else {
+						showBoardAndCardView(); //exchange was successful
+						ableToMove = _currentPlayer->mayMove(_board);
+					}
 				}
 
 				else if (command.isCheckHands()) showPlayerInfo("hands");
@@ -178,50 +169,45 @@ void Game::askCommand(int turnNumber) {
 				else if (command.isCheckPool()) showPool();
 				else if (command.isHelp()) showHelp();
 				else if (command.isHint()) {
-					coord pos = _currentPlayer->getPossibleMovePos(_board);
-					if (pos.hColumn == IMPOSSIBLE_MOVE_COORD || pos.vLine == IMPOSSIBLE_MOVE_COORD) {
-						regularMessage = "Maybe you can't move right now...";
+					if (!ableToMove) {
+						regularMessage << "Maybe you can't move right now...\n";
 					}
 					else {
-						regularMessage = "Look carefully at the board on position " + _board->getPositionString(pos) + "...";
+						coord pos = _currentPlayer->getPossibleMovePos(_board);
+						regularMessage << "Look carefully at the board on position " + _board->getPositionString(pos) + "...\n";
 					}
 				}
 				else if (command.isPass()) {
-					if (_currentPlayer->mayMove(_board)) {
-						regularMessage = "You cannot pass when you have possible moves. Look carefully!";
+					if (ableToMove) {
+						regularMessage << "You cannot pass when you have possible moves. Look carefully!\n";
 					}
 					else if (_pool->getCurrentSize() && !_currentPlayer->getExchangeCount()) {
-						regularMessage = "The pool is not empty. Try to exchange a letter before passing.";
+						regularMessage << "The pool is not empty. Try to exchange a letter before passing.\n";
 					}
-					else {
+					else { //allow passing
 						_currentPlayer->forcePass();
 						break;
 					}
 				}
 				else if (command.isClear()) showBoardAndCardView();
-				else regularMessage = smartCommandAdvice(command.getStr());
+				else regularMessage << smartCommandAdvice(command.getStr());
 			}
-			else regularMessage = "We found overlapping command keywords in your input. Type 'help' to learn why.";
+			else regularMessage << "We found overlapping command keywords in your input. Type 'help' to learn why.\n";
 		}
 
-		if (regularMessage.size()) {
+		if (!isEmpty(regularMessage)) {
 			paddingAndTopic(WHITE, true);
-			std::cout << regularMessage << "\n";
+			std::cout << regularMessage.str();
 		}
 
-		if (coloredMessage.size()) {
-			coloredMessage.push_back("Press enter to continue. ");
-			std::cout << "\n";
-			for (const auto &i : coloredMessage) {
-				if (i == std::string(1, SPACE)) {
-					std::cout << "\n";
-					continue;
-				}
-				else {
-					paddingAndTopic(playerColor, false);
-					std::cout << i << "\n";
-				}
+		else if (!isEmpty(coloredMessage)) {
+			coloredMessage << "Press enter to continue.\n";
+			std::string sentence;
+			while (std::getline(coloredMessage, sentence)) {
+				paddingAndTopic(playerColor, true);
+				std::cout << sentence;
 			}
+			std::cout << "\n";
 			askEnter();
 			return;
 		}

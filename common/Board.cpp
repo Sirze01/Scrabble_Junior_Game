@@ -89,7 +89,7 @@ void Board::show() const { //Prototype function (needs styling)
 		for (size_t j = 0; j < _hDimension; j++) {
 			std::cout << SPACE;
 			if (getHighlights().at(i).at(j)) {
-				outputBackForeColor(std::cout, WHITE, _highlightColors.at(i).at(j), _letters.at(i).at(j));
+				outputBackColor(std::cout, _highlightColors.at(i).at(j), _letters.at(i).at(j));
 			}
 			else std::cout << _letters[i][j];
 		}
@@ -122,7 +122,7 @@ bool Board::fileExport(std::string filename) const {
     if (file.is_open()) {
         file << _vDimension << " x " << _hDimension << '\n';
         for (auto line : _words) {
-            file << Board::indexToLetter(line.firstCoord) << ' ' << line.orientation << ' ' << line.word << '\n';
+            file << Board::getPositionString(line.firstCoord) << ' ' << line.orientation << ' ' << line.word << '\n';
         }
         file << "#####END_OF_BOARD#####\n";
 
@@ -420,8 +420,4 @@ std::vector<coord> Board::checkIntersections(codedWord word) {
         }
     }
     return intersections;
-}
-
-std::string Board::indexToLetter(coord coordinates) const {
-    return (std::string(1,toupper(_alphabet.at(coordinates.vLine))) + std::string(1,tolower(_alphabet.at(coordinates.hColumn))));
 }

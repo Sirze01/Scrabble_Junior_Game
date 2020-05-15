@@ -34,7 +34,7 @@ void Player::showHand(std::ostream &output, bool color) const {
         return;
     }
     for (const auto &i : _hand) {
-        if (color) outputBackForeColor(output, WHITE, _color, i);
+        if (color) outputBackColor(output, _color, i);
         else output << i;
         output << " ";
     }

@@ -17,7 +17,6 @@ struct PlayerData {
 	bool isBot;
 };
 
-
 int askPlayFirst(const Board* board, int nPlayers, std::vector<std::string> playerNames, std::vector<int> playerColors) {
 	{
 		std::stringstream toWrite;
@@ -42,7 +41,7 @@ int askPlayFirst(const Board* board, int nPlayers, std::vector<std::string> play
 	for (;;) {
 		paddingAndTopic(WHITE, true); std::cout << "Who should go first? ";
 		std::getline(std::cin, playerName); cleanBuffer();
-		stripSpaces(playerName);
+		stripSpecialChars(playerName); stripSpaces(playerName);
 
 		if (playerName == "random") {
 			int randomPos = randomBetween(0, nPlayers - 1);
@@ -103,8 +102,6 @@ std::string askBoardFileName(const Board* board) {
 
 			if (testBoard.getNonEmptyChars().size() < MAX_BOARD_LETTERS_WARNING) {
 				std::string userAns;
-				paddingAndTopic(RED, true); std::cout << "That board hasn't got enough letters to create a fair 4 player game.\n";
-				paddingAndTopic(RED, false); std::cout << "Are you sure you want to proceed? ";
 
 				for (;;) {
 					paddingAndTopic(RED, true); std::cout << "That board hasn't got enough letters to create a fair 4 player game. Proceed? ";
@@ -114,7 +111,7 @@ std::string askBoardFileName(const Board* board) {
 					if (userAns == "yes" || userAns == "y") return fileName;
 					if (userAns == "no" || userAns == "n") break;
 					else {
-						paddingAndTopic(RED, true); std::cout << "Please answer 'yes' or 'no': ";
+						paddingAndTopic(BLUE, true); std::cout << "Please answer 'yes' or 'no'.\n";
 						continue;
 					}
 				}
@@ -127,7 +124,6 @@ std::string askBoardFileName(const Board* board) {
 	return fileName;
 }
 
-
 PlayerData askPlayer(int position, const Board* board, std::vector<std::string> forbiddenNames, std::vector<int> forbiddenColors) {
 
 	std::string name, colorName;
@@ -139,7 +135,7 @@ PlayerData askPlayer(int position, const Board* board, std::vector<std::string> 
 		std::stringstream toWrite;
 		std::vector<std::string> sentences = {
 			"|If you want this player to be a bot\n",
-			"|include 'Computer' in his name.\n"
+			"|include 'Computer' or 'Bot' in his name.\n"
 		};
 
 		for (const auto& sentence : sentences) toWrite << sentence;
@@ -149,7 +145,7 @@ PlayerData askPlayer(int position, const Board* board, std::vector<std::string> 
 	for (;;) { //ask name
 		paddingAndTopic(WHITE, true); std::cout << "Player " << position << " name: ";
 		std::getline(std::cin, name); cleanBuffer();
-		stripSpaces(name);
+		stripSpecialChars(name); stripSpaces(name);
 
 		if (name == "random") {
 			paddingAndTopic(RED, true); std::cout << "That is a reserved keyword. Please choose a different name.\n";
@@ -170,7 +166,7 @@ PlayerData askPlayer(int position, const Board* board, std::vector<std::string> 
 		else if (std::find(forbiddenNames.begin(), forbiddenNames.end(), name) != forbiddenNames.end()) {
 			paddingAndTopic(RED, true); std::cout << "Another player has already chosen that name. Try again.\n";
 		}
-		else if (name.find("Computer") != std::string::npos) {
+		else if (name.find("Computer") != std::string::npos || name.find("Bot") != std::string::npos) {
 			isBot = true;
 			paddingAndTopic(BLUE, true); std::cout << "This player will be a bot.\n";
 			break;
@@ -199,8 +195,7 @@ PlayerData askPlayer(int position, const Board* board, std::vector<std::string> 
 
 		paddingAndTopic(WHITE, true); std::cout << "Player " << position << " color: ";
 		std::getline(std::cin, colorName); cleanBuffer();
-		stripSpecialChars(colorName);
-		stripSpaces(colorName);
+		stripSpecialChars(name); stripSpaces(name);
 		for (auto& i : colorName) i = static_cast<char>(tolower(i));
 
 		if (colorName == "red") color = RED;

@@ -119,12 +119,12 @@ std::string smartCommandAdvice(const std::string &command) {
         processed += static_cast<char>(toupper(command.at(0)));
         processed += static_cast<char>(tolower(command.at(1)));
         return "Did you attempt to play a tile on position " + processed +
-               "? Please specify letter as in 'Yx <letter>'.";
+               "? Please specify letter as in 'Yx <letter>'.\n";
 
     } else if (command.find("exchange") != std::string::npos) {
-        return "Are you trying to exchange one of your tiles? Please specify letter as in 'exchange <letter>'.";
+        return "Are you trying to exchange one of your tiles? Please specify letter as in 'exchange <letter>'.\n";
     } else {
-        return "Command not recognized. Please type 'help' to view the available commands.";
+        return "Command not recognized. Please type 'help' to view the available commands.\n";
     }
 }
     
@@ -144,4 +144,8 @@ bool isAlpha(const std::string &toTest, bool acceptSpaces) {
 bool isDigit(const std::string &toTest) {
     for (const auto &letter : toTest) if (!std::isdigit(letter)) return false;
     return toTest.size();
+}
+
+bool isEmpty(const std::stringstream& ss) {
+    return ss.rdbuf()->in_avail() == 0;
 }

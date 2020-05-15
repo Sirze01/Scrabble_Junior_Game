@@ -43,7 +43,7 @@ CARD_LEFT_PADDING = 12,
 BOARD_LEFT_PADDING = 2,
 BOARD_TOP_PADDING = 1,
 BOARD_BOTTOM_PADDING = 2,
-BOARD_MIN_DIM = 8,
+BOARD_MIN_DIM = 7, //this is dependent on card view info cards
 COMPACT_VIEW_MAX = 12,
 MAX_PLAYER_NAME_SIZE = 20;
 
@@ -76,7 +76,6 @@ void askEnter();
 
 void outputBackColor(std::ostream& toWrite, int backColor, const char c);
 void outputForeColor(std::ostream& toWrite, int foreColor, const char c);
-void outputBackForeColor(std::ostream &toWrite, int foreColor, int backColor, const char c);
 
 bool putCursorOnPos(int line, int col);
 void eraseLineToTheEnd();

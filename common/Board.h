@@ -48,7 +48,6 @@ public:
     bool wordExists(coord inates) const;
     void removeLetter(coord inates, char letter);
     bool checkIntersection(codedWord);
-    std::string indexToLetter(coord coordinates) const;
     bool boardBounds(const codedWord &entry);
     void placeChar(coord inates, char character);
     std::string getAlphabet() const;

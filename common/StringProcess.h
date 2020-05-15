@@ -14,3 +14,4 @@ std::string smartCommandAdvice(const std::string &command);
 
 bool isAlpha(const std::string &toTest, bool acceptSpaces = false);
 bool isDigit(const std::string &toTest);
+bool isEmpty(const std::stringstream &ss);

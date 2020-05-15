@@ -63,10 +63,6 @@ void outputForeColor(std::ostream& output, int foreColor, const char c) {
 	output << "\033[38;5;" << foreColor << "m" << c << "\033[0m";
 }
 
-void outputBackForeColor(std::ostream& output, int foreColor, int backColor, const char c) {
-	output << "\033[38;5;" << foreColor << ";48;5;" << backColor << "m" << c << "\033[0m";
-}
-
 bool putCursorOnPos(int line, int col) {
 	if (line < 1 || col < 1) return false;
 	std::cout << "\033[" << line << ";" << col << "H";
