@@ -45,8 +45,7 @@ void clearConsole() {
 }
 
 void cleanBuffer() {
-	if (std::cin.eof()) std::cin.clear();
-	else if (std::cin.fail()) {
+	if (std::cin.fail()) {
 		std::cin.clear();
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
@@ -54,31 +53,18 @@ void cleanBuffer() {
 
 void askEnter() {
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-	if (std::cin.eof()) std::cin.clear();
 }
 
-void printBackColor(int backColor, const char c) {
-	std::cout << "\033[48;5;" << backColor << "m" << c << "\033[0m";
+void outputBackColor(std::ostream& output, int backColor, const char c) {
+	output << "\033[48;5;" << backColor << "m" << c << "\033[0m";
 }
 
-void printBackColor(int backColor, std::string message) {
-	std::cout << "\033[48;5;" << backColor << "m" << message << "\033[0m";
+void outputForeColor(std::ostream& output, int foreColor, const char c) {
+	output << "\033[38;5;" << foreColor << "m" << c << "\033[0m";
 }
 
-void printForeColor(int foreColor, const char c) {
-	std::cout << "\033[38;5;" << foreColor << "m" << c << "\033[0m";
-}
-
-void printForeColor(int foreColor, std::string message) {
-	std::cout << "\033[38;1;" << foreColor << "m" << message << "\033[0m";
-}
-
-void print(int foreColor, int backColor, const char c) {
-	std::cout << "\033[38;5;" << foreColor << ";48;5;" << backColor << "m" << c << "\033[0m";
-}
-
-void print(int foreColor, int backColor, std::string message) {
-	std::cout << "\033[38;5;" << foreColor << ";48;5;" << backColor << "m" << message << "\033[0m";
+void outputBackForeColor(std::ostream& output, int foreColor, int backColor, const char c) {
+	output << "\033[38;5;" << foreColor << ";48;5;" << backColor << "m" << c << "\033[0m";
 }
 
 bool putCursorOnPos(int line, int col) {
@@ -114,18 +100,23 @@ void eraseCardView(int boardDimension, int col) {
 	restoreSavedCursorPosition();
 }
 
-void writeCardView(int boardHeight, int boardWidth, std::function<void(int,int)> write){
+void writeCardView(int boardHeight, int boardWidth, std::stringstream &toWrite){
 	saveCurrentCursorPosition();
 	int line = 2 + BOARD_TOP_PADDING;
 	int col = 2 * boardWidth + CARD_LEFT_PADDING;
 	eraseCardView(boardHeight, col);
-	putCursorOnPos(line++, col);
-	write(line,col);
+
+	std::string current;
+	while (getline(toWrite, current)) {
+		putCursorOnPos(line++, col);
+		std::cout << current;
+	}
+
 	restoreSavedCursorPosition();
 }
 
 void paddingAndTopic(int color, bool newLine) {
-	if (newLine) std::cout << "\n";
+	if (newLine) std::cout << std::endl;
 	std::cout << LEFT_PADDING_STR;
-	printForeColor(color, TOPIC);
+	outputForeColor(std::cout, color, TOPIC);
 }

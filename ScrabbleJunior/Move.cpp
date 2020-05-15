@@ -1,6 +1,5 @@
 #include "Move.h"
 #include "Command.h"
-#include "../common/Board.h"
 
 
 Move::Move(const Command *command, const Board *board) {
@@ -12,7 +11,7 @@ Move::Move(const Command *command, const Board *board) {
 	_boardHighlights = board->getHighlights();
 }
 
-Move::Move(coord pos, char letter, const Board *board) {
+Move::Move(const coord pos, char letter, const Board *board) {
 	_posToMove = pos;
 	_letter = letter;
 	_maxCol = board->getDimensions().hCollumn - 1;
@@ -35,14 +34,14 @@ int Move::hasProblems(const Player *player) const {
 		return 4;
 	}
 
-	if (!singleCharWordOnLine() && continueOnLine()) return 0;
-	if (!singleCharWordOnCol() && continueOnCol()) return 0;
+	if (continueOnLine() && !singleCharWordOnLine()) return 0;
+	if (continueOnCol() && !singleCharWordOnCol()) return 0;
 
 	return 5;
 }
 
-bool Move::execute(Player *player, Board *board, Pool *pool) {
-	if (hasProblems(player)) return false;
+bool Move::execute(Player *player, Board *board, Pool *pool, bool checkValidity) const {
+	if (checkValidity && hasProblems(player)) return false;
 
 	int color = player->getColor();
 	board->highlight(color, _posToMove.vLine, _posToMove.hCollumn);
@@ -50,8 +49,8 @@ bool Move::execute(Player *player, Board *board, Pool *pool) {
 	player->takeRandom(player->getHandPosition(_letter),pool);
 	
 	//add scores and highlight ("territory dominance" feature)
-	if ( (!singleCharWordOnLine() && continueOnLine() && finishOnLine())
-		|| (!singleCharWordOnCol() && continueOnCol() && finishOnCol()) ) {
+	if ( (continueOnLine() && finishOnLine() && !singleCharWordOnLine())
+		|| (continueOnCol() && finishOnCol() && !singleCharWordOnCol()) ) {
 		player->addScore();
 		board->highlightFinishedWord(player->getColor(), _posToMove.vLine, _posToMove.hCollumn);
 	}
@@ -61,16 +60,14 @@ bool Move::execute(Player *player, Board *board, Pool *pool) {
 }
 
 bool Move::inBounds() const {
-	if (_posToMove.hCollumn > _maxCol) return false;
-	if (_posToMove.vLine > _maxLine) return false;
-	if (_posToMove.hCollumn < 0) return false;
-	if (_posToMove.vLine < 0) return false;
-	return true;
+	return _posToMove.hCollumn <= _maxCol
+		&& _posToMove.vLine <= _maxLine
+		&& _posToMove.hCollumn >= 0
+		&& _posToMove.vLine >= 0;
 }
 
 bool Move::letterMatch() const {
-	if (_letter == ' ') return false;
-	return _letter == _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn);
+    return _letter != ' '  && _letter == _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn);
 }
 
 bool Move::singleCharWordOnLine() const {
@@ -82,72 +79,68 @@ bool Move::singleCharWordOnCol() const {
 }
 
 bool Move::startOnLine() const {
-	if (_posToMove.hCollumn == 0) return true;
-	return _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn - 1) == ' ';
+	return _posToMove.hCollumn == 0 || _boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn - 1) == ' ';
 }
 
 bool Move::startOnCol() const {
-	if (_posToMove.vLine == 0) return true;
-	return _boardLetters.at(_posToMove.vLine - 1).at(_posToMove.hCollumn) == ' ';
+	return _posToMove.vLine == 0 || _boardLetters.at(_posToMove.vLine - 1).at(_posToMove.hCollumn) == ' ';
 }
 
 
 bool Move::continueOnLine() const {
-	if (_posToMove.hCollumn == 0) return true;
-	bool continueWord = true;
-	for (int i = 1; _posToMove.hCollumn - i >= 0; ++i) {
-		if (!_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn - i)) {
-			if (_boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn - i) == ' ') break;
-			else if (_boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn - i) != ' ') {
-				continueWord = false;
-				break;
-			}
-		}
-	}
-	return continueWord;
+	return wordCompletionOnLine(-1);
 }
 
 bool Move::continueOnCol() const {
-	if (_posToMove.vLine == 0) return true;
-	bool continueWord = true;
-	for (int i = 1; _posToMove.vLine - i >= 0; ++i) {
-		if (!_boardHighlights.at(_posToMove.vLine - i).at(_posToMove.hCollumn)) {
-			if (_boardLetters.at(_posToMove.vLine - i).at(_posToMove.hCollumn) == ' ') break;
-			else if (_boardLetters.at(_posToMove.vLine - i).at(_posToMove.hCollumn) != ' ') {
-				continueWord = false;
-				break;
-			}
-		}
-	}
-	return continueWord;
+	return wordCompletionOnCol(-1);
 }
 
 bool Move::finishOnLine() const {
-	if (_posToMove.hCollumn == _maxCol) return true;
-	bool finishWord = true;
-	for (int i = 1; _posToMove.hCollumn + i <= _maxCol; ++i) {
-		if (!_boardHighlights.at(_posToMove.vLine).at(_posToMove.hCollumn + i)) {
-			if (_boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn + i) == ' ') break;
-			else if (_boardLetters.at(_posToMove.vLine).at(_posToMove.hCollumn + i) != ' ') {
-				finishWord = false;
-				break;
-			}
-		}
-	}
-	return finishWord;
+	return wordCompletionOnLine(1);
 }
 
 bool Move::finishOnCol() const {
-	if (_posToMove.vLine == _maxLine) return true;
-	bool finishWord = true;
-	for (int i = 1; _posToMove.vLine + i <= _maxLine; ++i) {
-		if (!_boardHighlights.at(_posToMove.vLine+i).at(_posToMove.hCollumn)) {
-			if (_boardLetters.at(_posToMove.vLine+i).at(_posToMove.hCollumn) == ' ') break;
-			else if (_boardLetters.at(_posToMove.vLine + i).at(_posToMove.hCollumn) != ' ') {
-				finishWord = false;
+	return wordCompletionOnCol(1);
+}
+
+bool Move::wordCompletionOnCol(int cof) const {
+	if (_posToMove.vLine == 0 && cof == -1) return true;
+	if (_posToMove.vLine == _maxLine && cof == 1) return true;
+	else if (cof != -1 && cof != 1) return false;
+
+	bool completion = true; int line = _posToMove.vLine;
+	for (int i = line + cof; i >= 0 && i <= _maxLine; i+=cof) {
+		if (!_boardHighlights.at(i).at(_posToMove.hCollumn)) {
+
+			if (_boardLetters.at(i).at(_posToMove.hCollumn) == ' ') {
+				break;
+			}
+			else {
+				completion = false;
 				break;
 			}
 		}
 	}
-	return finishWord;
+	return completion;
+}
+
+bool Move::wordCompletionOnLine(int cof) const {
+	if (_posToMove.hCollumn == 0 && cof == -1) return true;
+	if (_posToMove.hCollumn == _maxCol && cof == 1) return true;
+	else if (cof != -1 && cof != 1) return false;
+
+	bool completion = true; int col = _posToMove.hCollumn;
+	for (int i = col + cof; i >= 0 && i <= _maxCol; i += cof) {
+		if (!_boardHighlights.at(_posToMove.vLine).at(i)) {
+
+			if (_boardLetters.at(_posToMove.vLine).at(i) == ' ') {
+				break;
+			}
+			else {
+				completion = false;
+				break;
+			}
+		}
+	}
+	return completion;
 }

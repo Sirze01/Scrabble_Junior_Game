@@ -1,15 +1,15 @@
 #include "Game.h"
 #include "../common/ConsoleSetup.h"
-#include "../common/StringProcess.h"
 
-Game::Game(Board* board, std::vector<std::string> playerNames, std::vector<int> playerForeColors, int firstToMove) {
+Game::Game(Board* board, const std::vector<std::string> &playerNames, const std::vector<int> &playerForeColors, int firstToMove) {
 	_nPlayers = playerNames.size();
 	_board = board;
 	_pool = new Pool(board);
 	_playerForeColors = playerForeColors;
 
 	for (int i = 0; i < _nPlayers;++i) {
-		_players.push_back(new Player(_pool, playerNames.at(i), playerForeColors.at(i)));
+		Player* player = new Player(_pool, playerNames.at(i), playerForeColors.at(i));
+		_players.push_back(player);
 	}
 
 	_currentPlayerPos = firstToMove % _nPlayers;
@@ -27,32 +27,36 @@ Game::~Game() {
 	}
 }
 
-void Game::showBoardAndCardView(std::string view, bool showInfo) const {
+void Game::showBoardAndCardView(const std::string &view, bool showTurnInfo) const {
 	clearConsole();
 	_board->show();
-	if (view == "hands") showHands(showInfo);
-	else showScores(showInfo);
+	showPlayerInfo(view, showTurnInfo);
 }
 
 void Game::askCommand(int turnNumber) {
-	if (_currentPlayer->getMayPass() && _currentPlayer->mayMove(_board, _pool)) _currentPlayer->doNotPass();
 	_currentPlayer->resetExchangeCount();
 
 	std::string commandPrompt, regularMessage, input;
 	std::vector<std::string> coloredMessage;
 	int playerColor = _currentPlayer->getColor();
 
-	if (_currentPlayer->getMayPass() && !_currentPlayer->mayMove(_board, _pool)) { //passed before and can't move
-		if (turnNumber == 1) {
-			coloredMessage = {
-				_currentPlayer->getName() + ", you still cannot move.",
-				"We will skip your turn automatically.",
-			};
+	if (_currentPlayer->getMayPass()) {
+		bool ableToMove = _currentPlayer->mayMove(_board);
+		if (ableToMove) {
+			_currentPlayer->doNotPass();
 		}
-		else return;
+		else {
+			if (turnNumber == 1) {
+				coloredMessage = {
+					_currentPlayer->getName() + ", you still cannot move.",
+					"We will skip your turn automatically.",
+				};
+			}
+			else return;
+		}
 	}
 
-	if (!_currentPlayer->getHandSize() && !coloredMessage.size()) { //player has nothing on hand
+	if (!_currentPlayer->getActualHandSize() && !coloredMessage.size()) { //player has nothing on hand
 		_currentPlayer->forcePass();
 		coloredMessage = {
 			_currentPlayer->getName() + ", you have nothing on your hand.",
@@ -65,25 +69,28 @@ void Game::askCommand(int turnNumber) {
 	for (;;) {
 
 		if (!coloredMessage.size()) {
+
 			commandPrompt = "(turn " + std::to_string(turnNumber) + ") " + _currentPlayer->getName() + ": ";
 			regularMessage = "", coloredMessage = {};
-			std::cout << "\n"; paddingAndTopic(playerColor);
+
+			paddingAndTopic(playerColor,true);
 			std::cout << commandPrompt;
+
 			std::getline(std::cin, input); cleanBuffer();
-			Command command(input);
+			const Command command(input);
 
 			if (command.isMove()) {
-				Move move(&command, _board);
+				const Move move(&command, _board);
 				int problemLevel = move.hasProblems(_currentPlayer);
 				if (problemLevel) {
 					regularMessage = "Could not play! ";
 					if (problemLevel == 1) {
-						regularMessage += "Are you attempting to put a tile outside the board?";
+						regularMessage += "You are attempting to put a tile outside the board.";
 					}
 					else if (problemLevel == 2) {
-						regularMessage += "Is the letter ";
+						regularMessage += "The letter ";
 						regularMessage += command.getMoveLetter();
-						regularMessage += " in that position?";
+						regularMessage += " is not in that position.";
 					}
 					else if (problemLevel == 3) {
 						regularMessage += "You do not have the letter ";
@@ -94,7 +101,7 @@ void Game::askCommand(int turnNumber) {
 						regularMessage += "That position already has a tile.";
 					}
 					else if (problemLevel == 5) {
-						regularMessage += "Are you actually starting or continuing a word?";
+						regularMessage += "You are not starting or continuing a word.";
 					}
 				}
 				else {
@@ -106,8 +113,8 @@ void Game::askCommand(int turnNumber) {
 			else if (command.hasNoConflicts()) {
 
 				if (command.isExchange()) {
-					int token = command.getExchangeLetter();
-					if (_currentPlayer->mayMove(_board, _pool)) {
+					char token = command.getExchangeLetter();
+					if (_currentPlayer->mayMove(_board)) {
 						regularMessage = "You can not exchange when you have possible moves. Pay attention!";
 					}
 					else if (!_pool->getCurrentSize()) {
@@ -132,13 +139,15 @@ void Game::askCommand(int turnNumber) {
 					else showBoardAndCardView(); //exchange was successful
 				}
 
-				else if (command.isCheckHands()) showHands();
-				else if (command.isCheckScores()) showScores();
+				else if (command.isCheckHands()) showPlayerInfo("hands");
+				else if (command.isCheckScores()) showPlayerInfo("scores");
 				else if (command.isCheckPool()) showPool();
 				else if (command.isHelp()) showHelp();
 				else if (command.isHint()) {
-					coord pos = _currentPlayer->getPossiblePos(_board, _pool);
-					if (pos.hCollumn == -1 || pos.vLine == -1) regularMessage = "Maybe you can't move right now...";
+					coord pos = _currentPlayer->getPossibleMovePos(_board);
+					if (pos.hCollumn == IMPOSSIBLE_MOVE_COORD || pos.vLine == IMPOSSIBLE_MOVE_COORD) {
+						regularMessage = "Maybe you can't move right now...";
+					}
 					else {
 						regularMessage = "Look carefully at the board on position ";
 						regularMessage += (char)('A' + pos.vLine);
@@ -147,11 +156,11 @@ void Game::askCommand(int turnNumber) {
 					}
 				}
 				else if (command.isPass()) {
-					if (_currentPlayer->mayMove(_board, _pool)) {
+					if (_currentPlayer->mayMove(_board)) {
 						regularMessage = "You cannot pass when you have possible moves. Look carefully!";
 					}
 					else if (_pool->getCurrentSize() && !_currentPlayer->getExchangeCount()) {
-						regularMessage = "The pool is not empty. Please try to exchange a letter before passing.";
+						regularMessage = "The pool is not empty. Try to exchange a letter before passing.";
 					}
 					else {
 						_currentPlayer->forcePass();
@@ -189,26 +198,15 @@ void Game::nextTurn() {
 }
 
 bool Game::allPlayersMustPass() const {
-	for (Player* player : _players) {
+	for (const Player* player : _players) {
 		if (!player->getMayPass()) return false;
 	}
 	return true;
 }
 
 bool Game::hasFinished() const {
-	if (_currentPlayer->mayMove(_board, _pool)) return false;
-	else if (allPlayersMustPass()) return true;
-
-	int maxLine = _board->getDimensions().vLine - 1;
-	int maxCol = _board->getDimensions().hCollumn - 1;
-	std::vector<std::vector<char>> letters = _board->getLetters();
-	std::vector<std::vector<bool>> highlights = _board->getHighlights();
-
-	for (int line = 0; line <= maxLine;++line) {
-		for (int col = 0;col <= maxCol;++col) {
-			if (letters.at(line).at(col) != ' '
-				&& !highlights.at(line).at(col)) return false;
-		}
+	for (const auto& player : _players) {
+		if (player->mayMove(_board)) return false;
 	}
 	return true;
 }
@@ -223,7 +221,6 @@ int Game::getWinner() const {
 	int maxScore = 0; int currentWinner = -1;
 	for (int i = 0; i < _nPlayers;++i) {
 		int score = _players.at(i)->getScore();
-
 		if (score == maxScore) currentWinner = -1;
 		else if (score > maxScore) {
 			currentWinner = i;
@@ -233,60 +230,42 @@ int Game::getWinner() const {
 	return currentWinner;
 }
 
-void Game::showScores(bool function) const {
-	std::function<void(int, int)> write = [&](int line, int col) {
+void Game::showPlayerInfo(const std::string &info, bool showTurnInfo) const {
+	std::stringstream toWrite;
 
-		for (int i = 0; i < _nPlayers;++i) {
-			Player* player = _players.at(i);
+	for (int i = 0; i < _nPlayers;++i) {
+		const Player* player = _players.at(i);
 
-			putCursorOnPos(line++, col);
-			printForeColor(player->getColor(), '|');
-			std::cout << player->getName();
-			if (function) {
-				if (i == _currentPlayerPos) std::cout << " - to play!";
-				else if (player->getMayPass()) std::cout << " - passed last turn";
-			}
-			std::cout << std::endl;
+		outputForeColor(toWrite, player->getColor(), '|');
+		toWrite << player->getName();
 
-			putCursorOnPos(line++, col);
-			printForeColor(player->getColor(), '|');
-			std::cout << player->getScore() << " points";
-
-			for (int i = 0; i < 5 - _nPlayers - _compactCardView; ++i) line++;
+		if (showTurnInfo) {
+			if (i == _currentPlayerPos) toWrite << " - to play!";
+			else if (player->getMayPass()) toWrite << " - passed last turn";
 		}
-	};
+		toWrite << "\n";
 
-	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, write);
-}
+		outputForeColor(toWrite, player->getColor(), '|');
 
-void Game::showHands(bool function) const {
-	std::function<void(int,int)> write = [&](int line, int col){
-		for (int i = 0; i < _nPlayers;++i) {
-			Player* player = _players.at(i);
-
-			putCursorOnPos(line++, col);
-			printForeColor(player->getColor(), '|');
-			std::cout << player->getName();
-			if (function) {
-				if (i == _currentPlayerPos) std::cout << " - to play!";
-				else if (player->getMayPass()) std::cout << " - passed last turn";
-			}
-			std::cout << std::endl;
-
-			putCursorOnPos(line++, col);
-			printForeColor(player->getColor(), '|');
-			if (i == _currentPlayerPos) player->showHand(true);
-			else player->showHand(false);
-
-			for (int i = 0; i < 5 - _nPlayers - _compactCardView; ++i) line++;
+		if (info == "hands") {
+			if (i == _currentPlayerPos) player->showHand(toWrite, true);
+			else player->showHand(toWrite, false);
 		}
-	};
+		else if (info == "scores"){
+			toWrite << player->getScore() << " points\n";
+		}
+		else {
+			toWrite << "No info requested\n";
+		}
 
-	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, write);
+		for (int j = 0; j < 5 - _nPlayers - _compactCardView; ++j) toWrite << "\n";
+	}
+
+	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, toWrite);
 }
 
 void Game::showHelp() const {
-	std::function<void(int, int)> write = [&](int line, int col) {
+	std::stringstream toWrite;
 		std::vector<std::string> intro =
 		{
 			"|Start or continue words with the tiles you have on hand.",
@@ -308,39 +287,33 @@ void Game::showHelp() const {
 		};
 
 		if (!_compactCardView) {
-			for (auto sentence : intro) {
-				std::cout << sentence << std::endl;
-				putCursorOnPos(line++, col);
+			for (const auto &sentence : intro) {
+				toWrite << sentence << "\n";
 			}
 		}
-		for (auto sentence : commands) {
-			std::cout << sentence << std::endl;
-			putCursorOnPos(line++, col);
+		for (const auto &sentence : commands) {
+			toWrite << sentence << "\n";
 		}
-	};
 
-	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, write);
+	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, toWrite);
 }
 
 void Game::showPool() const {
-	std::function<void(int, int)> write = [&](int line, int col) {
+	std::stringstream toWrite;
 
 		std::vector<char> letters = _pool->getAllLetters();
 		int size = letters.size();
 
-		std::cout << "|" << size << " letters on the pool";
-		putCursorOnPos(line++, col);
+		toWrite << "|" << size << " letters on the pool";
 
 		for (int i = 0; i < size;++i) {
 			if (i % 11 == 0) {
-				putCursorOnPos(line++, col);
-				std::cout << "|";
+				toWrite << "\n" << "|";
 			}
-			std::cout << letters.at(i) << " ";
+			toWrite << letters.at(i) << " ";
 		}
-	};
 
-	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, write);
+	writeCardView(_board->getDimensions().vLine, _board->getDimensions().hCollumn, toWrite);
 }
 
 std::string Game::getPlayerName(int playerPos) const {
@@ -348,14 +321,13 @@ std::string Game::getPlayerName(int playerPos) const {
 	else return _players.at(playerPos)->getName();
 }
 
-void Game::end() const {
+void Game::showEndMessage() const {
 	showBoardAndCardView("scores", false);
 
-	int color;
+	int color = WHITE;
 	int winner = getWinner();
 
 	if (hasWinner()) color = _players.at(winner)->getColor();
-	else color = WHITE;
 
 	paddingAndTopic(WHITE, true); std::cout << "THE GAME HAS ENDED!\n";
 

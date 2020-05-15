@@ -9,14 +9,13 @@
 
 class Game{
 public:
-	Game(Board* board, std::vector<std::string> playerNames, std::vector<int> playerForeColors, int firstToMove);
+	Game(Board* board, const std::vector<std::string> &playerNames, const std::vector<int> &playerForeColors, int firstToMove);
 	~Game();
-	void end() const;
-	void showBoardAndCardView(std::string view = "hands", bool showInfo = true) const;
+	void showEndMessage() const;
+	void showBoardAndCardView(const std::string &view = "hands", bool showTurnInfo = true) const;
 	void askCommand(int turnNumber);
 	void nextTurn();
-	void showScores(bool function = true) const;
-	void showHands(bool function = true) const;
+	void showPlayerInfo(const std::string& info, bool showTurnInfo = true) const;
 	void showHelp() const;
 	void showPool() const;
 	bool hasFinished() const;

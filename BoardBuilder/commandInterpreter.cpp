@@ -198,8 +198,8 @@ bool commandInterpreter::cmdDict() {
     if (file.is_open()) {
         while(getline(file, line)){
             if(line.size() > 1){
-                std::string aaa = stripSpecialChars(line);
-                _dict.push_back(stripSpecialChars(line));
+                stripSpecialChars(line);
+                _dict.push_back(line);
             }
         }
         file.close();
@@ -447,11 +447,12 @@ bool commandInterpreter::cmdAdd(int &last) {
 
 
     for(auto &letter : newEntry.word) letter = tolower(letter);
-    for (auto &entry : _board.getWords()){
-        if (entry.word == newEntry.word){
+
+    for (auto &entry : _board.getWords()) {
+        if (entry.word == newEntry.word) {
             last = -3;
             std::cout << stringWriter(100, "The word you're trying to add is already in the board",
-                                                 BOARD_LEFT_PADDING) << std::endl;
+                                      BOARD_LEFT_PADDING) << std::endl;
             return false;
         }
     }
@@ -503,7 +504,7 @@ bool commandInterpreter::cmdAdd(int &last) {
 }
 
 
-bool commandInterpreter::cmdRemove(int &last){
+bool commandInterpreter::cmdRemove(int &last) {
     if (!_state) {
         std::cout
                 << stringWriter(100, "You need to be editing a board to run this command. Import or create a new one!",
