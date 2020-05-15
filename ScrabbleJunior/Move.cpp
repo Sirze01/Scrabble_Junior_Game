@@ -41,13 +41,14 @@ void Move::execute(Player &player, Board &board, Pool &pool) const {
 
 	player.takeRandom(player.getHandPosition(_letter),pool);
 
-	auto scoreAction = [&]() { 	//add scores and highlight ("territory dominance" feature)
+	auto scoreAction = [&](const std::string &direction) { //add scores and highlight ("territory dominance" feature)
 		player.addScore();
-		board.highlightFinishedWord(player.getColor(), _posToMove.vLine, _posToMove.hColumn);
+		if (direction == "line") board.highlightWordOnLine(player.getColor(), _posToMove.vLine, _posToMove.hColumn);
+		else board.highlightWordOnCol(player.getColor(), _posToMove.vLine, _posToMove.hColumn);
 	};
 	
-	if (continueOnLine() && finishOnLine() && !singleCharWordOnLine()) scoreAction();
-	if (continueOnCol() && finishOnCol() && !singleCharWordOnCol()) scoreAction();
+	if (continueOnLine() && finishOnLine() && !singleCharWordOnLine()) scoreAction("line");
+	if (continueOnCol() && finishOnCol() && !singleCharWordOnCol()) scoreAction("column");
 }
 
 bool Move::inBounds() const {
@@ -75,7 +76,6 @@ bool Move::startOnCol() const {
 	return _posToMove.vLine == 0 || _boardLetters.at(_posToMove.vLine - 1).at(_posToMove.hColumn) == SPACE;
 }
 
-
 bool Move::continueOnLine() const {
 	return wordCompletionOnLine(-1);
 }
@@ -93,43 +93,25 @@ bool Move::finishOnCol() const {
 }
 
 bool Move::wordCompletionOnCol(int cof) const {
-	if (_posToMove.vLine == 0 && cof == -1) return true;
-	if (_posToMove.vLine == _maxLine && cof == 1) return true;
-	else if (cof != -1 && cof != 1) return false;
+	if ((_posToMove.vLine == 0 && cof == -1) ||
+		(_posToMove.vLine == _maxLine && cof == 1)) return true;
 
-	bool completion = true; int line = _posToMove.vLine;
-	for (int i = line + cof; i >= 0 && i <= static_cast<int>(_maxLine); i+=cof) {
+	for (size_t i = _posToMove.vLine + cof; i <= _maxLine; i+=cof) {
 		if (!_boardHighlights.at(i).at(_posToMove.hColumn)) {
-
-			if (_boardLetters.at(i).at(_posToMove.hColumn) == SPACE) {
-				break;
-			}
-			else {
-				completion = false;
-				break;
-			}
+			return _boardLetters.at(i).at(_posToMove.hColumn) == SPACE;
 		}
 	}
-	return completion;
+	return true;
 }
 
 bool Move::wordCompletionOnLine(int cof) const {
-	if (_posToMove.hColumn == 0 && cof == -1) return true;
-	if (_posToMove.hColumn == _maxCol && cof == 1) return true;
-	else if (cof != -1 && cof != 1) return false;
+	if ((_posToMove.hColumn == 0 && cof == -1) ||
+		(_posToMove.hColumn == _maxLine && cof == 1)) return true;
 
-	bool completion = true; int col = _posToMove.hColumn;
-	for (int i = col + cof; i >= 0 && i <= static_cast<int>(_maxCol); i += cof) {
+	for (size_t i = _posToMove.hColumn + cof; i <= _maxCol; i += cof) {
 		if (!_boardHighlights.at(_posToMove.vLine).at(i)) {
-
-			if (_boardLetters.at(_posToMove.vLine).at(i) == SPACE) {
-				break;
-			}
-			else {
-				completion = false;
-				break;
-			}
+			return _boardLetters.at(_posToMove.vLine).at(i) == SPACE;
 		}
 	}
-	return completion;
+	return true;
 }

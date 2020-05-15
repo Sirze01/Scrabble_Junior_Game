@@ -32,7 +32,8 @@ public:
     std::string getPositionString(coord c) const;
 	bool fileExport(std::string filename) const;
     bool highlight(int color, int vIndex, int hIndex);
-    void highlightFinishedWord(int color, int vIndex, int hIndex);
+    void highlightWordOnLine(int color, int vIndex, int hIndex);
+    void highlightWordOnCol(int color, int vIndex, int hIndex);
     std::vector<std::vector<char>> getLetters() const;
     std::vector<char> getNonEmptyChars() const;
     std::vector<std::vector<bool>> getHighlights() const;

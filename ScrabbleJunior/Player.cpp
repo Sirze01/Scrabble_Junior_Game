@@ -40,20 +40,19 @@ void Player::addScore() {
     _score++;
 }
 
-bool Player::exchange(char letter, Pool& pool) {
-    //if pool is empty, abort exchange operation
-    if (!pool.getCurrentSize()) return false;
-
+char Player::exchange(char letter, Pool& pool) {
     int handPos = getHandPosition(letter);
-    if (handPos = -1) return false;
-    if (!takeRandom(handPos, pool)) return false;
+    if (handPos == -1) return '?';
 
+    takeRandom(handPos, pool);
     pool.include(letter);
     _exchangeCount++;
-    return true;
+    return _hand.at(handPos);
 }
 
 bool Player::takeRandom(int handPos, Pool &pool) {
+    if (handPos == -1) return false;
+
     int poolSize = pool.getCurrentSize();
     if (!poolSize) { //if pool is empty, remove from hand (endgame)
         _hand.erase(_hand.begin() + handPos);

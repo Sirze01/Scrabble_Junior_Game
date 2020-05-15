@@ -7,7 +7,7 @@
 #include <functional>
 
 //for shuffle purposes - should only be defined once
-unsigned const SEED = (unsigned)std::chrono::system_clock::now().time_since_epoch().count();
+unsigned const SEED = static_cast<unsigned>(std::chrono::system_clock::now().time_since_epoch().count());
 std::mt19937 RANDOM_GENERATOR(SEED);
 
 struct PlayerData {
@@ -72,14 +72,14 @@ std::string askBoardFileName(const Board &board) {
 	{
 		std::stringstream toWrite;
 		std::vector<std::string> sentences = {
-			"Tip\n\n",
-			"You can use our companion\n",
-			"Board Builder program\n",
-			"to create your own board!\n"
+			"Tip\n",
+			"You can use our companion",
+			"Board Builder program",
+			"to create your own board!"
 		};
 
 		for (std::string str : sentences) {
-			toWrite << TOPIC << str;
+			toWrite << TOPIC << str << "\n";
 		}
 
 		writeCardView(board.getDimensions().vLine, board.getDimensions().hColumn, toWrite);
@@ -104,7 +104,8 @@ std::string askBoardFileName(const Board &board) {
 				std::string userAns;
 
 				for (;;) {
-					paddingAndTopic(RED, true); std::cout << "That board hasn't got enough letters to create a fair 4 player game. Proceed? ";
+					paddingAndTopic(RED, true);
+					std::cout << "That board hasn't got enough letters to create a fair 4 player game. Proceed? ";
 					std::getline(std::cin, userAns); cleanBuffer();
 					stripSpaces(userAns);
 					for (auto& i : userAns) i = static_cast<char>(tolower(i));
@@ -146,7 +147,7 @@ PlayerData askPlayer(int position, const Board& board,
 	for (;;) { //ask name
 		paddingAndTopic(WHITE, true); std::cout << "Player " << position << " name: ";
 		std::getline(std::cin, name); cleanBuffer();
-		stripSpecialChars(name); stripSpaces(name);
+		stripSpaces(name);
 
 		if (name == "random") {
 			paddingAndTopic(RED, true); std::cout << "That is a reserved keyword. Please choose a different name.\n";
@@ -196,7 +197,7 @@ PlayerData askPlayer(int position, const Board& board,
 
 		paddingAndTopic(WHITE, true); std::cout << "Player " << position << " color: ";
 		std::getline(std::cin, colorName); cleanBuffer();
-		stripSpecialChars(name); stripSpaces(name);
+		stripSpecialChars(colorName); stripSpaces(colorName);
 		for (auto& i : colorName) i = static_cast<char>(tolower(i));
 
 		if (colorName == "red") color = RED;

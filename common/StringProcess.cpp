@@ -52,7 +52,7 @@ void stripSpecialChars(std::string &name, bool acceptDigits) {
  * @param text       - Text to write
  * @param padding    - Spaces before the line
  * */
-std::string stringWriter(size_t text_width, std::string text, int padding = 0) {
+std::string stringWriter(size_t text_width, std::string text, int padding = 0) { //needs serious cleanup
     size_t charNbr;
     std::string output_str;
 
@@ -101,29 +101,28 @@ std::string stringWriter(size_t text_width, std::string text, int padding = 0) {
 }
 
 void stripCommandBloat(std::string &command) {
-    std::string cleanCommand(command);
     std::vector<std::string> keywords = //careful not to interfere with board coords or reserved commands
     { "play","move","from","letter","check","get","position","board","load","save","write","show", "tile"};
 
     for (const std::string &word : keywords) {
-        int pos = cleanCommand.find(word);
-        if (cleanCommand.find(word) != std::string::npos) {
-            cleanCommand.erase(pos, pos + word.size());
+        int pos = command.find(word);
+        if (command.find(word) != std::string::npos) {
+            command.erase(pos, pos + word.size());
         }
     }
 }
 
 std::string smartCommandAdvice(const std::string &command) {
     if (command.size() == 2 && isalpha(command.at(0)) && isalpha(command.at(1))) {
-        std::string processed;
-        processed += static_cast<char>(toupper(command.at(0)));
-        processed += static_cast<char>(tolower(command.at(1)));
-        return "Did you attempt to play a tile on position " + processed +
-               "? Please specify letter as in 'Yx <letter>'.\n";
-
-    } else if (command.find("exchange") != std::string::npos) {
+        std::stringstream processed;
+        processed << toupper(command.at(0)) << tolower(command.at(1));
+        return "Did you attempt to play a tile on position " + processed.str() +
+            "? Please specify letter as in 'Yx <letter>'.\n";
+    }
+    else if (command.find("exchange") != std::string::npos) {
         return "Are you trying to exchange one of your tiles? Please specify letter as in 'exchange <letter>'.\n";
-    } else {
+    }
+    else {
         return "Command not recognized. Please type 'help' to view the available commands.\n";
     }
 }

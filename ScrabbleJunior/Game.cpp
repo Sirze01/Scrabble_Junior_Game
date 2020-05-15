@@ -60,8 +60,7 @@ void Game::askCommand(int turnNumber) {
 			else if (!_currentPlayer->getExchangeCount() && _currentPlayer->getHandSize() && _pool.getCurrentSize()) {
 				int handPos = randomBetween(0, _currentPlayer->getHandSize() - 1);
 				char oldLetter = _currentPlayer->getHand().at(handPos);
-				_currentPlayer->exchange(oldLetter, _pool);
-				char newLetter = _currentPlayer->getHand().at(handPos);
+				char newLetter = _currentPlayer->exchange(oldLetter, _pool);
 				coloredMessage << name << " exchanged letter " << oldLetter << " from the pool and got letter " << newLetter << ".\n\n";
 				ableToMove = _currentPlayer->mayMove(_board);
 				showPlayerInfo("hands");
@@ -136,6 +135,9 @@ void Game::askCommand(int turnNumber) {
 					if (ableToMove) {
 						regularMessage << "You can not exchange when you have possible moves. Pay attention!\n";
 					}
+					else if (!_currentPlayer->hasOnHand(token)) {
+						regularMessage << "Could not exchange! You do not have the letter " << token << " on hand.\n";
+					}
 					else if (!_pool.getCurrentSize()) {
 						_currentPlayer->forcePass();
 						coloredMessage << "The pool is empty.\n" <<
@@ -146,11 +148,10 @@ void Game::askCommand(int turnNumber) {
 						coloredMessage << "You already exchanged once and still cannot move.\n" <<
 							"Your turn will be skipped as long as you cannot move.\n";
 					}
-					else if (!_currentPlayer->exchange(token, _pool)) {
-						regularMessage << "Could not exchange! You do not have the letter " << command.getExchangeLetter() << " on hand.\n";
-					}
-					else { //exchange was successful
+					else {
+						char newLetter = _currentPlayer->exchange(token, _pool);
 						showPlayerInfo("hands");
+						regularMessage << "The exchange was successful. You got letter " << newLetter << " from the pool.\n";
 						ableToMove = _currentPlayer->mayMove(_board);
 					}
 				}
@@ -224,7 +225,7 @@ bool Game::allPlayersMustPass() const {
 bool Game::hasFinished() const {
 	if (allHighlighted()) return true;
 	for (const auto& player : _players) {
-		if (player.mayMove(_board)) return false;
+		if (!player.getHasPassed() || player.mayMove(_board)) return false;
 	}
 	return true;
 }
@@ -284,31 +285,31 @@ void Game::showHelp() const {
 	std::stringstream toWrite;
 	std::vector<std::string> intro =
 	{
-		"|Start or continue words with the tiles you have on hand.",
-		"|You get one point for each word you complete.",
-		"|Available commands:",
-		"|"
+		"Start or continue words with the tiles you have on hand.",
+		"You get one point for each word you complete.",
+		"Available commands:",
+		""
 	};
 
 	std::vector<std::string> commands =
 	{
-		"|. 'move <Yx> <letter>' - play letter on position Yx.",
-		"|. 'exchange <letter>' - exchange a letter from the pool.",
-		"|. 'check hands' - have a look at all players' hands.",
-		"|. 'check scores' - have a look at the current scores.",
-		"|. 'check pool' - spy on the current state of the pool.",
-		"|. 'get hint' - get some advice. Do not abuse of this!",
-		"|. 'pass' - skip turn when you have no possible moves.",
-		"|. 'clear' - erase command history and reload screen."
+		"'move <Yx> <letter>' - play letter on position Yx.",
+		"'exchange <letter>' - exchange a letter from the pool.",
+		"'check hands' - have a look at all players' hands.",
+		"'check scores' - have a look at the current scores.",
+		"'check pool' - spy on the current state of the pool.",
+		"'get hint' - get some advice. Do not abuse of this!",
+		"'pass' - skip turn when you have no possible moves.",
+		"'clear' - erase command history and reload screen."
 	};
 
 	if (!_compactCardView) {
 		for (const auto& sentence : intro) {
-			toWrite << sentence << "\n";
+			toWrite << sentence << TOPIC << "\n";
 		}
 	}
 	for (const auto& sentence : commands) {
-		toWrite << sentence << "\n";
+		toWrite << TOPIC << ARROW << SPACE << sentence << "\n";
 	}
 
 	writeCardView(_board.getDimensions().vLine, _board.getDimensions().hColumn, toWrite);
@@ -320,12 +321,12 @@ void Game::showPool() const {
 	std::vector<char> letters = _pool.getAllLetters();
 	int size = letters.size();
 
-	toWrite << "|" << size << " letters on the pool";
+	toWrite << TOPIC << size << " letters on the pool";
 
 	const int MAX_LETTERS_PER_LINE = 10;
 	for (int i = 0; i < size;++i) {
 		if (i % (MAX_LETTERS_PER_LINE+1) == 0) {
-			toWrite << "\n" << "|";
+			toWrite << "\n" << TOPIC;
 		}
 		toWrite << letters.at(i) << " ";
 	}

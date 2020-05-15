@@ -5,6 +5,7 @@
 #include "../common/Board.h"
 #include <vector>
 #include <string>
+#include <assert.h>
 
 class Player {
 public:
@@ -17,7 +18,7 @@ public:
 	void resetExchangeCount();
 	void forcePass();
 	void doNotPass();
-	bool exchange(char letter, Pool &pool);
+	char exchange(char letter, Pool &pool);
 	bool takeRandom(int handPos, Pool &pool);
 	bool mayMove(const Board &board) const;
 	bool getHasPassed() const;
