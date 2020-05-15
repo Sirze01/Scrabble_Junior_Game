@@ -9,11 +9,10 @@
 
 struct coord{
     size_t vLine;
-    size_t hCollumn;
+    size_t hColumn;
 
-    bool operator==(const coord& l) const
-    {
-        return (l.vLine == vLine && l.hCollumn == hCollumn);
+    bool operator==(const coord& l) const{
+        return (l.vLine == vLine && l.hColumn == hColumn);
     }
 };
 
@@ -29,7 +28,8 @@ public:
 	Board(size_t nLines = BOARD_MIN_DIM, size_t nColumns = BOARD_MIN_DIM);
     Board(std::string filename);
     void show() const;
-	coord getIndex(std::string position) const;
+	coord getIndex(const std::string &position) const;
+    std::string getPositionString(coord c) const;
 	bool fileExport(std::string filename) const;
     bool highlight(int color, int vIndex, int hIndex);
     void highlightFinishedWord(int color, int vIndex, int hIndex);

@@ -14,6 +14,7 @@ std::mt19937 RANDOM_GENERATOR(SEED);
 struct PlayerData {
 	std::string name;
 	int color;
+	bool isBot;
 };
 
 
@@ -34,7 +35,7 @@ int askPlayFirst(const Board* board, int nPlayers, std::vector<std::string> play
 			toWrite << "-> " << playerNames.at(i) << "\n";
 		}
 
-		writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, toWrite);
+		writeCardView(board->getDimensions().vLine, board->getDimensions().hColumn, toWrite);
 	}
 
 	std::string playerName;
@@ -82,7 +83,7 @@ std::string askBoardFileName(const Board* board) {
 			toWrite << str;
 		}
 
-		writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, toWrite);
+		writeCardView(board->getDimensions().vLine, board->getDimensions().hColumn, toWrite);
 	}
 
 	std::string fileName;
@@ -130,9 +131,20 @@ std::string askBoardFileName(const Board* board) {
 PlayerData askPlayer(int position, const Board* board, std::vector<std::string> forbiddenNames, std::vector<int> forbiddenColors) {
 
 	std::string name, colorName;
+	bool isBot = false;
 	int color = WHITE;
 	position++;
 
+	{
+		std::stringstream toWrite;
+		std::vector<std::string> sentences = {
+			"|If you want this player to be a bot\n",
+			"|include 'Computer' in his name.\n"
+		};
+
+		for (const auto& sentence : sentences) toWrite << sentence;
+		writeCardView(board->getDimensions().vLine, board->getDimensions().hColumn, toWrite);
+	}
 
 	for (;;) { //ask name
 		paddingAndTopic(WHITE, true); std::cout << "Player " << position << " name: ";
@@ -152,11 +164,16 @@ PlayerData askPlayer(int position, const Board* board, std::vector<std::string> 
 		else if (name.size() > MAX_PLAYER_NAME_SIZE) {
 			paddingAndTopic(RED, true); std::cout << "Please do not input large names!\n";
 		}
-		else if (!isAlpha(name)) {
+		else if (!isAlpha(name,true)) {
 			paddingAndTopic(RED, true); std::cout << "Please do not use digits or special characters.\n";
 		}
 		else if (std::find(forbiddenNames.begin(), forbiddenNames.end(), name) != forbiddenNames.end()) {
 			paddingAndTopic(RED, true); std::cout << "Another player has already chosen that name. Try again.\n";
+		}
+		else if (name.find("Computer") != std::string::npos) {
+			isBot = true;
+			paddingAndTopic(BLUE, true); std::cout << "This player will be a bot.\n";
+			break;
 		}
 		else break;
 	}
@@ -174,7 +191,7 @@ PlayerData askPlayer(int position, const Board* board, std::vector<std::string> 
 			outputForeColor(toWrite, colors.at(i), TOPIC);
 			toWrite << "-> " << colorNames.at(i) << "\n";
 		}
-		writeCardView(board->getDimensions().vLine, board->getDimensions().hCollumn, toWrite);
+		writeCardView(board->getDimensions().vLine, board->getDimensions().hColumn, toWrite);
 	}
 
 
@@ -202,7 +219,7 @@ PlayerData askPlayer(int position, const Board* board, std::vector<std::string> 
 		else break;
 	}
 
-	return { name,color };
+	return { name,color, isBot };
 }
 
 int askNumberOfPlayers() {
@@ -211,6 +228,7 @@ int askNumberOfPlayers() {
 	for (;;) {
 		paddingAndTopic(WHITE, true); std::cout << "Number of players: ";
 		std::getline(std::cin, input); cleanBuffer();
+		stripSpecialChars(input,true); stripSpaces(input);
 
 		if (!isDigit(input)) {
 			errorMessage = "Please input a valid number.";
@@ -256,7 +274,10 @@ int main()
 
 	Board introBoard("intro_board.txt");
 
-	int nPlayers; std::vector<std::string> playerNames; std::vector<int> playerColors;
+	int nPlayers;
+	std::vector<std::string> playerNames;
+	std::vector<int> playerColors;
+	std::vector<bool> botFlags;
 
 	printIntro(&introBoard); clearAndShowBoard(&introBoard);
 
@@ -270,12 +291,13 @@ int main()
 		PlayerData player = askPlayer(i, &gameBoard, playerNames, playerColors);
 		playerNames.push_back(player.name);
 		playerColors.push_back(player.color);
+		botFlags.push_back(player.isBot);
 	}
 
 	
 	clearAndShowBoard(&gameBoard);
 	int first = askPlayFirst(&gameBoard, nPlayers, playerNames, playerColors);
-	Game my_game(&gameBoard, playerNames, playerColors, first);
+	Game my_game(&gameBoard, playerNames, playerColors, botFlags, first);
 
 	for (;;) {
 		my_game.askCommand(1);

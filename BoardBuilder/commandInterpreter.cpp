@@ -402,7 +402,7 @@ bool commandInterpreter::cmdAdd(int &last) {
 
 
     std::string userInput;
-    if(newEntry.firstCoord.vLine == SIZE_MAX && newEntry.firstCoord.hCollumn == SIZE_MAX){
+    if(newEntry.firstCoord.vLine == SIZE_MAX && newEntry.firstCoord.hColumn == SIZE_MAX){
         int temp = 0;
         do {
             if(temp)
@@ -446,7 +446,7 @@ bool commandInterpreter::cmdAdd(int &last) {
     }
 
 
-    for(auto &letter : newEntry.word) letter = tolower(letter);
+    for(auto &letter : newEntry.word) letter = toupper(letter);
 
     for (auto &entry : _board.getWords()) {
         if (entry.word == newEntry.word) {
@@ -458,6 +458,7 @@ bool commandInterpreter::cmdAdd(int &last) {
     }
 
     // Binary search
+    for(auto &letter : newEntry.word) letter = tolower(letter);
     bool inDict = std::binary_search(_dict.begin(), _dict.end(), newEntry.word);
     for(auto &letter : newEntry.word) letter = toupper(letter);
     if (!inDict){
@@ -489,12 +490,12 @@ bool commandInterpreter::cmdAdd(int &last) {
     if(retValue){
         if (newEntry.orientation == 'V'){
             for(int i = 0; i < newEntry.word.size(); i++){
-                _board.placeChar({newEntry.firstCoord.vLine + i, newEntry.firstCoord.hCollumn}, newEntry.word.at(i));
+                _board.placeChar({newEntry.firstCoord.vLine + i, newEntry.firstCoord.hColumn}, newEntry.word.at(i));
             }
         }
         else{
             for(int i = 0; i < newEntry.word.size(); i++){
-                _board.placeChar({newEntry.firstCoord.vLine, newEntry.firstCoord.hCollumn + i}, newEntry.word[i]);
+                _board.placeChar({newEntry.firstCoord.vLine, newEntry.firstCoord.hColumn + i}, newEntry.word[i]);
             }
         }
         _board.addWord(newEntry);
@@ -524,28 +525,28 @@ bool commandInterpreter::cmdRemove(int &last) {
         std::vector<coord> intersections = _board.checkIntersections(wordToRemove);
         if (wordToRemove.orientation== 'V'){
             for(int i = 0; i < wordToRemove.word.size(); i++){
-                coord current = {wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hCollumn};
+                coord current = {wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hColumn};
                 if(intersections.empty()){
-                    _board.placeChar({wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hCollumn}, ' ');
+                    _board.placeChar({wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hColumn}, ' ');
                 }
 
                 else{
                     if(std::find(intersections.begin(), intersections.end(), current) == intersections.end())
-                        _board.placeChar({wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hCollumn}, ' ');
+                        _board.placeChar({wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hColumn}, ' ');
                     }
                 }
             }
 
         else{
             for(int i = 0; i < wordToRemove.word.size(); i++){
-                coord current = {wordToRemove.firstCoord.vLine, wordToRemove.firstCoord.hCollumn + i};
+                coord current = {wordToRemove.firstCoord.vLine, wordToRemove.firstCoord.hColumn + i};
                 if(intersections.empty()){
-                    _board.placeChar({wordToRemove.firstCoord.vLine, wordToRemove.firstCoord.hCollumn + i}, ' ');
+                    _board.placeChar({wordToRemove.firstCoord.vLine, wordToRemove.firstCoord.hColumn + i}, ' ');
                 }
 
                 else{
                     if(std::find(intersections.begin(), intersections.end(), current) == intersections.end())
-                        _board.placeChar({wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hCollumn}, ' ');
+                        _board.placeChar({wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hColumn}, ' ');
                 }
             }
         }
