@@ -1,5 +1,5 @@
 #include "Board.h"
-#include "../common/ConsoleSetup.h"
+
 
 
 void Board::defaultInit(size_t nLines, size_t nColumns) {
@@ -23,11 +23,13 @@ void Board::defaultInit(size_t nLines, size_t nColumns) {
     }
 }
 
+
 Board::Board(size_t nLines, size_t nColumns) {
     defaultInit(nLines, nColumns);
 }
 
-Board::Board(std::string filename) : Board() {
+
+Board::Board(std::string filename){
     int lineDim, colDim;
     std::string content;
 	std::ifstream file;
@@ -42,23 +44,36 @@ Board::Board(std::string filename) : Board() {
 
         defaultInit(lineDim, colDim);
 
-        while(getline(file, content) && content != "#####END_OF_BOARD#####"){
-            codedWord entry;
+        codedWord entry;
+        auto fillEntry = [&](std::string content){
             entry.firstCoord = getIndex(content.substr(0, 2));
-            entry.orientation = content.at(3);
-            entry.word = content.substr(5);
+            content.erase(0, 2);
+            if (!content.empty())
+                entry.orientation = content.at(1);
+            content.erase(0, 2);
+            if (!content.empty())
+                entry.word = content.substr(1);
+            return entry;
+        };
 
-            _words.push_back(entry);
-            coord index = entry.firstCoord;
+        auto checkCoordCases = [](std::string letterCoords){
+            return (isupper(letterCoords.at(0)) && islower(letterCoords.at(1)));
+        };
 
-            if(entry.orientation == 'H'){
-                for(size_t w = 0; w < entry.word.size(); w++){
-                    _letters[index.vLine][index.hColumn + w] = entry.word.at(w);
+        while(getline(file, content)) {
+            if(content.size() > 2 && (checkCoordCases(content.substr(0, 2)) && boardBounds(fillEntry(content)))){
+                _words.push_back(entry);
+                coord index = entry.firstCoord;
+
+                if(entry.orientation == 'H'){
+                    for(size_t w = 0; w < entry.word.size(); w++){
+                        _letters.at(index.vLine).at(index.hColumn + w) = entry.word.at(w);
+                    }
                 }
-            }
-            else if (entry.orientation == 'V'){
-                for(size_t w = 0; w < entry.word.size(); w++){
-                    _letters[index.vLine + w][index.hColumn] = entry.word.at(w);
+                else if (entry.orientation == 'V'){
+                    for(size_t w = 0; w < entry.word.size(); w++){
+                        _letters.at(index.vLine + w).at(index.hColumn) = entry.word.at(w);
+                    }
                 }
             }
         }
@@ -70,6 +85,7 @@ Board::Board(std::string filename) : Board() {
 		std::cerr << "Cannot open file! Created default board." << std::endl;
 	}
 }
+
 
 void Board::show() const { //Prototype function (needs styling)
 	auto darkSpace = []() {outputBackColor(std::cout, DARK_GREY, SPACE); };
@@ -103,12 +119,14 @@ void Board::show() const { //Prototype function (needs styling)
 	while (i--) std::cout << "\n";
 }
 
+
 coord Board::getIndex(const std::string &position) const {
 	coord coordinates{};
 	coordinates.vLine = _alphabet.find(tolower(position.at(0)));
 	coordinates.hColumn = _alphabet.find(position.at(1));
 	return coordinates;
 }
+
 
 std::string Board::getPositionString(coord c) const {
     std::string str;
@@ -117,40 +135,6 @@ std::string Board::getPositionString(coord c) const {
     return str;
 }
 
-bool Board::fileExport(std::string filename) const {
-    std::ofstream file(filename);
-    if (file.is_open()) {
-        file << _vDimension << " x " << _hDimension << '\n';
-        for (auto line : _words) {
-            file << Board::indexToLetter(line.firstCoord) << ' ' << line.orientation << ' ' << line.word << '\n';
-        }
-        file << "#####END_OF_BOARD#####\n";
-
-        file << std::string(2, '\n');
-        file << std::string(BOARD_TOP_PADDING,'\n') << LEFT_PADDING_STR;
-        file << ' ';
-        for (int i = 0; i < _hDimension; i++) {
-            file << " " << _alphabet.at(i);
-        }
-        file << std::endl;
-        for (int i = 0; i < _vDimension; i++) {
-            file << LEFT_PADDING_STR;
-            file << std::string(1,toupper(_alphabet.at(i)));
-            for (int j = 0; j < _hDimension; j++) {
-                file << ' ';
-                file << _letters[i][j];
-            }
-            file << " ";
-            file << std::endl;
-        }
-        return true;
-    }
-
-    else {
-        std::cerr << "Could not write to file." << std::endl;
-        return false;
-    }
-}
 
 bool Board::highlight(int color, int vIndex, int hIndex) {
 	if (vIndex >= (int)_vDimension || hIndex >= (int)_hDimension) return false;
@@ -161,6 +145,7 @@ bool Board::highlight(int color, int vIndex, int hIndex) {
 	_highlightColors.at(vIndex).at(hIndex) = color;
 	return true;
 }
+
 
 //Check for allways true conditions
 void Board::highlightFinishedWord(int color, int vIndex, int hIndex) {
@@ -195,9 +180,11 @@ void Board::highlightFinishedWord(int color, int vIndex, int hIndex) {
 	}
 }
 
+
 std::vector<std::vector<char>> Board::getLetters() const {
 	return _letters;
 }
+
 
 std::vector<char> Board::getNonEmptyChars() const {
 	std::vector<char> allChars;
@@ -207,9 +194,11 @@ std::vector<char> Board::getNonEmptyChars() const {
 	return allChars;
 }
 
+
 std::vector<std::vector<bool>> Board::getHighlights() const {
 	return _highlights;
 }
+
 
 coord Board::getDimensions() const {
 	coord dimensions = { _vDimension, _hDimension};
@@ -239,6 +228,7 @@ bool Board::boardBounds(const codedWord &entry){
 void Board::placeChar(coord inates, char character) {
     _letters[inates.vLine][inates.hColumn] = character;
 }
+
 
 void Board::addWord(codedWord word) {
     _words.push_back(word);
@@ -312,6 +302,7 @@ bool Board::wordSpaces(codedWord word) {
     return true;
 }
 
+
 // Needs Testing - Reserved area :)
 std::string Board::getAlphabet() const {
     return _alphabet;
@@ -330,11 +321,9 @@ void Board::removeWord(codedWord entry){
     }
 }
 
-codedWord* Board::findWord(std::string word) {
-    for(size_t i = 0; i < _words.size(); i++){
-        if (_words.at(i).word == word){
-            return &_words.at(i);
-        }
+codedWord* Board::findWord(const std::string &word){
+    for(auto &boardWord : _words){
+         if(boardWord.word == word) return &boardWord;
     }
     return nullptr;
 }
@@ -357,11 +346,9 @@ bool Board::wordExists(std::string word) const {
     return false;
 }
 
-codedWord* Board::findWord(coord coordinates) {
-    for(size_t i = 0; i < _words.size(); i++){
-        if (_words.at(i).firstCoord.vLine == coordinates.vLine && _words.at(i).firstCoord.hColumn == coordinates.hColumn){
-            return &_words.at(i);
-        }
+codedWord* Board::findWord(const coord &coordinates) {
+    for(auto &boardWord : _words){
+        if(boardWord.firstCoord == coordinates) return &boardWord;
     }
     return nullptr;
 }
@@ -422,6 +409,36 @@ std::vector<coord> Board::checkIntersections(codedWord word) {
     return intersections;
 }
 
-std::string Board::indexToLetter(coord coordinates) const {
-    return (std::string(1,toupper(_alphabet.at(coordinates.vLine))) + std::string(1,tolower(_alphabet.at(coordinates.hColumn))));
+bool Board::fileExport(const std::string &filename) const {
+    std::ofstream file(filename);
+    if (file.is_open()) {
+        file << _vDimension << " x " << _hDimension << '\n';
+        for (const auto &line : _words) {
+            file << Board::getPositionString(line.firstCoord) << ' ' << line.orientation << ' ' << line.word << '\n';
+        }
+
+        file << std::string(2, '\n');
+        file << std::string(BOARD_TOP_PADDING,'\n') << LEFT_PADDING_STR;
+        file << ' ';
+        for (int i = 0; i < _hDimension; i++) {
+            file << " " << _alphabet.at(i);
+        }
+        file << std::endl;
+        for (int i = 0; i < _vDimension; i++) {
+            file << LEFT_PADDING_STR;
+            file << std::string(1,toupper(_alphabet.at(i)));
+            for (int j = 0; j < _hDimension; j++) {
+                file << ' ';
+                file << _letters[i][j];
+            }
+            file << " ";
+            file << std::endl;
+        }
+        return true;
+    }
+
+    else {
+        std::cerr << "Could not write to file." << std::endl;
+        return false;
+    }
 }

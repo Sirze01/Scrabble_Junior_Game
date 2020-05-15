@@ -5,29 +5,26 @@
 
 class commandInterpreter {
 public:
-    commandInterpreter();
-    commandInterpreter (std::string command);
-    void edit(std::string command);
-    std::string boardName();
-    bool interpret(int &last);
-    bool _dictBool = false;
-    bool _state = false; // 0 to board closed, 1 to board open
+    commandInterpreter (std::vector<std::string> &dict, std::string &boardName, Board &board,
+                        bool &dictOpen, bool &boardOpen, std::string command);
+    void interpret(int &statusCodes);
 private:
     std::string _command;
     std::string _modifiers;
-
-    std::vector<std::string> _dict;
-    std::string _name;
-    Board _board;
-    void cmdHelp() const;
+    bool& _dictOpen;
+    bool& _boardOpen; // 0 to board closed, 1 to board open
+    std::vector<std::string>& _dict;
+    std::string& _name;
+    Board& _board;
     bool cmdDict();
+    void cmdHelp() const;
     bool cmdNew();
     bool cmdImport();
-    bool cmdAdd(int &last);
-    bool cmdRemove(int &last);
+    bool cmdAdd(int &statusCodes);
+    bool cmdRemove(int &statusCodes);
     bool cmdExport() const;
-    void cmdDelete(int &last);
-    void cmdExit(int &last);
+    void cmdDelete(int &statusCodes);
+    void cmdExit(int &statusCodes);
 
 };
 

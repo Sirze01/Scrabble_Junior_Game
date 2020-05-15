@@ -20,7 +20,6 @@ struct codedWord{
     coord firstCoord;
     char orientation;
     std::string word;
-
 };
 
 class Board {
@@ -30,7 +29,7 @@ public:
     void show() const;
 	coord getIndex(const std::string &position) const;
     std::string getPositionString(coord c) const;
-	bool fileExport(std::string filename) const;
+	bool fileExport(const std::string &filename) const;
     bool highlight(int color, int vIndex, int hIndex);
     void highlightFinishedWord(int color, int vIndex, int hIndex);
     std::vector<std::vector<char>> getLetters() const;
@@ -42,13 +41,12 @@ public:
     std::vector<codedWord> getWords() const;
     //Testing
     void removeWord(codedWord word);
-    codedWord* findWord (std::string word);
-    codedWord* findWord (coord inates);
+    codedWord* findWord (const std::string &word);
+    codedWord* findWord (const coord &inates);
     bool wordExists(std::string word) const;
     bool wordExists(coord inates) const;
     void removeLetter(coord inates, char letter);
     bool checkIntersection(codedWord);
-    std::string indexToLetter(coord coordinates) const;
     bool boardBounds(const codedWord &entry);
     void placeChar(coord inates, char character);
     std::string getAlphabet() const;
