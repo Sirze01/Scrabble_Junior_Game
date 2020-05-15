@@ -147,7 +147,7 @@ void Game::askCommand(int turnNumber) {
 							"Your turn will be skipped as long as you cannot move.\n";
 					}
 					else if (!_currentPlayer->exchange(token, _pool)) {
-						regularMessage << "Could not exchange. Have you got the letter " << command.getExchangeLetter() << " on hand?\n";
+						regularMessage << "Could not exchange! You do not have the letter " << command.getExchangeLetter() << " on hand.\n";
 					}
 					else { //exchange was successful
 						showPlayerInfo("hands");

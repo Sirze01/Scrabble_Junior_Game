@@ -45,6 +45,7 @@ bool Player::exchange(char letter, Pool& pool) {
     if (!pool.getCurrentSize()) return false;
 
     int handPos = getHandPosition(letter);
+    if (handPos = -1) return false;
     if (!takeRandom(handPos, pool)) return false;
 
     pool.include(letter);
@@ -54,7 +55,6 @@ bool Player::exchange(char letter, Pool& pool) {
 
 bool Player::takeRandom(int handPos, Pool &pool) {
     int poolSize = pool.getCurrentSize();
-
     if (!poolSize) { //if pool is empty, remove from hand (endgame)
         _hand.erase(_hand.begin() + handPos);
         return false;
