@@ -7,6 +7,11 @@
 extern unsigned const SEED;
 extern std::mt19937 RANDOM_GENERATOR;
 
+int randomBetween(int lowerBound, int upperBound) {
+	std::uniform_int_distribution<int> distribution{ lowerBound, upperBound };
+	return distribution(RANDOM_GENERATOR);
+}
+
 Pool::Pool(const Board *board) {
 	_letters = board->getNonEmptyChars();
 }

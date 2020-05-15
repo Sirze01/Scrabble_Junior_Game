@@ -4,6 +4,8 @@
 #include <chrono>
 #include <random>
 
+int randomBetween(int lowerBound, int upperBound);
+
 class Pool {
 public:
 	Pool() = default;

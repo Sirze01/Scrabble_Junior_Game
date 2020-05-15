@@ -1,7 +1,6 @@
 #include "Board.h"
 #include "../common/ConsoleSetup.h"
 
-const std::string alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 void Board::defaultInit(size_t nLines, size_t nColumns) {
     _vDimension = nLines;
@@ -11,13 +10,13 @@ void Board::defaultInit(size_t nLines, size_t nColumns) {
     _highlights.resize(_vDimension);
     _highlightColors.resize(_vDimension);
 
+
     for (size_t line = 0; line < _vDimension; ++line) {
         _letters.at(line).resize(_hDimension);
         _highlights.at(line).resize(_hDimension);
         _highlightColors.at(line).resize(_hDimension);
-
         for (size_t col = 0; col < _hDimension; ++col) {
-            _letters.at(line).at(col) = ' ';
+            _letters.at(line).at(col) = SPACE;
             _highlights.at(line).at(col) = false;
             _highlightColors.at(line).at(col) = RED;
         }
@@ -37,28 +36,29 @@ Board::Board(std::string filename) : Board() {
 	if (file.is_open()) {
         getline(file, content);
 
-        lineDim = std::stoi(content.substr(0, content.find_first_of(' ')));
-        content.erase(0, content.find_first_of(' ') + 3);
+        lineDim = std::stoi(content.substr(0, content.find_first_of(SPACE)));
+        content.erase(0, content.find_first_of(SPACE) + 3);
         colDim = std::stoi(content);
 
         defaultInit(lineDim, colDim);
 
-        while(getline(file, content)){
+        while(getline(file, content) && content != "#####END_OF_BOARD#####"){
             codedWord entry;
-            entry.firstCoord = content.substr(0, 2);
+            entry.firstCoord = getIndex(content.substr(0, 2));
             entry.orientation = content.at(3);
             entry.word = content.substr(5);
-            _words.push_back(entry);
-            coord index = Board::getIndex(entry.firstCoord);
 
-            if((entry.orientation == "H") or (entry.orientation == "h")){
+            _words.push_back(entry);
+            coord index = entry.firstCoord;
+
+            if(entry.orientation == 'H'){
                 for(size_t w = 0; w < entry.word.size(); w++){
-                    _letters[index.vLine][index.hCollumn + w] = entry.word.at(w);
+                    _letters[index.vLine][index.hColumn + w] = entry.word.at(w);
                 }
             }
-            else if ((entry.orientation == "V") or (entry.orientation == "v")){
+            else if (entry.orientation == 'V'){
                 for(size_t w = 0; w < entry.word.size(); w++){
-                    _letters[index.vLine + w][index.hCollumn] = entry.word.at(w);
+                    _letters[index.vLine + w][index.hColumn] = entry.word.at(w);
                 }
             }
         }
@@ -72,21 +72,22 @@ Board::Board(std::string filename) : Board() {
 }
 
 void Board::show() const { //Prototype function (needs styling)
-	auto darkSpace = []() {outputBackColor(std::cout, DARK_GREY, ' '); };
+	auto darkSpace = []() {outputBackColor(std::cout, DARK_GREY, SPACE); };
 
     std::cout << std::string(BOARD_TOP_PADDING,'\n') << LEFT_PADDING_STR;
 
 	darkSpace();
+
 	for (size_t i = 0; i < _hDimension; i++) {
-		darkSpace(); outputBackColor(std::cout, DARK_GREY, alphabet.at(i));
+		darkSpace(); outputBackColor(std::cout, DARK_GREY, _alphabet.at(i));
 	}
 	//std::cout << std::endl;
 	darkSpace(); darkSpace(); std::cout << std::endl;
 	for (size_t i = 0; i < _vDimension; i++) {
 		std::cout << LEFT_PADDING_STR;
-		outputBackColor(std::cout, DARK_GREY,toupper(alphabet.at(i)));
+		outputBackColor(std::cout, DARK_GREY,toupper(_alphabet.at(i)));
 		for (size_t j = 0; j < _hDimension; j++) {
-			std::cout << ' ';
+			std::cout << SPACE;
 			if (getHighlights().at(i).at(j)) {
 				outputBackForeColor(std::cout, WHITE, _highlightColors.at(i).at(j), _letters.at(i).at(j));
 			}
@@ -102,29 +103,58 @@ void Board::show() const { //Prototype function (needs styling)
 	while (i--) std::cout << "\n";
 }
 
-coord Board::getIndex(std::string position) const {
+coord Board::getIndex(const std::string &position) const {
 	coord coordinates{};
-	coordinates.vLine = alphabet.find(tolower(position.at(0)));
-	coordinates.hCollumn = alphabet.find(position.at(1));
+	coordinates.vLine = _alphabet.find(tolower(position.at(0)));
+	coordinates.hColumn = _alphabet.find(position.at(1));
 	return coordinates;
+}
+
+std::string Board::getPositionString(coord c) const {
+    std::string str;
+    str += static_cast<char>('A' + c.vLine);
+    str += static_cast<char>('a' + c.hColumn);
+    return str;
 }
 
 bool Board::fileExport(std::string filename) const {
     std::ofstream file(filename);
     if (file.is_open()) {
-        file << _vDimension << 'x' << _hDimension << '\n';
+        file << _vDimension << " x " << _hDimension << '\n';
         for (auto line : _words) {
-            file << line.firstCoord << ' ' << line.orientation << ' ' << line.word << '\n';
+            file << Board::indexToLetter(line.firstCoord) << ' ' << line.orientation << ' ' << line.word << '\n';
+        }
+        file << "#####END_OF_BOARD#####\n";
+
+        file << std::string(2, '\n');
+        file << std::string(BOARD_TOP_PADDING,'\n') << LEFT_PADDING_STR;
+        file << ' ';
+        for (int i = 0; i < _hDimension; i++) {
+            file << " " << _alphabet.at(i);
+        }
+        file << std::endl;
+        for (int i = 0; i < _vDimension; i++) {
+            file << LEFT_PADDING_STR;
+            file << std::string(1,toupper(_alphabet.at(i)));
+            for (int j = 0; j < _hDimension; j++) {
+                file << ' ';
+                file << _letters[i][j];
+            }
+            file << " ";
+            file << std::endl;
         }
         return true;
     }
-    std::cerr << "Could not write to file." << std::endl;
-    return false;
+
+    else {
+        std::cerr << "Could not write to file." << std::endl;
+        return false;
+    }
 }
 
 bool Board::highlight(int color, int vIndex, int hIndex) {
 	if (vIndex >= (int)_vDimension || hIndex >= (int)_hDimension) return false;
-	if (_letters.at(vIndex).at(hIndex) == ' ') return false;
+	if (_letters.at(vIndex).at(hIndex) == SPACE) return false;
 	if (_highlights.at(vIndex).at(hIndex)) return false;
 
 	_highlights.at(vIndex).at(hIndex) = 1;
@@ -145,19 +175,19 @@ void Board::highlightFinishedWord(int color, int vIndex, int hIndex) {
 				tempCol.at(line).at(hIndex) = color;
 			}
 			else {
-				if (_letters.at(line).at(hIndex) != ' ') successOnCol = false;
+				if (_letters.at(line).at(hIndex) != SPACE) successOnCol = false;
 				break;
 			}
 		}
 		if (successOnCol) _highlightColors = tempCol;
 
 		successOnLine = true; tempLine = _highlightColors;
-		for (size_t col = hIndex + cof; col < dim.hCollumn; col+=cof) {
+		for (size_t col = hIndex + cof; col < dim.hColumn; col+=cof) {
 			if (_highlights.at(vIndex).at(col)) {
 				tempLine.at(vIndex).at(col) = color;
 			}
 			else {
-				if (_letters.at(vIndex).at(col) != ' ') successOnLine = false;
+				if (_letters.at(vIndex).at(col) != SPACE) successOnLine = false;
 				break;
 			}
 		}
@@ -172,7 +202,7 @@ std::vector<std::vector<char>> Board::getLetters() const {
 std::vector<char> Board::getNonEmptyChars() const {
 	std::vector<char> allChars;
 	for (std::vector<char> v : _letters) {
-		for (char c : v) if (c != ' ') allChars.push_back(c);
+		for (char c : v) if (c != SPACE) allChars.push_back(c);
 	}
 	return allChars;
 }
@@ -187,63 +217,60 @@ coord Board::getDimensions() const {
 }
 
 
-// Needs Testing - Reserved area :)
-bool Board::boardBounds(coord firstLetter, char orientation, int wordLen){ //ORIENTATION IS NOW A CHAR - MIND THIS
-    return firstLetter.vLine < _vDimension
-        && firstLetter.hCollumn < _hDimension
-        && !(orientation == 'V' && firstLetter.vLine + wordLen >= _vDimension)
-        && !(orientation == 'H' && firstLetter.hCollumn + wordLen >= _hDimension);
+bool Board::boardBounds(const codedWord &entry){
+    if((entry.firstCoord.vLine > _vDimension) || (entry.firstCoord.vLine < 0))
+        return false;
+    if((entry.firstCoord.hColumn > _hDimension) || (entry.firstCoord.hColumn < 0))
+        return false;
+    if(entry.orientation == 'V') {
+        if ((entry.firstCoord.vLine + entry.word.size() > _vDimension) || (entry.firstCoord.vLine + entry.word.size() < 0))
+            return false;
+    }
+
+    if(entry.orientation == 'H') {
+        if((entry.firstCoord.hColumn + entry.word.size() > _hDimension) || (entry.firstCoord.hColumn + entry.word.size() < 0))
+            return false;
+    }
+
+    return true;
 }
 
-bool Board::goodIntersects(codedWord word) {
-    bool valid = true;
-    if(word.orientation == "V") {
-        for(size_t i = 0; i < word.word.size(); i++){
-            if (_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn] != ' ')
-                if(_letters[getIndex(word.firstCoord).vLine + i][getIndex(word.firstCoord).hCollumn] != word.word[i])
-                    valid = false;
-        }
-    }
-    if(word.orientation == "H") {
-        for(size_t i = 0; i < word.word.size(); i++){
-            if (_letters[getIndex(word.firstCoord).vLine][getIndex(word.firstCoord).hCollumn + i] != ' ')
-                if(_letters[getIndex(word.firstCoord).vLine][getIndex(word.firstCoord).hCollumn + i] != word.word[i])
-                    valid = false;
-        }
-    }
-    return valid;
-}
 
-void Board::lettersManip(coord c, char letter) { //setletter
-    _letters[c.vLine][c.hCollumn] = letter;
+void Board::placeChar(coord inates, char character) {
+    _letters[inates.vLine][inates.hColumn] = character;
 }
 
 void Board::addWord(codedWord word) {
     _words.push_back(word);
 }
 
-bool Board::wordSpaces(codedWord entry) { // isIsolated
-    if(entry.orientation == "V") {
 
-        for (size_t i = 0; i < entry.word.size(); i++) {
-            if (i == 0 && (getIndex(entry.firstCoord).vLine - 1 <= _vDimension - 1)) {
-                if (_letters[getIndex(entry.firstCoord).vLine + i - 1][getIndex(entry.firstCoord).hCollumn] != ' ')
+bool Board::wordSpaces(codedWord word) {
+    if(word.orientation == 'V') {
+
+        for (int i = 0; i < word.word.size(); i++) {
+            if (i == 0 &&
+                (word.firstCoord.vLine - 1 <= _vDimension - 1 && word.firstCoord.vLine - 1 >= 0)) {
+                if (_letters.at(word.firstCoord.vLine + i - 1).at(word.firstCoord.hColumn) != ' ')
                     return false;
             }
 
-            if (i == (entry.word.size() - 1) && (getIndex(entry.firstCoord).vLine + i + 1 <= _vDimension - 1)) {
-                if (_letters[getIndex(entry.firstCoord).vLine + i + 1][getIndex(entry.firstCoord).hCollumn] != ' ')
+            if (i == (word.word.size() - 1) && (word.firstCoord.vLine + i + 1 <= _vDimension - 1 &&
+                                                word.firstCoord.vLine + i + 1 >= 0)) {
+                if (_letters.at(word.firstCoord.vLine + i + 1).at(word.firstCoord.hColumn) != ' ')
                     return false;
             }
 
-            if (_letters[getIndex(entry.firstCoord).vLine + i][getIndex(entry.firstCoord).hCollumn] != entry.word[i]) {
-                if (getIndex(entry.firstCoord).hCollumn + 1 <= _hDimension - 1) {
-                    if (_letters[getIndex(entry.firstCoord).vLine + i][getIndex(entry.firstCoord).hCollumn + 1] != ' ')
+            if (_letters.at(word.firstCoord.vLine + i).at(word.firstCoord.hColumn) != word.word[i]) {
+                if (word.firstCoord.hColumn + 1 <= _hDimension - 1 &&
+                    word.firstCoord.hColumn + 1 >= 0) {
+                    if (_letters.at(word.firstCoord.vLine + i).at(word.firstCoord.hColumn + 1) != ' ')
                         return false;
                 }
 
-                if (getIndex(entry.firstCoord).hCollumn - 1 <= _hDimension - 1) {
-                    if (_letters[getIndex(entry.firstCoord).vLine + i][getIndex(entry.firstCoord).hCollumn - 1] != ' ')
+                if (word.firstCoord.hColumn - 1 <= _hDimension - 1 &&
+                    word.firstCoord.hColumn - 1 >= 0) {
+                    if (_letters.at(word.firstCoord.vLine + i).at(word.firstCoord.hColumn - 1) != ' ')
                         return false;
 
                 }
@@ -251,26 +278,31 @@ bool Board::wordSpaces(codedWord entry) { // isIsolated
         }
     }
 
-    if(entry.orientation == "H") {
-        for (size_t i = 0; i < entry.word.size(); i++) {
-            if (i == 0 && (getIndex(entry.firstCoord).hCollumn - 1 <= _hDimension - 1)) {
-                if (_letters[getIndex(entry.firstCoord).vLine][getIndex(entry.firstCoord).hCollumn + i - 1] != ' ')
+
+    if(word.orientation == 'H') {
+        for (int i = 0; i < word.word.size(); i++) {
+            if (i == 0 &&
+                (word.firstCoord.hColumn - 1 <= _hDimension - 1 && word.firstCoord.hColumn - 1 >= 0)) {
+                if (_letters.at(word.firstCoord.vLine).at(word.firstCoord.hColumn + i - 1) != ' ')
                     return false;
             }
 
-            if (i == (entry.word.size() - 1) && (getIndex(entry.firstCoord).hCollumn + i + 1 <= _hDimension - 1)) {
-                if (_letters[getIndex(entry.firstCoord).vLine][getIndex(entry.firstCoord).hCollumn + i + 1] != ' ')
+            if (i == (word.word.size() - 1) && (word.firstCoord.hColumn + i + 1 <= _hDimension - 1 &&
+                                                word.firstCoord.hColumn + i + 1 >= 0)) {
+                if (_letters.at(word.firstCoord.vLine).at(word.firstCoord.hColumn + i + 1) != ' ')
                     return false;
             }
 
-            if (_letters[getIndex(entry.firstCoord).vLine][getIndex(entry.firstCoord).hCollumn + i] != entry.word[i]) {
-                if (getIndex(entry.firstCoord).vLine + 1 <= _vDimension - 1) {
-                    if (_letters[getIndex(entry.firstCoord).vLine + 1][getIndex(entry.firstCoord).hCollumn + i] != ' ')
+            if (_letters.at(word.firstCoord.vLine).at(word.firstCoord.hColumn + i) != word.word[i]) {
+                if (word.firstCoord.vLine + 1 <= _vDimension - 1 &&
+                    word.firstCoord.vLine + 1 >= 0) {
+                    if (_letters.at(word.firstCoord.vLine + 1).at(word.firstCoord.hColumn + i) != ' ')
                         return false;
                 }
 
-                if (getIndex(entry.firstCoord).vLine - 1 <= _vDimension - 1) {
-                    if (_letters[getIndex(entry.firstCoord).vLine - 1][getIndex(entry.firstCoord).hCollumn + i] != ' ')
+                if (word.firstCoord.vLine - 1 <= _vDimension - 1 &&
+                    word.firstCoord.vLine - 1 >= 0) {
+                    if (_letters.at(word.firstCoord.vLine - 1).at(word.firstCoord.hColumn + i) != ' ')
                         return false;
 
                 }
@@ -278,4 +310,118 @@ bool Board::wordSpaces(codedWord entry) { // isIsolated
         }
     }
     return true;
+}
+
+// Needs Testing - Reserved area :)
+std::string Board::getAlphabet() const {
+    return _alphabet;
+}
+
+std::vector<codedWord> Board::getWords() const {
+    return _words;
+}
+
+void Board::removeWord(codedWord entry){
+    for(size_t i = 0; i < _words.size(); i++){
+        if (_words.at(i).word == entry.word){
+            _words.erase(_words.begin() + i);
+            break;
+        }
+    }
+}
+
+codedWord* Board::findWord(std::string word) {
+    for(size_t i = 0; i < _words.size(); i++){
+        if (_words.at(i).word == word){
+            return &_words.at(i);
+        }
+    }
+    return nullptr;
+}
+
+bool Board::wordExists(coord coordinates) const {
+    for(size_t i = 0; i < _words.size(); i++){
+        if (_words.at(i).firstCoord.vLine == coordinates.vLine && _words.at(i).firstCoord.hColumn == coordinates.hColumn){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Board::wordExists(std::string word) const {
+    for(const auto &inBoard : _words){
+        if (inBoard.word == word){
+            return true;
+        }
+    }
+    return false;
+}
+
+codedWord* Board::findWord(coord coordinates) {
+    for(size_t i = 0; i < _words.size(); i++){
+        if (_words.at(i).firstCoord.vLine == coordinates.vLine && _words.at(i).firstCoord.hColumn == coordinates.hColumn){
+            return &_words.at(i);
+        }
+    }
+    return nullptr;
+}
+
+bool Board::checkIntersection(codedWord word) {
+    bool valid = true;
+    if(word.orientation == 'V') {
+        for(size_t i = 0; i < word.word.size(); i++){
+            if (_letters.at(word.firstCoord.vLine + i).at(word.firstCoord.hColumn) != ' ') {
+                if (_letters.at(word.firstCoord.vLine + i).at(word.firstCoord.hColumn) != word.word.at(i))
+                    valid = false;
+            }
+        }
+    }
+    if(word.orientation == 'H') {
+        for (int i = 0; i < word.word.size(); i++) {
+            if (_letters.at(word.firstCoord.vLine).at(word.firstCoord.hColumn + i) != ' ') {
+                if (_letters.at(word.firstCoord.vLine).at(word.firstCoord.hColumn + i) != word.word.at(i))
+                    valid = false;
+            }
+        }
+    }
+    return valid;
+}
+
+std::vector<coord> Board::checkIntersections(codedWord word) {
+    std::vector<coord> intersections;
+    if(word.orientation == 'V') {
+        for(size_t i = 0; i < word.word.size(); i++){
+            if (word.firstCoord.hColumn + 1 <= getDimensions().hColumn) {
+                if (_letters.at(word.firstCoord.vLine + i).at(word.firstCoord.hColumn + 1) != ' ') {
+                    intersections.push_back({word.firstCoord.vLine + i, word.firstCoord.hColumn});
+                }
+            }
+            if (word.firstCoord.hColumn - 1 >= 0){
+                if(_letters.at(word.firstCoord.vLine + i).at(word.firstCoord.hColumn - 1) != ' ') {
+                    intersections.push_back({word.firstCoord.vLine + i, word.firstCoord.hColumn});
+                }
+            }
+        }
+    }
+    if(word.orientation == 'H') {
+        for (int i = 0; i < word.word.size(); i++) {
+            if (word.firstCoord.vLine + 1 <= getDimensions().vLine){
+                if(_letters.at(word.firstCoord.vLine + 1).at(word.firstCoord.hColumn + i) != ' '){
+                    intersections.push_back({word.firstCoord.vLine, word.firstCoord.hColumn + i});
+                }
+            }
+            if (word.firstCoord.vLine - 1 >= 0){
+                if(_letters.at(word.firstCoord.vLine - 1).at(word.firstCoord.hColumn + i) != ' '){
+                    intersections.push_back({word.firstCoord.vLine, word.firstCoord.hColumn + i});
+                }
+            }
+
+
+        }
+    }
+    return intersections;
+}
+
+std::string Board::indexToLetter(coord coordinates) const {
+    return (std::string(1,toupper(_alphabet.at(coordinates.vLine))) + std::string(1,tolower(_alphabet.at(coordinates.hColumn))));
 }
