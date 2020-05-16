@@ -4,8 +4,8 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include "../common/StringProcess.h"
-#include "ConsoleSetup.h"
+#include "containerUtil.h"
+#include "consoleUtil.h"
 
 struct coord{
     size_t vLine;
@@ -32,7 +32,8 @@ public:
     std::string getPositionString(coord c) const;
 	bool fileExport(std::string filename) const;
     bool highlight(int color, int vIndex, int hIndex);
-    void highlightFinishedWord(int color, int vIndex, int hIndex);
+    void highlightWordOnLine(int color, int vIndex, int hIndex);
+    void highlightWordOnCol(int color, int vIndex, int hIndex);
     std::vector<std::vector<char>> getLetters() const;
     std::vector<char> getNonEmptyChars() const;
     std::vector<std::vector<bool>> getHighlights() const;
@@ -46,9 +47,7 @@ public:
     codedWord* findWord (coord inates);
     bool wordExists(std::string word) const;
     bool wordExists(coord inates) const;
-    void removeLetter(coord inates, char letter);
     bool checkIntersection(codedWord);
-    std::string indexToLetter(coord coordinates) const;
     bool boardBounds(const codedWord &entry);
     void placeChar(coord inates, char character);
     std::string getAlphabet() const;
