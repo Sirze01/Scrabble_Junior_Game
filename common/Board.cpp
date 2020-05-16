@@ -261,11 +261,11 @@ bool Board::addWord(codedWord word) {
 
 bool Board::wordIsolation(codedWord word) const{
     if(word.orientation == 'V') {
-        if (word.firstCoord.vLine - 1 >= _vDimension){
+        if (word.firstCoord.vLine - 1 < _vDimension){
             if (_letters.at(word.firstCoord.vLine - 1).at(word.firstCoord.hColumn) != ' ')
                 return false;
         }
-        if(word.firstCoord.vLine + word.word.size() + 1 >= _vDimension){
+        if(word.firstCoord.vLine + word.word.size() + 1 < _vDimension){
             if (_letters.at(word.firstCoord.vLine + 1).at(word.firstCoord.hColumn) != ' ')
                 return false;
         }
@@ -282,11 +282,11 @@ bool Board::wordIsolation(codedWord word) const{
     }
 
     else{
-        if (word.firstCoord.hColumn - 1 >= _hDimension){
+        if (word.firstCoord.hColumn - 1 < _hDimension){
             if (_letters.at(word.firstCoord.vLine).at(word.firstCoord.hColumn - 1) != ' ')
                 return false;
         }
-        if(word.firstCoord.hColumn + word.word.size() + 1 >= _hDimension){
+        if(word.firstCoord.hColumn + word.word.size() + 1 < _hDimension){
             if (_letters.at(word.firstCoord.vLine).at(word.firstCoord.hColumn + 1) != ' ')
                 return false;
         }

@@ -1,5 +1,7 @@
 #include <iostream>
+
 #include "../common/ConsoleSetup.h"
+#include "../common/StringProcess.h"
 #include "commandInterpreter.h"
 
 /*#################################################################*/
@@ -7,24 +9,15 @@
 /**
  * Oppening message for the utility
  */
-void openingMessage() {
+void openingMessage(){
 
     const std::string message = "Board Builder v0.0.1";
-    const std::vector<char> separator(100, '#');
-    const std::vector<char> filler(((100 - message.size()) / 2), '-');
+    const std::string separator(100, '#');
+    const std::string filler(((100 - message.size()) / 2), '-');
     std::cout << LEFT_PADDING_STR << message << " Debug version\n";
-    std::cout << LEFT_PADDING_STR;
-    for(const auto &character : separator) std::cout << character;
-    std::cout << std::string(1, '\n');
-    std::cout << LEFT_PADDING_STR;
-    for(const auto &character : filler) std::cout << character;
-    std::cout << message;
-    for(const auto &character : filler) std::cout << character;
-    std::cout << std::endl;
-    std::cout << std::string(1, '\n');
-    std::cout << LEFT_PADDING_STR;
-    for(const auto &character : separator) std::cout << character;
-    std::cout << std::endl;
+    std::cout << LEFT_PADDING_STR << separator << std::endl << std::endl;
+    std::cout << LEFT_PADDING_STR << filler << message << filler << std::endl << std::endl;
+    std::cout << LEFT_PADDING_STR << separator <<std::endl;
     std::cout << std::string(2, '\n');
     std::cout << LEFT_PADDING_STR << stringWriter(100,
                               "Input the desired operation. Alternatively you can access the available commands with 'help' at anytime.",0);
@@ -35,9 +28,8 @@ void openingMessage() {
  * Message about the need to open a dict when starting to edit a board
  */
 void dictMessage() {
-    std::cout << stringWriter(100,
-                              "Start by importing a dictionary, so your board knows what words to use",
-                              BOARD_LEFT_PADDING);
+    std::cout << LEFT_PADDING_STR << stringWriter(100,
+                              "Start by importing a dictionary, so your board knows what words to use",0);
 }
 
 
@@ -45,9 +37,8 @@ void dictMessage() {
  * Message about the need to create or import a board to edit
  */
 void boardMessage() {
-    std::cout << stringWriter(100,
-                              "Now you need to start editing a board. Try to create a new one with 'new' or import one already built with 'import'",
-                              BOARD_LEFT_PADDING);
+    std::cout << LEFT_PADDING_STR << stringWriter(100,
+                              "Now you need to start editing a board. Try to create a new one with 'new' or import one already built with 'import'",0);
 }
 
 
@@ -107,7 +98,5 @@ int main() {
         }while(!(statusCodes == -1 || statusCodes == -4));
         count = 0;
     }while(statusCodes == -4);
-
-    std::cout << "main exiting" << std::endl;
     return 0;
 }
