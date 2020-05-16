@@ -1,9 +1,8 @@
 #include "commandInterpreter.h"
-#include "../common/ConsoleSetup.h"
 #include <algorithm>
 
 commandInterpreter::commandInterpreter(std::vector<std::string> &dict, std::string &boardName, Board &board,
-        bool &dictOpen, bool &boardOpen, std::string command):  _dict( dict ), _dictOpen( dictOpen ), _board(board),
+        bool &dictOpen, bool &boardOpen, std::string command): _dict( dict ), _dictOpen( dictOpen ), _board(board),
         _boardOpen(boardOpen), _name(boardName){
     _command = "";
     _modifiers = "";
@@ -424,17 +423,17 @@ bool commandInterpreter::cmdRemove(int &statusCodes) {
 
     if(_board.wordExists(_modifiers)){
         codedWord wordToRemove = *_board.findWord(_modifiers);
-        std::vector<coord> intersections = _board.checkIntersections(wordToRemove);
+        std::vector<coord> intersections = _board.intersectionsVector(wordToRemove);
         if (wordToRemove.orientation== 'V'){
             for(int i = 0; i < wordToRemove.word.size(); i++){
                 coord current = {wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hColumn};
                 if(intersections.empty()){
-                    _board.placeChar({wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hColumn}, ' ');
+                    _board.placeChar(current, ' ');
                 }
 
                 else{
                     if(std::find(intersections.begin(), intersections.end(), current) == intersections.end())
-                        _board.placeChar({wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hColumn}, ' ');
+                        _board.placeChar(current, ' ');
                     }
                 }
             }
@@ -443,12 +442,12 @@ bool commandInterpreter::cmdRemove(int &statusCodes) {
             for(int i = 0; i < wordToRemove.word.size(); i++){
                 coord current = {wordToRemove.firstCoord.vLine, wordToRemove.firstCoord.hColumn + i};
                 if(intersections.empty()){
-                    _board.placeChar({wordToRemove.firstCoord.vLine, wordToRemove.firstCoord.hColumn + i}, ' ');
+                    _board.placeChar(current, ' ');
                 }
 
                 else{
                     if(std::find(intersections.begin(), intersections.end(), current) == intersections.end())
-                        _board.placeChar({wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hColumn}, ' ');
+                        _board.placeChar(current, ' ');
                 }
             }
         }

@@ -374,16 +374,14 @@ bool Board::checkIntersection(codedWord word) {
     return valid;
 }
 
-std::vector<coord> Board::checkIntersections(codedWord word) {
+std::vector<coord> Board::intersectionsVector(codedWord word) {
     std::vector<coord> intersections;
     if(word.orientation == 'V') {
         for(size_t i = 0; i < word.word.size(); i++){
-            if (word.firstCoord.hColumn + 1 <= getDimensions().hColumn) {
+            if ((word.firstCoord.hColumn + 1) <= getDimensions().hColumn - 1 && (word.firstCoord.hColumn - 1) <= getDimensions().hColumn - 1) {
                 if (_letters.at(word.firstCoord.vLine + i).at(word.firstCoord.hColumn + 1) != ' ') {
                     intersections.push_back({word.firstCoord.vLine + i, word.firstCoord.hColumn});
                 }
-            }
-            if (word.firstCoord.hColumn - 1 >= 0){
                 if(_letters.at(word.firstCoord.vLine + i).at(word.firstCoord.hColumn - 1) != ' ') {
                     intersections.push_back({word.firstCoord.vLine + i, word.firstCoord.hColumn});
                 }
@@ -392,16 +390,17 @@ std::vector<coord> Board::checkIntersections(codedWord word) {
     }
     if(word.orientation == 'H') {
         for (int i = 0; i < word.word.size(); i++) {
-            if (word.firstCoord.vLine + 1 <= getDimensions().vLine){
+            if ((word.firstCoord.vLine + 1) <= getDimensions().vLine - 1 && (word.firstCoord.vLine - 1) <= getDimensions().vLine - 1){
                 if(_letters.at(word.firstCoord.vLine + 1).at(word.firstCoord.hColumn + i) != ' '){
                     intersections.push_back({word.firstCoord.vLine, word.firstCoord.hColumn + i});
                 }
-            }
-            if (word.firstCoord.vLine - 1 >= 0){
                 if(_letters.at(word.firstCoord.vLine - 1).at(word.firstCoord.hColumn + i) != ' '){
                     intersections.push_back({word.firstCoord.vLine, word.firstCoord.hColumn + i});
                 }
             }
+
+
+
 
 
         }

@@ -50,7 +50,7 @@ public:
     bool boardBounds(const codedWord &entry);
     void placeChar(coord inates, char character);
     std::string getAlphabet() const;
-    std::vector<coord> checkIntersections(codedWord word);
+    std::vector<coord> intersectionsVector(codedWord word);
 
 private:
 

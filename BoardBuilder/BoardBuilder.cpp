@@ -48,6 +48,7 @@ void boardMessage() {
 
 int main() {
     setupConsole();
+
     /*#################################################*/
     std::vector<std::string> dict;
     std::string boardName;
@@ -57,54 +58,33 @@ int main() {
     std::string userInput;
     int statusCodes = 0;
     openingMessage();
+    int count = 0;
     do{
-        dictMessage();
         do{
+            if(count == 0) {
+                dictMessage();
+            }
+            else if (count == 1) {
+                boardMessage();
+            }
             if (statusCodes == -3) {
                 std::cout
                         << stringWriter(100, "Please choose a valid command. If you need help input 'help'.",
                                         BOARD_LEFT_PADDING);
             }
-            std::cout << std::string(2, BOARD_LEFT_PADDING) << "There's no dictionary open yet" << std::endl;
-            std::cout << std::string(2, BOARD_LEFT_PADDING) << "Your input: ";
+            if(boardName.empty())
+                std::cout << std::string(2, BOARD_LEFT_PADDING) << "Your input: ";
+            else
+                std::cout << std::string(2, BOARD_LEFT_PADDING) << "(" << boardName << ") " << "Your input: ";
             std::getline(std::cin, userInput);
             commandInterpreter command(dict, boardName, board, dictOpen, boardOpen, userInput);
             command.interpret(statusCodes);
-        }while(!(dictOpen || statusCodes == -1 || statusCodes == -4));
-        if (statusCodes == -4)
-            continue;
-
-        if(statusCodes != -1) {
-            boardMessage();
-            do {
-                if (statusCodes == -3) {
-                    std::cout
-                            << stringWriter(100, "Please choose a valid command. If you need help input 'help'.",
-                                            BOARD_LEFT_PADDING);
-                }
-                std::cout << std::string(2, BOARD_LEFT_PADDING) << "There's no board open yet" << std::endl;
-                std::cout << std::string(2, BOARD_LEFT_PADDING) << "Your input: ";
-                std::getline(std::cin, userInput);
-                commandInterpreter command(dict, boardName, board, dictOpen, boardOpen, userInput);
-                command.interpret(statusCodes);
-            } while (!(boardOpen || statusCodes == -1 || statusCodes == -4));
-        }
-        if (statusCodes == -4)
-            continue;
-        if(statusCodes != -1) {
-            do {
-                if (statusCodes == -3) {
-                    std::cout
-                            << stringWriter(100, "Please choose a valid command. If you need help input 'help'.",
-                                            BOARD_LEFT_PADDING);
-                }
-                std::cout << std::string(2, BOARD_LEFT_PADDING) << "(" << boardName << ")" << " Your input: ";
-                std::getline(std::cin, userInput);
-                commandInterpreter command(dict, boardName, board, dictOpen, boardOpen, userInput);
-                command.interpret(statusCodes);
-            } while (!(statusCodes == -1 || statusCodes == -4));
-        }
-
+            if (dictOpen && count == 0 )
+                count++;
+            if (boardOpen && count == 1)
+                count ++;
+        }while(!(statusCodes == -1 || statusCodes == -4));
+        count = 0;
     }while(statusCodes == -4);
 
     std::cout << "main exiting" << std::endl;
