@@ -83,7 +83,7 @@ Board::Board(std::string filename){
 	}
 	else {
         defaultInit();
-		std::cerr << "Cannot open file! Created default board." << std::endl;
+		std::cerr << LEFT_PADDING_STR << "Cannot open file! Created default board.\n";
 	}
 }
 

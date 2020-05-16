@@ -164,9 +164,11 @@ void commandInterpreter::cmdHelp(){
 
     };
 
+    std::stringstream output;
     for (auto& sentence : sentences) {
-        std::cout << LEFT_PADDING_STR << sentence << std::endl;
+        output << LEFT_PADDING_STR << sentence << std::endl;
     }
+    std::cout << output.str();
 }
 
 
@@ -187,13 +189,16 @@ bool commandInterpreter::cmdDict() {
     std::string line;
     std::ifstream file;
     file.open(_modifiers, std::ios::in);
+    // Check if file is open
     if (file.is_open()) {
+        // Read from it while there are lines to read
         while(getline(file, line)){
             stripSpecialChars(line);
             if(line.size() > 1){
                 _dict.push_back(line);
             }
         }
+        // Close the file and change flags
         file.close();
         _dictOpen = true;
         std::cout << std::string(BOARD_LEFT_PADDING, SPACE) << "Dictionary loaded\n" << std::endl;
@@ -308,11 +313,13 @@ bool commandInterpreter::cmdImportBoard() {
     }
     std::ifstream file;
     file.open(_modifiers, std::ios::in);
+    // Check if file exists
     if (!file.is_open()) {
         std::cout << LEFT_PADDING_STR << "Cannot open file! Try another\n" << std::endl;
         return false;
     }
     else{
+        // Close file if it exists
         file.close();
     }
     Board newBoard(_modifiers);
@@ -346,8 +353,9 @@ bool commandInterpreter::cmdAdd() {
         std::stringstream commandStream(_modifiers);
         commandStream >> tempString;
         if(isAlpha(tempString)){
+            // Check if given coordinates are valid
             if (!(_board.boardBounds({_board.getIndex(tempString), '\0', ""}))) {
-            return false;
+                return false;
             }
             newEntry.firstCoord = _board.getIndex(tempString);
         }

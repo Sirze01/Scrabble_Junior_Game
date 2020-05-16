@@ -68,6 +68,7 @@ int main() {
     int statusCodes = 0;
 
     openingMessage();
+    //Counter to define what help message to show
     int count = 0;
     do{
         do{
