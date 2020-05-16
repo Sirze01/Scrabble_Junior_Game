@@ -1,6 +1,5 @@
 #include "Board.h"
-#include "../common/ConsoleSetup.h"
-
+#include "../common/consoleUtil.h"
 
 void Board::defaultInit(size_t nLines, size_t nColumns) {
 	_vDimension = nLines;
@@ -72,24 +71,24 @@ Board::Board(std::string filename) : Board() {
 }
 
 void Board::show() const { //Prototype function (needs styling)
-	auto darkSpace = []() {outputBackColor(std::cout, DARK_GREY, SPACE); };
+	auto darkSpace = []() {Util::outputBackColor(std::cout, DARK_GREY, SPACE); };
 
 	std::cout << std::string(BOARD_TOP_PADDING, '\n') << LEFT_PADDING_STR;
 
 	darkSpace();
 
 	for (size_t i = 0; i < _hDimension; i++) {
-		darkSpace(); outputBackColor(std::cout, DARK_GREY, _alphabet.at(i));
+		darkSpace(); Util::outputBackColor(std::cout, DARK_GREY, _alphabet.at(i));
 	}
 	//std::cout << std::endl;
 	darkSpace(); darkSpace(); std::cout << std::endl;
 	for (size_t i = 0; i < _vDimension; i++) {
 		std::cout << LEFT_PADDING_STR;
-		outputBackColor(std::cout, DARK_GREY, toupper(_alphabet.at(i)));
+		Util::outputBackColor(std::cout, DARK_GREY, toupper(_alphabet.at(i)));
 		for (size_t j = 0; j < _hDimension; j++) {
 			std::cout << SPACE;
 			if (getHighlights().at(i).at(j)) {
-				outputBackColor(std::cout, _highlightColors.at(i).at(j), _letters.at(i).at(j));
+				Util::outputBackColor(std::cout, _highlightColors.at(i).at(j), _letters.at(i).at(j));
 			}
 			else std::cout << _letters[i][j];
 		}
@@ -242,8 +241,8 @@ bool Board::wordSpaces(codedWord word) {
 					return false;
 			}
 
-			if (i == (word.word.size() - 1) && (word.firstCoord.vLine + i + 1 <= _vDimension - 1 &&
-				word.firstCoord.vLine + i + 1 >= 0)) {
+			if (i == word.word.size() - 1 && word.firstCoord.vLine + i + 1 <= _vDimension - 1 &&
+				word.firstCoord.vLine + i + 1 >= 0) {
 				if (_letters.at(word.firstCoord.vLine + i + 1).at(word.firstCoord.hColumn) != ' ')
 					return false;
 			}
@@ -267,7 +266,7 @@ bool Board::wordSpaces(codedWord word) {
 
 
 	if (word.orientation == 'H') {
-		for (int i = 0; i < word.word.size(); i++) {
+		for (int i = 0; i < word.word.size(); i++) { //-1,1
 			if (i == 0 &&
 				(word.firstCoord.hColumn - 1 <= _hDimension - 1 && word.firstCoord.hColumn - 1 >= 0)) {
 				if (_letters.at(word.firstCoord.vLine).at(word.firstCoord.hColumn + i - 1) != ' ')

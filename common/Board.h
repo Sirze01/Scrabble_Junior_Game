@@ -4,8 +4,8 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include "../common/StringProcess.h"
-#include "ConsoleSetup.h"
+#include "containerUtil.h"
+#include "consoleUtil.h"
 
 struct coord{
     size_t vLine;
@@ -47,7 +47,6 @@ public:
     codedWord* findWord (coord inates);
     bool wordExists(std::string word) const;
     bool wordExists(coord inates) const;
-    void removeLetter(coord inates, char letter);
     bool checkIntersection(codedWord);
     bool boardBounds(const codedWord &entry);
     void placeChar(coord inates, char character);

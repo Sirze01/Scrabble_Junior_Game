@@ -1,16 +1,21 @@
 #include "Game.h"
-#include "../common/ConsoleSetup.h"
-#include "../common/StringProcess.h"
-#include <windows.h>
 
+/**
+ * A game directly changes a board, creates a pool based on it, and stores players to be iterated in each turn.
+ * @param board - to changed during games.
+ * @param playerNames - storing names of players by order.
+ * @param playerColors - storing colors of players by order.
+ * @param botFlags - storing isBot attribute of players by order.
+ * @param firstToMove - position on the previous vectors of the player who shall go first.
+ */
 Game::Game(Board& board, const std::vector<std::string>& playerNames,
-	const std::vector<int>& playerForeColors, const std::vector<bool>& botFlags, int firstToMove) :
-	_pool{board}, _board{board}, _playerForeColors{ playerForeColors },
-	_nPlayers{ static_cast<int>(playerNames.size()) }, _currentPlayerPos{ firstToMove }
+	const std::vector<int>& playerColors, const std::vector<bool>& botFlags, int firstToMove) :
+	_board{ board }, _pool{ board }, _nPlayers{ playerNames.size() },
+	_playerColors{ playerColors }, _currentPlayerPos{ firstToMove }
 {
 
 	for (int i = 0; i < _nPlayers;++i) {
-		Player player = Player(_pool, playerNames.at(i), playerForeColors.at(i), botFlags.at(i));
+		Player player = Player(_pool, playerNames.at(i), playerColors.at(i), botFlags.at(i));
 		_players.push_back(player);
 	}
 
@@ -21,20 +26,21 @@ Game::Game(Board& board, const std::vector<std::string>& playerNames,
 	else _compactCardView = true;
 }
 
-void Game::showBoardAndCardView(const std::string& view, bool showTurnInfo) const {
-	clearConsole();
-	_board.show();
-	showPlayerInfo(view, showTurnInfo);
-}
-
-void Game::askCommand(int turnNumber) {
+/**
+ * Executes all commands following the game rules, including moves.
+ * If the player is a bot, generates a move and shows a message.
+ * If the player is human, gives access for commands and loops while the entered command is a valid move.
+ * For both, if they can't move and it's the second turn, immediately returns; else clears console and shows board.
+ * @param turnNumber - first or second turn.
+ */
+void Game::moveHandler(int turnNumber) {
 
 	_currentPlayer->resetExchangeCount();
 	bool ableToMove = _currentPlayer->mayMove(_board);
 
 	if (_currentPlayer->getHasPassed()) {
 		if (ableToMove) {
-			_currentPlayer->doNotPass();
+			_currentPlayer->doNotPass(); //can't pass if a move is passible
 		}
 		else if (turnNumber == 2) {
 			return;
@@ -58,14 +64,14 @@ void Game::askCommand(int turnNumber) {
 				break;
 			}
 			else if (!_currentPlayer->getExchangeCount() && _currentPlayer->getHandSize() && _pool.getCurrentSize()) {
-				int handPos = randomBetween(0, _currentPlayer->getHandSize() - 1);
+				int handPos = Util::randomBetween(0, _currentPlayer->getHandSize() - 1);
 				char oldLetter = _currentPlayer->getHand().at(handPos);
 				char newLetter = _currentPlayer->exchange(oldLetter, _pool);
 				coloredMessage << name << " exchanged letter " << oldLetter << " from the pool and got letter " << newLetter << ".\n\n";
 				ableToMove = _currentPlayer->mayMove(_board);
 				showPlayerInfo("hands");
 			}
-			else {
+			else { //exchange is not possible
 				coloredMessage << name << " cannot move and thus will pass.\n";
 				_currentPlayer->forcePass();
 				break;
@@ -74,7 +80,7 @@ void Game::askCommand(int turnNumber) {
 	}
 
 	else {
-		if (!ableToMove) {
+		if (!ableToMove) { //if player has on hand and haven't passed last time, will have to pass manually
 			if (_currentPlayer->getHasPassed()) {
 				coloredMessage << name << ", you still cannot move.\n" <<
 					"We will skip your turn automatically.\n";
@@ -89,16 +95,16 @@ void Game::askCommand(int turnNumber) {
 
 	std::string commandPrompt, input;
 
-	for (;;) {
+	for (;;) { //breaks when command is a valid move, or player passes
 		std::stringstream regularMessage;
 
-		if (isEmpty(coloredMessage)) {
+		if (Util::isEmpty(coloredMessage)) {
 			commandPrompt = "(turn " + std::to_string(turnNumber) + ") " + name + ": ";
 
-			paddingAndTopic(playerColor, true);
+			Util::paddingAndTopic(playerColor, true);
 			std::cout << commandPrompt;
 
-			std::getline(std::cin, input); cleanBuffer();
+			std::getline(std::cin, input); Util::cleanBuffer();
 			const Command command(input);
 
 			if (command.isMove()) {
@@ -182,46 +188,45 @@ void Game::askCommand(int turnNumber) {
 					}
 				}
 				else if (command.isClear()) showBoardAndCardView();
-				else regularMessage << smartCommandAdvice(command.getStr());
+				else regularMessage << Util::smartCommandAdvice(input);
 			}
 			else regularMessage << "We found overlapping command keywords in your input. Type 'help' to learn why.\n";
 		}
 
-		if (!isEmpty(regularMessage)) {
-			paddingAndTopic(WHITE, true);
+		if (!Util::isEmpty(regularMessage)) {
+			Util::paddingAndTopic(WHITE, true);
 			std::cout << regularMessage.str();
 		}
 
-		else if (!isEmpty(coloredMessage)) {
+		else if (!Util::isEmpty(coloredMessage)) {
 			coloredMessage << "Press enter to continue.\n";
 			std::string sentence;
 			while (std::getline(coloredMessage, sentence)) {
 				if (sentence.size()) {
-					paddingAndTopic(playerColor, true);
+					Util::paddingAndTopic(playerColor, true);
 				}
 				else std::cout << "\n";
 				std::cout << sentence;
 			}
 			std::cout << "\n";
-			askEnter();
+			Util::askEnter();
 			return;
 		}
 	}
 }
 
+/** Makes the next player the current one. */
 void Game::nextTurn() {
 	_currentPlayerPos++;
-	if (_currentPlayerPos == _nPlayers) _currentPlayerPos = 0;
+	_currentPlayerPos %= _nPlayers;
 	_currentPlayer = &_players.at(_currentPlayerPos);
 }
 
-bool Game::allPlayersMustPass() const {
-	for (const Player& player : _players) {
-		if (!player.getHasPassed()) return false;
-	}
-	return true;
-}
-
+/**
+ * Checks if a game is finished - all tiles are highlighted, or all players cannot move and have passed
+ * @return true 
+ * @return false 
+ */
 bool Game::hasFinished() const {
 	if (allHighlighted()) return true;
 	for (const auto& player : _players) {
@@ -230,10 +235,95 @@ bool Game::hasFinished() const {
 	return true;
 }
 
+/** Shows the board with scores card view. Output to the console the game winner and asks for to two enters. */
+void Game::showEndMessage() const {
+	showBoardAndCardView(false, false);
+
+	int color = WHITE;
+	int winner = getWinner();
+
+	if (hasWinner()) color = _players.at(winner).getColor();
+
+	Util::paddingAndTopic(WHITE, true); std::cout << "THE GAME HAS ENDED!\n";
+
+	Util::paddingAndTopic(color, true);
+	if (hasWinner()) std::cout << _players.at(winner).getName() << " won with brilliancy!\n";
+	else std::cout << "There has been a draw! Congratulations to all.\n";
+
+	Util::paddingAndTopic(WHITE, true); std::cout << "Press enter twice to exit.\n";
+	int i = 2; while (i--) Util::askEnter();
+}
+
+/**
+ * Shows the board and the card view - the info on the side of the board - which defaults to players.
+ * @param hands - if true, show player's hands; else show scores.
+ * @param turnInfo - whether to show "to play!" and "has passed" when appropriate
+ */
+void Game::showBoardAndCardView(bool hands, bool turnInfo) const {
+	Util::clearConsole();
+	_board.show();
+	showPlayerInfo(hands, turnInfo);
+}
+
+/**
+ * Puts player info in the card view (side of the board info)
+ * @param hands - if true, show player's hands; else show scores.
+ * @param turnInfo - whether to show "to play!" and "has passed" when appropriate
+ */
+void Game::showPlayerInfo(bool hands, bool turnInfo) const {
+	std::stringstream toWrite;
+
+	for (int i = 0; i < _nPlayers;++i) {
+		const Player player = _players.at(i);
+
+		Util::outputForeColor(toWrite, player.getColor(), TOPIC);
+		toWrite << player.getName();
+
+		if (turnInfo) {
+			if (i == _currentPlayerPos) toWrite << " - to play!";
+			else if (player.getHasPassed()) toWrite << " - passed last turn";
+		}
+		toWrite << "\n";
+
+		Util::outputForeColor(toWrite, player.getColor(), TOPIC);
+
+		if (hands) {
+			if (i == _currentPlayerPos) player.showHand(toWrite, true);
+			else player.showHand(toWrite, false);
+		}
+		else {
+			toWrite << player.getScore() << " points\n";
+		}
+
+		for (int j = 0; j < 5 - _nPlayers - _compactCardView; ++j) toWrite << "\n";
+	}
+
+	Util::writeCardView(_board.getDimensions().vLine, _board.getDimensions().hColumn, toWrite);
+}
+
+/**
+ * Get name of the player.
+ * @param playerPos - player position
+ * @return player - name if valid position, else "Not found"
+ */
+std::string Game::getPlayerName(int playerPos) const {
+	if (playerPos >= _nPlayers || playerPos < 0) return "Not found";
+	else return _players.at(playerPos).getName();
+}
+
+/**
+ * Check if the game has a winner (there are no two players with the same score)
+ * @return true - winner found.
+ * @return false - game has no winner.
+ */
 bool Game::hasWinner() const {
 	return getWinner() != -1;
 }
 
+/**
+ * Get game winner's position.
+ * @return position if game has winner, else -1.
+ */
 int Game::getWinner() const {
 	int maxScore = 0; int currentWinner = -1;
 	for (int i = 0; i < _nPlayers;++i) {
@@ -247,40 +337,27 @@ int Game::getWinner() const {
 	return currentWinner;
 }
 
-void Game::showPlayerInfo(const std::string& info, bool showTurnInfo) const {
-	std::stringstream toWrite;
+/**
+ * Check if all letters (non spaces) in the board are highlighted (have been played)
+ * @return true - all tiles are highlighted.
+ * @return false - at least one tile is available to be played.
+ */
+bool Game::allHighlighted() const {
+	coord boardDim = _board.getDimensions();
+	std::vector<std::vector<char>> boardLetters = _board.getLetters();
+	std::vector<std::vector<bool>> boardHighlights = _board.getHighlights();
 
-	for (int i = 0; i < _nPlayers;++i) {
-		const Player player = _players.at(i);
-
-		outputForeColor(toWrite, player.getColor(), TOPIC);
-		toWrite << player.getName();
-
-		if (showTurnInfo) {
-			if (i == _currentPlayerPos) toWrite << " - to play!";
-			else if (player.getHasPassed()) toWrite << " - passed last turn";
+	for (size_t line = 0; line < boardDim.vLine; ++line) {
+		for (size_t col = 0; col < boardDim.hColumn; ++col) {
+			char letter = boardLetters.at(line).at(col);
+			if (letter == SPACE) continue;
+			if (!boardHighlights.at(line).at(col)) return false;
 		}
-		toWrite << "\n";
-
-		outputForeColor(toWrite, player.getColor(), TOPIC);
-
-		if (info == "hands") {
-			if (i == _currentPlayerPos) player.showHand(toWrite, true);
-			else player.showHand(toWrite, false);
-		}
-		else if (info == "scores") {
-			toWrite << player.getScore() << " points\n";
-		}
-		else {
-			toWrite << "No info requested\n";
-		}
-
-		for (int j = 0; j < 5 - _nPlayers - _compactCardView; ++j) toWrite << "\n";
 	}
-
-	writeCardView(_board.getDimensions().vLine, _board.getDimensions().hColumn, toWrite);
+	return true;
 }
 
+/** Makes the help message the card view. */
 void Game::showHelp() const {
 	std::stringstream toWrite;
 	std::vector<std::string> intro =
@@ -312,9 +389,13 @@ void Game::showHelp() const {
 		toWrite << TOPIC << ARROW << SPACE << sentence << "\n";
 	}
 
-	writeCardView(_board.getDimensions().vLine, _board.getDimensions().hColumn, toWrite);
+	Util::writeCardView(_board.getDimensions().vLine, _board.getDimensions().hColumn, toWrite);
 }
 
+/*
+ * Makes pool letters the card view.
+ * Mind that even if the player has the ability to spy on the pool, all takes from it are random.
+ */
 void Game::showPool() const {
 	std::stringstream toWrite;
 
@@ -325,54 +406,11 @@ void Game::showPool() const {
 
 	const int MAX_LETTERS_PER_LINE = 10;
 	for (int i = 0; i < size;++i) {
-		if (i % (MAX_LETTERS_PER_LINE+1) == 0) {
+		if (i % (MAX_LETTERS_PER_LINE + 1) == 0) {
 			toWrite << "\n" << TOPIC;
 		}
 		toWrite << letters.at(i) << " ";
 	}
 
-	writeCardView(_board.getDimensions().vLine, _board.getDimensions().hColumn, toWrite);
-}
-
-std::string Game::getPlayerName(int playerPos) const {
-	if (playerPos >= _nPlayers || playerPos < 0) return "Not found";
-	else return _players.at(playerPos).getName();
-}
-
-void Game::showEndMessage() const {
-	showBoardAndCardView("scores", false);
-
-	int color = WHITE;
-	int winner = getWinner();
-
-	if (hasWinner()) color = _players.at(winner).getColor();
-
-	paddingAndTopic(WHITE, true); std::cout << "THE GAME HAS ENDED!\n";
-
-	if (allPlayersMustPass()) {
-		paddingAndTopic(WHITE, true);
-		std::cout << "All players passed their moves.\n";
-	}
-
-	paddingAndTopic(color, true);
-	if (hasWinner()) std::cout << _players.at(winner).getName() << " won with brilliancy!\n";
-	else std::cout << "There has been a draw! Congratulations to all.\n";
-
-	paddingAndTopic(WHITE, true); std::cout << "Press enter twice to exit.\n";
-	int i = 2; while (i--) askEnter();
-}
-
-bool Game::allHighlighted() const {
-	coord boardDim = _board.getDimensions();
-	std::vector<std::vector<char>> boardLetters = _board.getLetters();
-	std::vector<std::vector<bool>> boardHighlights = _board.getHighlights();
-
-	for (size_t line = 0; line < boardDim.vLine; ++line) {
-		for (size_t col = 0; col < boardDim.hColumn; ++col) {
-			char letter = boardLetters.at(line).at(col);
-			if (letter == SPACE) continue;
-			if (!boardHighlights.at(line).at(col)) return false;
-		}
-	}
-	return true;
+	Util::writeCardView(_board.getDimensions().vLine, _board.getDimensions().hColumn, toWrite);
 }

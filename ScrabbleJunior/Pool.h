@@ -1,14 +1,10 @@
 #pragma once
-#include <vector>
-#include "../common/Board.h"
-#include <chrono>
-#include <random>
 
-int randomBetween(int lowerBound, int upperBound);
+#include "../common/Board.h"
+#include <vector>
 
 class Pool {
 public:
-	Pool() = default;
 	Pool(const Board &Board);
 	void take(int pos);
 	void include(char letter);

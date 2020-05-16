@@ -15,16 +15,17 @@ public:
 private:
 	bool inBounds() const;
 	bool letterMatch() const;
+	bool singleCharWordOnLine() const;
+	bool singleCharWordOnCol() const;
 	bool startOnLine() const;
 	bool startOnCol() const;
 	bool continueOnLine() const;
 	bool continueOnCol() const;
 	bool finishOnLine() const;
 	bool finishOnCol() const;
-	bool wordCompletionOnCol(int cof) const;
 	bool wordCompletionOnLine(int cof) const;
-	bool singleCharWordOnLine() const;
-	bool singleCharWordOnCol() const;
+	bool wordCompletionOnCol(int cof) const;
+
 	coord _posToMove;
 	char _letter;
 	size_t _maxCol;
