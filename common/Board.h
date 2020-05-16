@@ -6,6 +6,7 @@
 #include <iostream>
 #include "../common/StringProcess.h"
 #include "ConsoleSetup.h"
+#include <algorithm>
 
 struct coord{
     size_t vLine;
@@ -36,25 +37,16 @@ public:
     std::vector<char> getNonEmptyChars() const;
     std::vector<std::vector<bool>> getHighlights() const;
     coord getDimensions() const;
-    void addWord(codedWord word);
-    bool wordSpaces(codedWord word);
+    bool addWord(codedWord word);
     std::vector<codedWord> getWords() const;
-    //Testing
-    void removeWord(codedWord word);
-    codedWord* findWord (const std::string &word);
-    codedWord* findWord (const coord &inates);
-    bool wordExists(std::string word) const;
-    bool wordExists(coord inates) const;
-    void removeLetter(coord inates, char letter);
-    bool checkIntersection(codedWord);
+    bool removeWord(std::string wordToRemove);
     bool boardBounds(const codedWord &entry);
-    void placeChar(coord inates, char character);
     std::string getAlphabet() const;
-    std::vector<coord> intersectionsVector(codedWord word);
+
 
 private:
 
-    std::string _alphabet = "abcdefghijklmnopqrstuvwxyz";
+    static std::string _alphabet;
     void defaultInit(size_t nLines = BOARD_MIN_DIM, size_t nColumns = BOARD_MIN_DIM);
     std::vector<std::vector<bool>> _highlights;
     std::vector<std::vector<int>> _highlightColors;
@@ -62,5 +54,13 @@ private:
     std::vector<codedWord> _words;
     size_t _vDimension;
     size_t _hDimension;
+
+    bool checkIntersection(codedWord) const;
+    bool wordIsolation(codedWord word) const;
+    codedWord* findWord (const std::string &word);
+    bool wordExists(std::string word) const;
+    std::vector<coord> getIntersectionsVector(codedWord word) const;
+    void placeChar(coord inates, char character);
+
 };
 

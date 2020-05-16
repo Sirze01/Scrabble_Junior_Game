@@ -16,12 +16,14 @@ private:
     std::vector<std::string>& _dict;
     std::string& _name;
     Board& _board;
+    void importPath();
+    void boardName();
     bool cmdDict();
     void cmdHelp() const;
-    bool cmdNew();
-    bool cmdImport();
-    bool cmdAdd(int &statusCodes);
-    bool cmdRemove(int &statusCodes);
+    bool cmdNewBoard();
+    bool cmdImportBoard();
+    bool cmdAdd();
+    bool cmdRemove();
     bool cmdExport() const;
     void cmdDelete(int &statusCodes);
     void cmdExit(int &statusCodes);

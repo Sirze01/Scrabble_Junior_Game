@@ -1,12 +1,20 @@
 #include "commandInterpreter.h"
 #include <algorithm>
 
+/**
+ * Constructor - Creates a commandInterpreter object, being initializes with params through reference.
+ * @param dict - Passed as reference, so the methods can modify it, it's a vector of strings with all the words in the dictionary
+ * @param boardName - Passed as reference, is a string with the name of the board used to export it
+ * @param board - Passed as reference, is a object of class board, containing the board to edit
+ * @param dictOpen - Passed as reference,
+ * @param boardOpen
+ * @param command
+ */
 commandInterpreter::commandInterpreter(std::vector<std::string> &dict, std::string &boardName, Board &board,
         bool &dictOpen, bool &boardOpen, std::string command): _dict( dict ), _dictOpen( dictOpen ), _board(board),
         _boardOpen(boardOpen), _name(boardName){
     _command = "";
     _modifiers = "";
-
 
     stripSpaces(command);
     std::string cmd = command.substr(0, command.find(' '));
@@ -43,16 +51,40 @@ commandInterpreter::commandInterpreter(std::vector<std::string> &dict, std::stri
 }
 
 
-/* 0  Valid command
- * -1 Exit
- * -2 loop, no message
- * -3 invalid
- * -4 delete
- * */
+/**
+ * Method to read user input to get a file path, saves it in the _modifiers variable
+ */
+void commandInterpreter::importPath() {
+    std::cout << std::string(1, '\n');
+    std::cout << stringWriter(100, "Input the path to the file you want to import", 2);
+    std::cout << std::string(2, ' ') << "Path: ";
+    std::getline(std::cin, _modifiers);
+}
+
+/**
+ * Method to read user input to get a board Name, saves it in the _name variable
+ */
+void commandInterpreter::boardName() {
+    std::cout << LEFT_PADDING_STR << "Insert the name of your board." << std::endl;
+    std::cout << std::string(2, ' ') << "Board name: ";
+    std::getline(std::cin, _name);
+}
+
+
+/**
+ * Method to control the loop in the main function, to decide what messages to show
+ *
+ * @param statusCodes
+ *      0 >  Valid command
+ *      -1 Exit
+ *      -2 loop, no message
+ *      -3 invalid
+ *      -4 delete
+ */
 void commandInterpreter::interpret(int &statusCodes) {
 
     if (_command == "new") {
-        if (cmdNew())
+        if (cmdNewBoard())
             statusCodes = 0;
         else
             statusCodes = -3;
@@ -66,20 +98,24 @@ void commandInterpreter::interpret(int &statusCodes) {
     }
 
     else if (_command == "import") {
-        if (cmdImport())
+        if (cmdImportBoard())
             statusCodes = 0;
         else
             statusCodes = -3;
     }
 
     else if (_command == "add") {
-        if (cmdAdd(statusCodes))
+        if (cmdAdd())
             statusCodes = 0;
+        else
+            statusCodes = -3;
     }
 
     else if (_command == "remove") {
-        if (cmdRemove(statusCodes))
+        if (cmdRemove())
             statusCodes = 0;
+        else
+            statusCodes = -3;
     }
 
     else if (_command == "export"){
@@ -108,82 +144,90 @@ void commandInterpreter::interpret(int &statusCodes) {
 }
 
 
+/**
+ * Method to display tha available commands
+ */
 void commandInterpreter::cmdHelp() const{
     std::cout << std::string(2, '\n');
-    std::cout << stringWriter(100, "### Help Page - List of all available commands", 2);
+    std::cout << LEFT_PADDING_STR << stringWriter(100, "### Help Page - List of all available commands", 0);
     std::cout << std::string(1, '\n');
-    std::cout << stringWriter(100, "new(n) - Creates a new board", 2);
-    std::cout << stringWriter(100, "import(i) 'filename' - Imports a board saved in a text file", 2);
-    std::cout << stringWriter(100,
+    std::cout << LEFT_PADDING_STR << stringWriter(100, "dict(d) 'filename' - Imports a board saved in a text file", 0);
+    std::cout << LEFT_PADDING_STR << stringWriter(100, "new(n) - Creates a new board", 0);
+    std::cout << LEFT_PADDING_STR << stringWriter(100, "import(i) 'filename' - Imports a board saved in a text file", 0);
+    std::cout << LEFT_PADDING_STR << stringWriter(100,
                               "add(a) Xx H(V) 'Word' - Adds a word to the board, only can be used after opening a board",
-                              2);
-    //std::cout << stringWriter(100, "remove Xx {H(V)} {'Word'} - Removes a word to the board, only can be used after opening a board", 2);
-    std::cout << stringWriter(100,
-                              "export(e) {'filename'} - Exports a board to a text file, only can be used after opening a board",
-                              2);
-    std::cout << stringWriter(100, "exit - Quit the program", 2);
+                              0);
+    std::cout << LEFT_PADDING_STR << stringWriter(100, "remove {'Word'} - Removes a word to the board, only can be used after opening a board", 0);
+    std::cout << LEFT_PADDING_STR << stringWriter(100,
+                              "export(e) - Exports a board to a text file, only can be used after opening a board",
+                              0);
+    std::cout << LEFT_PADDING_STR << stringWriter(100, "delete - Deletes the current board", 2);
+    std::cout << LEFT_PADDING_STR << stringWriter(100, "exit - Quit the program", 0);
 }
 
 
+/**
+ * Method to import a dictionary (vector of valid words) to use in the board to edit
+ * @return Returns true if the import is successful, false otherwise
+ */
 bool commandInterpreter::cmdDict() {
     if (_dictOpen && _boardOpen) {
         std::cout << std::string(BOARD_LEFT_PADDING, SPACE) << "You can't change your board's dictionary" << std::endl;
         return false;
     }
 
-
     if(_modifiers.empty()){
-        std::cout << std::string(1, '\n');
-        std::cout << stringWriter(100, "Input the path to the file you want to import", 2);
-        std::cout << std::string(2, ' ') << "Path: ";
-        std::getline(std::cin, _modifiers);
+        importPath();
     }
+
     std::string line;
     std::ifstream file;
     file.open(_modifiers, std::ios::in);
     if (file.is_open()) {
         while(getline(file, line)){
-            if(line.size() > 2){
-                stripSpecialChars(line);
+            stripSpecialChars(line);
+            if(line.size() > 1){
                 _dict.push_back(line);
             }
         }
         file.close();
+        _dictOpen = true;
+        std::cout << std::string(BOARD_LEFT_PADDING, SPACE) << "Dictionary loaded\n" << std::endl;
+        return true;
     }
     else{
-        std::cout << '\n' << std::string(2, SPACE) << "Cannot open file, try another file" << std::endl;
+        std::cout << '\n' << std::string(2, SPACE) << "Cannot open file, try another file\n" << std::endl;
         return false;
     }
-
-    _dictOpen = true;
-    std::cout << std::string(BOARD_LEFT_PADDING, SPACE) << "Dictionary loaded\n" << std::endl;
-    return true;
 }
 
 
-bool commandInterpreter::cmdNew() {
-    if (!_dictOpen) {
+/**
+ * Method to create an edit the current Board to an empty one with the desired dimensions
+ * @return Returns true if the board object is edited correctly, false otherwise
+ */
+bool commandInterpreter::cmdNewBoard() {
+    if (_dictOpen) {
+        if (_boardOpen) {
+            std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Cannot create a new board. You already have one open" << std::endl;
+            return false;
+        }
+    }
+    else{
         std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Cannot create a new board. You haven't added a dictionary" << std::endl;
         return false;
     }
-    if (_boardOpen) {
-        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Cannot create a new board. You already have one open" << std::endl;
-        return false;
-    }
-
+    
     std::string hTemp, vTemp;
-    std::string userInput;
-
+    
     if (_modifiers.empty()) {
-        std::cout << std::string(1, '\n');
-        std::cout << stringWriter(100, "What dimensions should the board be? (Height x Width)", 2);
+        std::string userInput;
+        std::cout << std::endl;
+        std::cout << LEFT_PADDING_STR << stringWriter(100, "What dimensions should the board be? (Height x Width)", 0);
         std::cout << std::string(2, ' ') << "Dimensions: ";
         std::getline(std::cin, _modifiers);
-        std::cout << std::string(1, '\n');
-        std::cout << std::string(2, ' ') << "Insert the name of your board." << std::endl;
-        std::cout << std::string(2, ' ') << "Board name: ";
-        std::getline(std::cin, userInput);
-        _name = userInput;
+        std::cout << std::endl << std::endl;
+        boardName();
     }
     else {
         if (_modifiers.find_first_of(' ') !=_modifiers.find_last_of(' ')) {
@@ -215,16 +259,14 @@ bool commandInterpreter::cmdNew() {
 
     vTemp = _modifiers.substr(0, _modifiers.find('X'));
     hTemp = _modifiers.substr(_modifiers.find('X') + 1);
-
-
-
-    if (std::stoi(vTemp) > _board.getAlphabet().size() || std::stoi(hTemp) > _board.getAlphabet().size()){
+    
+    if ( std::stoul(vTemp) > _board.getAlphabet().size() || std::stoul(hTemp) > _board.getAlphabet().size()){
         std::cout << std::string(1, '\n') << "The board you're trying to create is just too big. Create one up to 26x26" << std::endl;
         return false;
     }
 
 
-    Board newBoard(std::stoi(vTemp), std::stoi(hTemp));
+    Board newBoard(std::stoul(vTemp), std::stoul(hTemp));
     _board = newBoard;
     _boardOpen = true;
     _board.show();
@@ -232,13 +274,17 @@ bool commandInterpreter::cmdNew() {
 }
 
 
-bool commandInterpreter::cmdImport() {
+/**
+ * Method to import a previously created board from a external file correctly formated
+ * @return Returns true if the board object is edited correctly, false otherwise
+ */
+bool commandInterpreter::cmdImportBoard() {
     if (!_dictOpen) {
         std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Cannot create a new board. You haven't added a dictionary" << std::endl;
         return false;
     }
     if (_boardOpen){
-        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Cannot create a new board. You already have one open"
+        std::cout << LEFT_PADDING_STR << "Cannot create a new board. You already have one open"
                   << std::endl;
         return false;
     }
@@ -252,23 +298,21 @@ bool commandInterpreter::cmdImport() {
 
     }
     else{
-    std::cout << std::string(1, '\n');
-    std::cout << stringWriter(100, "Input the file you want to import: ", 2);
-    std::cout << std::string(2, ' ') << "Path: ";
-    std::getline(std::cin, _modifiers);
+        importPath();
     }
     std::ifstream file;
     file.open(_modifiers, std::ios::in);
     if (!file.is_open()) {
-        std::cout << std::string(BOARD_LEFT_PADDING, SPACE) << "Cannot open file! Try another\n" << std::endl;
+        std::cout << LEFT_PADDING_STR << "Cannot open file! Try another\n" << std::endl;
         return false;
+    }
+    else{
+        file.close();
     }
     Board newBoard(_modifiers);
     _board = newBoard;
     if(_name.empty()) {
-        std::cout << '\n' << std::string(2, ' ') << "Insert the name of your board." << std::endl;
-        std::cout << std::string(2, ' ') << "Board name: ";
-        std::getline(std::cin, _name);
+        boardName();
     }
     _boardOpen = true;
     _board.show();
@@ -276,7 +320,11 @@ bool commandInterpreter::cmdImport() {
 }
 
 
-bool commandInterpreter::cmdAdd(int &statusCodes) {
+/**
+ * Method to add words to the board
+ * @return Returns true if the word is palced, false otherwise
+ */
+bool commandInterpreter::cmdAdd() {
     if (!_boardOpen) {
         std::cout
                 << stringWriter(100, "You need to be editing a board to run this command. Import or create a new one!",
@@ -289,7 +337,6 @@ bool commandInterpreter::cmdAdd(int &statusCodes) {
     if(!_modifiers.empty()){
         if(isAlpha(_modifiers.substr(0,2))){
             if (!(_board.boardBounds({_board.getIndex(_modifiers.substr(0, 2)), '\0', ""}))) {
-            statusCodes = -3;
             return false;
             }
             newEntry.firstCoord = {_board.getIndex(_modifiers.substr(0,2))};
@@ -299,14 +346,12 @@ bool commandInterpreter::cmdAdd(int &statusCodes) {
             newEntry.orientation = toupper(_modifiers.substr(1, 1).at(0));
             _modifiers.erase(0, 2);
             if(!((newEntry.orientation == 'H') || (newEntry.orientation == 'V'))){
-                statusCodes = -3;
                 return false;
             }
         }
         if(!_modifiers.empty()) {
             newEntry.word = _modifiers.substr(1);
             if(!isAlpha(newEntry.word)) {
-                statusCodes = -3;
                 return false;
             }
         }
@@ -316,16 +361,14 @@ bool commandInterpreter::cmdAdd(int &statusCodes) {
     std::string userInput;
     if(_modifiers.empty()){
 
-        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the coordinates to the first letter of the word. Press e to quit"
-                      << std::endl;
-
-        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Coordinate: ";
+        std::cout << LEFT_PADDING_STR << "Input the coordinates to the first letter of the word. " << std::endl;
+        std::cout << LEFT_PADDING_STR << "Coordinate: ";
         getline(std::cin, userInput);
         stripSpaces(userInput);
         if(!(isAlpha(userInput) && _board.boardBounds({_board.getIndex(userInput), '\0', ""}))) {
-            statusCodes = -3;
             return false;
         }
+        newEntry.firstCoord = {_board.getIndex(userInput)};
 
         std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the desired orientation" << std::endl;
         std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Orientation: ";
@@ -333,17 +376,17 @@ bool commandInterpreter::cmdAdd(int &statusCodes) {
         stripSpaces(userInput);
         for(auto &letter: userInput) letter = toupper(letter);
         if (!(userInput.at(0) == 'H') || (userInput.at(0) == 'V')){
-            statusCodes = -3;
             return false;
         }
+        newEntry.orientation = toupper(userInput.at(0));
 
         std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Input the word you want to place" << std::endl;
         std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Word: ";
         getline(std::cin, newEntry.word);
         if (!isAlpha(newEntry.word)){
-            statusCodes = -3;
             return false;
         }
+        newEntry.word = userInput;
     }
 
 
@@ -351,7 +394,6 @@ bool commandInterpreter::cmdAdd(int &statusCodes) {
 
     for (auto &entry : _board.getWords()) {
         if (entry.word == newEntry.word) {
-            statusCodes = -3;
             std::cout << stringWriter(100, "The word you're trying to add is already in the board",
                                       BOARD_LEFT_PADDING) << std::endl;
             return false;
@@ -363,116 +405,62 @@ bool commandInterpreter::cmdAdd(int &statusCodes) {
     bool inDict = std::binary_search(_dict.begin(), _dict.end(), newEntry.word);
     for(auto &letter : newEntry.word) letter = toupper(letter);
     if (!inDict){
-        statusCodes = -2;
         std::cout <<stringWriter(100, "The word you chose isn't in the dictionary",
                                  BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
         retValue = false;
     }
 
     if (!(_board.boardBounds(newEntry))){
-        statusCodes = -2;
         std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Word is out of range! Try another one." << std::endl;
         retValue = false;
     }
-    else if(!(_board.checkIntersection(newEntry))){
-        statusCodes = -2;
-        std::cout <<stringWriter(100, "The word you're trying to add intersects with another in the wrong letter",
-                                 BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
-        retValue = false;
-    }
-    else if (!(_board.wordSpaces(newEntry))){
-        statusCodes = -2;
-        std::cout <<stringWriter(100, "The word you're trying to add doesn't fit in that space",
-                                 BOARD_LEFT_PADDING).substr(0, std::string::npos - 1) << std::endl;
-        retValue = false;
+    else{
+        retValue = _board.addWord(newEntry);
     }
 
-
-    if(retValue){
-        if (newEntry.orientation == 'V'){
-            for(int i = 0; i < newEntry.word.size(); i++){
-                _board.placeChar({newEntry.firstCoord.vLine + i, newEntry.firstCoord.hColumn}, newEntry.word.at(i));
-            }
-        }
-        else{
-            for(int i = 0; i < newEntry.word.size(); i++){
-                _board.placeChar({newEntry.firstCoord.vLine, newEntry.firstCoord.hColumn + i}, newEntry.word[i]);
-            }
-        }
-        _board.addWord(newEntry);
-        _board.show();
-    }
     return retValue;
 }
 
 
-bool commandInterpreter::cmdRemove(int &statusCodes) {
+/**
+ * Method to remove words to the board
+ * @param statusCodes - Controls the external loop and the messages shown
+ * @return Returns true if the word is removed, false otherwise
+ */
+bool commandInterpreter::cmdRemove() {
     if (!_boardOpen) {
-        std::cout
-                << stringWriter(100, "You need to be editing a board to run this command. Import or create a new one!",
-                                2);
+        std::cout << LEFT_PADDING_STR <<
+                stringWriter(100, "You need to be editing a board to run this command. Import or create a new one!",0);
         return false;
     }
 
     if(_modifiers.empty()) {
-        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Word: ";
+        std::cout << LEFT_PADDING_STR << "Word: ";
         getline(std::cin, _modifiers);
     }
 
     for (auto &letter : _modifiers) letter = toupper(letter);
 
-    if(_board.wordExists(_modifiers)){
-        codedWord wordToRemove = *_board.findWord(_modifiers);
-        std::vector<coord> intersections = _board.intersectionsVector(wordToRemove);
-        if (wordToRemove.orientation== 'V'){
-            for(int i = 0; i < wordToRemove.word.size(); i++){
-                coord current = {wordToRemove.firstCoord.vLine + i, wordToRemove.firstCoord.hColumn};
-                if(intersections.empty()){
-                    _board.placeChar(current, ' ');
-                }
-
-                else{
-                    if(std::find(intersections.begin(), intersections.end(), current) == intersections.end())
-                        _board.placeChar(current, ' ');
-                    }
-                }
-            }
-
-        else{
-            for(int i = 0; i < wordToRemove.word.size(); i++){
-                coord current = {wordToRemove.firstCoord.vLine, wordToRemove.firstCoord.hColumn + i};
-                if(intersections.empty()){
-                    _board.placeChar(current, ' ');
-                }
-
-                else{
-                    if(std::find(intersections.begin(), intersections.end(), current) == intersections.end())
-                        _board.placeChar(current, ' ');
-                }
-            }
-        }
-
-        _board.removeWord(wordToRemove);
-    }
-
-    else {
-        statusCodes = -2;
-        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "The word you trying to remove doesn't exist, try again"
-                  << std::endl;
-        return false;
-    }
-    _board.show();
-    return true;
+    return _board.removeWord(_modifiers);
 }
 
 
+/**
+ * Exports the current board to an external txt file
+ * @return True if the export occurs correctly, false otherwise
+ */
 bool commandInterpreter::cmdExport() const{
-    _board.fileExport((_name + ".txt"));
-    std::cout << std::string(BOARD_LEFT_PADDING, SPACE) << "Board exported\n" << std::endl;
-    return true;
+    if(_board.fileExport((_name + ".txt")))
+        std::cout << std::string(BOARD_LEFT_PADDING, SPACE) << "Board exported\n" << std::endl;
+    else
+        return false;
 }
 
 
+/**
+ * Controls the external loop to ask for new commands to edit the board, effectively creating a new one
+ * @param statusCodes - Controls the external loop and the messages shown
+ */
 void commandInterpreter::cmdDelete(int &statusCodes) {
     _dictOpen = false;
     _boardOpen = false;
@@ -481,7 +469,10 @@ void commandInterpreter::cmdDelete(int &statusCodes) {
     statusCodes = -4;
 }
 
-
+/**
+ * Exits the external loop
+ * @param statusCodes - Controls the external loop and the messages shown
+ */
 void commandInterpreter::cmdExit(int &statusCodes) {
     statusCodes = -1;
 }
