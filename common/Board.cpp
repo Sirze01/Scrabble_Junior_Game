@@ -397,7 +397,7 @@ bool Board::checkIntersection(codedWord word) const{
         }
     }
     if(word.orientation == 'H') {
-        for (int i = 0; i < word.word.size(); i++) {
+        for (size_t i = 0; i < word.word.size(); i++) {
             if (_letters.at(word.firstCoord.vLine).at(word.firstCoord.hColumn + i) != ' ') {
                 if (_letters.at(word.firstCoord.vLine).at(word.firstCoord.hColumn + i) != word.word.at(i))
                     valid = false;
@@ -423,7 +423,7 @@ std::vector<coord> Board::getIntersectionsVector(codedWord word) const {
         }
     }
     if(word.orientation == 'H') {
-        for (int i = 0; i < word.word.size(); i++) {
+        for (size_t i = 0; i < word.word.size(); i++) {
             if ((word.firstCoord.vLine + 1) <= _vDimension - 1 && (word.firstCoord.vLine - 1) <= _vDimension - 1){
                 if(_letters.at(word.firstCoord.vLine + 1).at(word.firstCoord.hColumn + i) != ' '){
                     intersections.push_back({word.firstCoord.vLine, word.firstCoord.hColumn + i});
@@ -449,14 +449,14 @@ bool Board::fileExport(const std::string &filename) const {
         file << std::string(2, '\n');
         file << std::string(BOARD_TOP_PADDING,'\n') << LEFT_PADDING_STR;
         file << ' ';
-        for (int i = 0; i < _hDimension; i++) {
+        for (size_t i = 0; i < _hDimension; i++) {
             file << " " << _alphabet.at(i);
         }
         file << std::endl;
-        for (int i = 0; i < _vDimension; i++) {
+        for (size_t i = 0; i < _vDimension; i++) {
             file << LEFT_PADDING_STR;
             file << std::string(1,toupper(_alphabet.at(i)));
-            for (int j = 0; j < _hDimension; j++) {
+            for (size_t j = 0; j < _hDimension; j++) {
                 file << ' ';
                 file << _letters[i][j];
             }

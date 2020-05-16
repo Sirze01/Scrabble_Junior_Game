@@ -12,9 +12,7 @@
  */
 commandInterpreter::commandInterpreter(std::vector<std::string> &dict, std::string &boardName, Board &board,
         bool &dictOpen, bool &boardOpen, std::string command): _dict( dict ), _dictOpen( dictOpen ), _board(board),
-        _boardOpen(boardOpen), _name(boardName){
-    _command = "";
-    _modifiers = "";
+        _boardOpen(boardOpen), _name(boardName), _command(), _modifiers(){
 
     stripSpaces(command);
     std::string cmd = command.substr(0, command.find(' '));
@@ -450,10 +448,11 @@ bool commandInterpreter::cmdRemove() {
  * @return True if the export occurs correctly, false otherwise
  */
 bool commandInterpreter::cmdExport() const{
-    if(_board.fileExport((_name + ".txt")))
+    if(_board.fileExport((_name + ".txt"))) {
         std::cout << std::string(BOARD_LEFT_PADDING, SPACE) << "Board exported\n" << std::endl;
-    else
-        return false;
+        return true;
+    }
+    return false;
 }
 
 
