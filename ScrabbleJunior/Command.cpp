@@ -1,5 +1,6 @@
 #include "Command.h"
 #include <string>
+#include <utility>
 
 /**
  * A command contains a string which defines its action on the game.
@@ -7,11 +8,12 @@
  * The actions of the command are handled by Game.
  * @param userInput - command string.
  */
-Command::Command(const std::string& userInput) : _str{ userInput } {
+Command::Command(std::string  &userInput) : _str{std::move( userInput )} {
 	Util::stripSpecialChars(_str);
 	Util::lowerCase(_str);
 	Util::stripCommandBloat(_str);
 	Util::stripSpaces(_str);
+	std::cout << _str;
 }
 
 /**
@@ -32,8 +34,8 @@ bool Command::isMove() const {
  * @param board - to extract the index
  * @return coordinates of the move
  */
-coord Command::getMovePos(const Board &board) const {
-	return board.getIndex(_str.substr(0, 2));
+coord Command::getMovePos() const {
+	return Board::getIndex(_str.substr(0, 2));
 }
 
 /**
@@ -151,4 +153,12 @@ bool Command::hasNoConflicts() const {
 	if (isPass()) count++;
 	if (isClear()) count++;
 	return count < 2;
+}
+
+/**
+ * Returns command string.
+ * @return - Command string
+ */
+std::string Command::getCommandStr() const {
+    return _str;
 }

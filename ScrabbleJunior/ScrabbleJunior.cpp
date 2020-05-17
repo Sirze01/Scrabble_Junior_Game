@@ -5,7 +5,6 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
-#include <functional>
 
 struct PlayerData {
 	std::string name;
@@ -21,7 +20,7 @@ struct PlayerData {
  * @param playerColors - colors of the players.
  * @return vector position of the player who'll start.
  */
-int askPlayFirst(const Board &board, int nPlayers,
+size_t askPlayFirst(const Board &board, size_t nPlayers,
 	const std::vector<std::string> &playerNames, const std::vector<int> &playerColors) {
 	{ // card view for available players and random tip
 		std::stringstream toWrite;
@@ -34,7 +33,7 @@ int askPlayFirst(const Board &board, int nPlayers,
 			toWrite << TOPIC << i << "\n";
 		}
 
-		for (int i = 0; i < nPlayers; ++i) {
+		for (size_t i = 0; i < nPlayers; ++i) {
 			Util::outputForeColor(toWrite, playerColors.at(i), TOPIC);
 			toWrite << ARROW << SPACE << playerNames.at(i) << "\n";
 		}
@@ -50,7 +49,7 @@ int askPlayFirst(const Board &board, int nPlayers,
 			Util::stripSpecialChars(playerName); Util::stripSpaces(playerName);
 
 			if (playerName == "random") {
-				int randomPos = Util::randomBetween(0, nPlayers - 1);
+				int randomPos = Util::randomBetween(0, static_cast<int>(nPlayers - 1));
 				Util::paddingAndTopic(playerColors.at(randomPos), true); std::cout << playerNames.at(randomPos) << " won the draw.\n";
 				Util::paddingAndTopic(playerColors.at(randomPos), false); std::cout << "Press enter to start!\n";
 				Util::askEnter();
@@ -58,7 +57,7 @@ int askPlayFirst(const Board &board, int nPlayers,
 			}
 
 			Util::upperNameInitials(playerName);
-			for (int i = 0; i < nPlayers; ++i) {
+			for (size_t i = 0; i < nPlayers; ++i) {
 				if (playerName == playerNames.at(i)) return i;
 			}
 
@@ -93,7 +92,7 @@ std::string askBoardFileName(const Board &board) {
 			"to create your own board!"
 		};
 
-		for (std::string str : sentences) {
+		for (const std::string &str : sentences) {
 			toWrite << TOPIC << str << "\n";
 		}
 
@@ -177,7 +176,7 @@ PlayerData askPlayer(int position, const Board& board,
 
 			Util::upperNameInitials(name);
 
-			if (!name.size() || name.size() > MAX_PLAYER_NAME_SIZE) {
+			if (name.empty() || name.size() > MAX_PLAYER_NAME_SIZE) {
 				Util::paddingAndTopic(RED, true); std::cout << "Please do not input large or empty names.\n";
 			}
 			else if (!Util::isAlpha(name, true)) {
@@ -216,7 +215,7 @@ PlayerData askPlayer(int position, const Board& board,
 
 	{ //ask color
 		std::string colorName;
-		int color = WHITE;
+		int color;
 
 		for (;;) { //ask color
 			Util::paddingAndTopic(WHITE, true); std::cout << "Player " << position << " color: ";
@@ -250,7 +249,8 @@ PlayerData askPlayer(int position, const Board& board,
  * @return size of the future vector of players
  */
 int askNumberOfPlayers() {
-	std::string input; std::string errorMessage; int intInput = 0;
+	std::string input, errorMessage;
+	int intInput;
 
 	for (;;) {
 		Util::paddingAndTopic(WHITE, true); std::cout << "Number of players: ";
@@ -339,7 +339,7 @@ int main()
 		my_game.moveHandler(2);
 		if (my_game.hasFinished()) break;
 		my_game.nextTurn();
-	};
+	}
 
 	my_game.showEndMessage();
 }

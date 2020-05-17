@@ -92,8 +92,8 @@ void Util::outputForeColor(std::ostream& output, int foreColor, const char c) {
  * @return true - given coordinates were valid.
  * @return false - coordinates invalid, aborted operation
  */
-bool Util::putCursorOnPos(int line, int col) {
-	if (line < 1 || col < 1) return false;
+bool Util::putCursorOnPos(size_t line, size_t col) {
+	if (line == 0 || col == 0) return false;
 	std::cout << "\033[" << line << ";" << col << "H";
 	return true;
 }
@@ -101,11 +101,6 @@ bool Util::putCursorOnPos(int line, int col) {
 /** Blanks the current line, beggining at the current cursor position and ending at the end of the line. */
 void Util::eraseLineToTheEnd() {
 	std::cout << "\033[0K";
-}
-
-/** Blanks the entire current line. */
-void Util::eraseEntireLine() {
-	std::cout << "\033[2K";
 }
 
 /** Save the current cursor position to later restore. */
@@ -123,11 +118,11 @@ void Util::restoreSavedCursorPosition() {
  * @param boardHeight - to check on which line to begin, and to end.
  * @param col - x coordinate from which to erase each line until the end.
  */
-void Util::eraseCardView(int boardHeight, int col) {
+void Util::eraseCardView(size_t boardHeight, size_t col) {
 	saveCurrentCursorPosition();
 	if (boardHeight < BOARD_MIN_DIM) boardHeight = BOARD_MIN_DIM;
 	boardHeight += BOARD_TOP_PADDING + 2; //2 frames
-	for (int i = 1; i <= boardHeight; i++) {
+	for (size_t i = 1; i <= boardHeight; i++) {
 		putCursorOnPos(i, col);
 		eraseLineToTheEnd();
 	}
@@ -140,10 +135,11 @@ void Util::eraseCardView(int boardHeight, int col) {
  * @param boardWidth - to get starting column (after adding padding).
  * @param toWrite - stream which is content is to be output to the console.
  */
-void Util::writeCardView(int boardHeight, int boardWidth, std::stringstream &toWrite){
+void Util::writeCardView(size_t boardHeight, size_t boardWidth, std::stringstream &toWrite){
 	saveCurrentCursorPosition();
-	int line = 2 + BOARD_TOP_PADDING;
-	int col = 2 * boardWidth + CARD_LEFT_PADDING;
+
+	size_t line = CARD_TOP_PADDING + BOARD_TOP_PADDING;
+	size_t col = CARD_TOP_PADDING * boardWidth + CARD_LEFT_PADDING;
 	eraseCardView(boardHeight, col);
 
 	std::string current;

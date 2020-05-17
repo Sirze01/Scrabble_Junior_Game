@@ -1,91 +1,97 @@
 #include <iostream>
-#include "../common/ConsoleSetup.h"
 #include "commandInterpreter.h"
 
 /*#################################################################*/
 
-void openingMessage() {
-    const std::string message = "Board Builder v0.0.1";
-    std::cout << std::string(2, ' ') << message << " Debug version\n";
-    std::cout << std::string(2, ' ');
-    for (int i = 0; i < 100; i++) {
-        std::cout << '#';
-    }
-    std::cout << std::endl;
-    std::cout << std::string(1, '\n');
-    std::cout << std::string(2, ' ');
-    for (int i = 0; i < (int) ((100 - message.size()) / 2); i++) { //size_t or cast to int to shut vs up
-        std::cout << '-';
-    }
-    std::cout << message;
-    for (int i = 0; i < (int) ((100 - message.size()) / 2); i++) {
-        std::cout << '-';
-    }
-    std::cout << std::endl;
-    std::cout << std::string(1, '\n');
-    std::cout << std::string(2, ' ');
-    for (int i = 0; i < 100; i++) {
-        std::cout << '#';
-    }
-    std::cout << std::endl;
-    std::cout << std::string(2, '\n');
-    std::cout << stringWriter(100,
-                              "Input the desired operation. Alternatively you can access the available commands with 'help' at anytime.",
-                              2);
-}
+/**
+ * Oppening message for the utility
+ */
+void openingMessage(){
+    std::stringstream output;
+    const std::string message = "Board Builder v1.0.0";
+    const std::string separator(100, '#');
+    const std::string filler(((100 - message.size()) / 2), '-');
 
-bool dialogue(int &last, commandInterpreter &aCommand){
-    if (last == -3) {
-        std::cout
-                << stringWriter(100, "Please choose a valid command. If you need help input 'help'.", 2);
-    }
-    if(aCommand._dictBool and aCommand._state)
-        std::cout << std::string(2, ' ') << '(' << aCommand.boardName() << ") " << "Your input: ";
-    else
-        std::cout << std::string(2, ' ') << "Your input: ";
-    std::string userInput;
-    std::getline(std::cin, userInput);
-    aCommand.edit(userInput);
-    bool temp = aCommand.interpret(last);
-    return temp;
-}
+    std::cout << '\n' << LEFT_PADDING_STR << separator << "\n\n" <<
+    LEFT_PADDING_STR << filler << message << filler << "\n\n  " << separator << "\n\n" << LEFT_PADDING_STR
+    << "Input the desired operation.\n  Alternatively you can access the available commands with 'help' at  anytime.\n";
 
-bool openingDialogue(int &last) {
-    std::cout << std::string(1, '\n');
-    if (last == -3) {
-        std::cout
-                << stringWriter(100, "Please choose a valid command. If you need help input 'help'.", 2);
-    }
-    std::cout << std::string(2, ' ') << "Your input: ";
-    std::string userInput;
-    std::getline(std::cin, userInput);
-    commandInterpreter command(userInput);
-    bool temp = command.interpret(last);
-    if (temp and (last != -1)) {
-        bool validation;
-        do {
-            do {
-                validation = dialogue(last, command);
-            } while (!validation);
-        } while (!(last == -1) && !(last == -4));
-    }
-
-    return temp;
 }
 
 
+/**
+ * Message about the need to open a dict when starting to edit a board
+ */
+void dictMessage() {
+    Util::stringWriter("Start by importing a dictionary, so your board knows what words to use\n\n");
+}
+
+
+/**
+ * Message about the need to create or import a board to edit
+ */
+void boardMessage() {
+    Util::stringWriter("Now you need to start editing a board. Try to create a new one with 'new' or import one already built with 'import'\n\n");
+}
+
+
+
+/**
+ * Main Function - Configures the Windows Console to accept ANSII escape codes and UTF-8 encoding, saves the board and
+ * associated variables and loops the program according to the status codes
+ * @return
+ */
 int main() {
-    setupConsole();
-    /*#################################################*/
-    bool validation;
-    openingMessage();
-    int last = 0;
-    do {
-        do {
-            validation = openingDialogue(last);
-        } while (!validation);
-    }while (last != -1);
-    std::cout << "main exiting" << std::endl;
+    Util::setupConsole();
 
+    /*#################################################*/
+
+    std::vector<std::string> dict;
+    std::string boardName;
+    Board board;
+    bool dictOpen = false;
+    bool boardOpen = false; // 0 to board closed, 1 to board open
+    std::string userInput;
+
+    /* 0 >  Valid command
+    * -1 Exit
+    * -2 loop, no message
+    * -3 invalid
+    * -4 delete
+    * */
+    int statusCodes = 0;
+
+    openingMessage();
+    //Counter to define what help message to show
+    int count = 0;
+    do{
+        do{
+            if(count == 0) {
+                dictMessage();
+            }
+            else if (count == 2) {
+                boardMessage();
+            }
+            if (statusCodes == -3) {
+                Util::stringWriter("Please choose a valid command. If you need help input 'help'.\n\n");
+            }
+            if(boardName.empty()) {
+                std::cout << LEFT_PADDING_STR << "Your input: ";
+            }
+            else {
+                std::cout << LEFT_PADDING_STR << "(" << boardName << ") " << "Your input: ";
+            }
+            std::getline(std::cin, userInput);
+            commandInterpreter command(dict, boardName, board, dictOpen, boardOpen, userInput);
+            command.interpret(statusCodes);
+            if (count == 0)
+                count++;
+            if (dictOpen && count == 1)
+                count ++;
+            if (count == 2)
+                count++;
+        }while(!(statusCodes == -1 || statusCodes == -4));
+        count = 0;
+    }while(statusCodes == -4);
     return 0;
 }

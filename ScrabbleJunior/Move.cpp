@@ -6,7 +6,7 @@
  * @param board - to then modify highlights and colors while executing.
  */
 Move::Move(const Command &command, const Board &board):
-	_posToMove{ command.getMovePos(board) }, _letter{ command.getMoveLetter() },
+	_posToMove{ command.getMovePos() }, _letter{ command.getMoveLetter() },
 	_maxCol{ board.getDimensions().hColumn - 1 }, _maxLine{board.getDimensions().vLine - 1 },
 	_boardLetters{ board.getLetters() }, _boardHighlights{ board.getHighlights() }
 {
@@ -74,8 +74,8 @@ void Move::execute(Player &player, Board &board, Pool &pool) const {
 		else board.highlightWordOnCol(player.getColor(), _posToMove.vLine, _posToMove.hColumn);
 	};
 	
-	if (continueOnLine() && finishOnLine() && !singleCharWordOnLine()) scoreAction(1);
-	if (continueOnCol() && finishOnCol() && !singleCharWordOnCol()) scoreAction(0);
+	if (continueOnLine() && finishOnLine() && !singleCharWordOnLine()) scoreAction(true);
+	if (continueOnCol() && finishOnCol() && !singleCharWordOnCol()) scoreAction(false);
 }
 
 /** Check if a move is outside board bounds. */

@@ -8,7 +8,7 @@
 
 class Player {
 public:
-	Player(Pool &pool, const std::string &name, int color, bool isBot);
+	Player(Pool &pool, std::string name, int color, bool isBot);
 	std::string getName() const;
 	int getColor() const;
 	int getScore() const;

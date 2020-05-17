@@ -10,8 +10,17 @@ static std::mt19937 RANDOM_GENERATOR;
  * Lowercase all chars.
  * @param command - string to be treated.
  */
-void Util::lowerCase(std::string& command) {
-	for (char& i : command) i = static_cast<char>(std::tolower(i));
+void Util::lowerCase(std::string& str) {
+	for (char& letter : str) letter = static_cast<char>(std::tolower(letter));
+}
+
+
+/**
+ * Uppercase all chars.
+ * @param command - string to be treated.
+ */
+void Util::upperCase(std::string &str) {
+    for(char &letter : str) letter = static_cast<char>(std::toupper(letter));
 }
 
 /**
@@ -39,11 +48,11 @@ void Util::stripSpaces(std::string& name) {
  */
 void Util::upperNameInitials(std::string& name) {
 	bool doUpper = true;
-	for (size_t i = 0; i < name.size(); i++) {
-		char current = name.at(i);
+	for (char & i : name) {
+		char current = i;
 		if (doUpper && std::isupper(current)) doUpper = false;
 		else if (doUpper && std::islower(current)) {
-			name.at(i) = static_cast<char>(toupper(name.at(i)));
+			i = static_cast<char>(toupper(i));
 			doUpper = false;
 		}
 		else if (SPACE == current) doUpper = true;
@@ -71,14 +80,16 @@ void Util::stripSpecialChars(std::string& name, bool acceptDigits) {
  * */
 void Util::stringWriter(const std::string& text) {
 	size_t lineCount = 0, len = text.size();
-	char current = text.at(0);
+	char current;
 
 	std::cout << LEFT_PADDING_STR;
 	for (size_t i = 0; i < len; ++i) {
 		current = text.at(i);
 		if (lineCount == 0 && current == SPACE) continue;
 		else if (current == '\n') {
-			std::cout << std::endl << LEFT_PADDING_STR;
+			std::cout << std::endl;
+			if (i != len - 1)
+			    std::cout << LEFT_PADDING_STR;
 			lineCount = 0;
 		}
 		else if (lineCount >= MAX_TEXT_WIDTH && i < len - 1 && text.at(i+1) == SPACE) {
@@ -114,9 +125,9 @@ void Util::stripCommandBloat(std::string& command) {
  * @return string with advice.
  */
 std::string Util::smartCommandAdvice(const std::string& command) {
-	if (command.size() == 2 && isalpha(command.at(0)) && isalpha(command.at(1))) {
+	if (command.size() == 2 && std::isalpha(command.at(0)) && std::isalpha(command.at(1))) {
 		std::stringstream processed;
-		processed << toupper(command.at(0)) << tolower(command.at(1));
+		processed << static_cast<char>(std::toupper(command.at(0))) << static_cast<char>(std::tolower(command.at(1)));
 		return "Did you attempt to play a tile on position " + processed.str() +
 			"? Please specify letter as in '<Yx> <letter>'.\n";
 	}
@@ -145,7 +156,7 @@ bool Util::isAlpha(const std::string& toTest, bool acceptSpaces) {
 			else return false;
 		}
 	}
-	return toTest.size();
+	return !toTest.empty();
 }
 
 /**
@@ -156,7 +167,7 @@ bool Util::isAlpha(const std::string& toTest, bool acceptSpaces) {
  */
 bool Util::isDigit(const std::string& toTest) {
 	for (const auto& letter : toTest) if (!std::isdigit(letter)) return false;
-	return toTest.size();
+	return !toTest.empty();
 }
 
 /**

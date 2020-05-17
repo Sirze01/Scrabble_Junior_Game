@@ -4,7 +4,8 @@
 #include <random>
 
 namespace Util {
-	void lowerCase(std::string& command);
+	void lowerCase(std::string& str);
+	void upperCase(std::string& str);
 	void stripSpaces(std::string& name);
 	void upperNameInitials(std::string& name);
 	void stripSpecialChars(std::string& name, bool acceptDigits = false);

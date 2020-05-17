@@ -5,7 +5,7 @@
 
 class Pool {
 public:
-	Pool(const Board &Board);
+	explicit Pool(const Board &Board);
 	void take(int pos);
 	void include(char letter);
 	void shuffle();

@@ -1,4 +1,6 @@
 #include "Player.h"
+
+#include <utility>
 #include "Move.h"
 #include "../common/consoleUtil.h"
 
@@ -9,8 +11,8 @@
  * @param color - to assign highlights and others to him.
  * @param isBot - if true, will not have access to commands and will act automatically (see conditions in Game)
  */
-Player::Player(Pool &pool, const std::string &name, int color, bool isBot):
-    _name{ name }, _hasPassed{ false }, _score{ 0 }, _color{ color }, _exchangeCount{ 0 }, _isBot{ isBot }
+Player::Player(Pool &pool, std::string name, int color, bool isBot):
+    _name{std::move( name )}, _hasPassed{ false }, _score{ 0 }, _color{ color }, _exchangeCount{ 0 }, _isBot{ isBot }
 {
     pool.shuffle();
     int handSize = 7;

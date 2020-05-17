@@ -4,8 +4,10 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <algorithm>
 #include "containerUtil.h"
 #include "consoleUtil.h"
+
 
 struct coord{
     size_t vLine;
@@ -20,42 +22,34 @@ struct codedWord{
     coord firstCoord;
     char orientation;
     std::string word;
-
 };
 
 class Board {
 public:
 	Board(size_t nLines = BOARD_MIN_DIM, size_t nColumns = BOARD_MIN_DIM);
-    Board(std::string filename);
+    Board(const std::string &filename);
     void show() const;
-	coord getIndex(const std::string &position) const;
-    std::string getPositionString(coord c) const;
-	bool fileExport(std::string filename) const;
-    bool highlight(int color, int vIndex, int hIndex);
-    void highlightWordOnLine(int color, int vIndex, int hIndex);
-    void highlightWordOnCol(int color, int vIndex, int hIndex);
+	static coord getIndex(const std::string &position);
+	static size_t getIndex(char letter);
+    static std::string getPositionString(coord c);
+	bool fileExport(const std::string &filename) const;
+    bool highlight(int color, size_t vIndex, size_t hIndex);
+    void highlightWordOnLine(int color, size_t vIndex, size_t hIndex);
+    void highlightWordOnCol(int color, size_t vIndex, size_t hIndex);
     std::vector<std::vector<char>> getLetters() const;
     std::vector<char> getNonEmptyChars() const;
     std::vector<std::vector<bool>> getHighlights() const;
     coord getDimensions() const;
-    void addWord(codedWord word);
-    bool wordSpaces(codedWord word);
+    bool addWord(codedWord word);
     std::vector<codedWord> getWords() const;
-    //Testing
-    void removeWord(codedWord word);
-    codedWord* findWord (std::string word);
-    codedWord* findWord (coord inates);
-    bool wordExists(std::string word) const;
-    bool wordExists(coord inates) const;
-    bool checkIntersection(codedWord);
-    bool boardBounds(const codedWord &entry);
-    void placeChar(coord inates, char character);
-    std::string getAlphabet() const;
-    std::vector<coord> checkIntersections(codedWord word);
+    bool removeWord(const std::string &wordToRemove);
+    bool boardBounds(const codedWord &entry) const;
+    static char getAlpha(size_t index, bool uppercase = true);
+
 
 private:
 
-    std::string _alphabet = "abcdefghijklmnopqrstuvwxyz";
+    static std::string _alphabet;
     void defaultInit(size_t nLines = BOARD_MIN_DIM, size_t nColumns = BOARD_MIN_DIM);
     std::vector<std::vector<bool>> _highlights;
     std::vector<std::vector<int>> _highlightColors;
@@ -63,5 +57,13 @@ private:
     std::vector<codedWord> _words;
     size_t _vDimension;
     size_t _hDimension;
+
+    bool checkIntersection(const codedWord &word) const;
+    bool wordIsolation(const codedWord &word) const;
+    codedWord* findWord (const std::string &word);
+    bool wordExists(const std::string &word) const;
+    std::vector<coord> getIntersectionsVector(const codedWord &word) const;
+    void placeChar(coord inates, char character);
+
 };
 
