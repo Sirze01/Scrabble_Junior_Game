@@ -85,7 +85,9 @@ int main() {
             commandInterpreter command(dict, boardName, board, dictOpen, boardOpen, userInput);
             command.interpret(statusCode);
 
-            if (count == 0 || (dictOpen && count == 1))
+            if (count == 0 )
+                count++;
+            if (dictOpen && count == 1)
                 count++;
             else if (count == 2)
                 count++;
