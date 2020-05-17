@@ -334,7 +334,6 @@ bool Board::addWord(Word word, int& statusCode) {
  */
 bool Board::wordIsolation(const Word& word) const {
 	size_t initialLine = word.firstLetterPos.line, initialCol = word.firstLetterPos.col;
-	char current;
 
 	if (word.orientation == 'V') {
 		if (initialLine > 0 && _letters.at(initialLine - 1).at(initialCol) != SPACE) return false;
