@@ -128,14 +128,15 @@ void commandInterpreter::interpret(int &statusCode) {
 void commandInterpreter::cmdHelp() {
     std::vector<std::string> sentences = {
             " ",
-            "### Help Page - List of all available commands",
-            "dict(d) 'filename' - Imports a board saved in a text file",
-            "new(n) - Creates a new board",
-            "import(i) 'filename' - Imports a board saved in a text file",
-            "add(a) Xx H(V) 'Word' - Adds a word to the board, only can be used after opening a board",
-            "remove {'Word'} - Removes a word to the board, only can be used after opening a board",
-            "export(e) - Exports a board to a text file, only can be used after opening a board",
-            "delete - Deletes the current board", "exit - Quit the program",
+            "### Help Page - available commands (first letter of keyword may be used)",
+            "'dict <filename>' - Imports a board saved in a text file",
+            "'new' - Creates a new board",
+            "'import <filename>' - Imports a board saved in a text file",
+            "'add <Xx> <H/V> <word>' - Adds on position Xx horizontally/vertically a word", 
+            "'remove <word>' - Removes a word to the board, only can be used after opening a board",
+            "'export' - Exports current board to a text file, only can be used after opening a board",
+            "'delete' - Deletes the current board",
+            "'exit' - Quit the program",
             " ",
     };
 
@@ -153,7 +154,7 @@ void commandInterpreter::cmdHelp() {
  */
 bool commandInterpreter::cmdDict() {
     if (_dictOpen && _boardOpen) {
-        std::cout << LEFT_PADDING_STR << "You can't change your board's dictionary" << std::endl;
+        std::cout << LEFT_PADDING_STR << "You can't change your board's dictionary\n\n";
         return false;
     }
 
@@ -204,7 +205,7 @@ bool commandInterpreter::cmdNewBoard() {
 
     if (_modifiers.empty()) { //assistant
         std::string userInput;
-        Util::stringWriter("\nWhat dimensions should the board be? (Height x Width)\n");
+        Util::stringWriter("\nWhat dimensions should the board be? (HxW)\n");
         std::cout << LEFT_PADDING_STR << "Dimensions: ";
         std::getline(std::cin, _modifiers);
         std::cout << std::endl;
@@ -241,10 +242,9 @@ bool commandInterpreter::cmdNewBoard() {
 
     if (std::stoul(vTemp) > MAX_BOARD_SIZE || std::stoul(hTemp) > MAX_BOARD_SIZE) {
         _name = std::string(); //prevent input prompt of using the faulty boards name
-        std::cout << "\nThe board you're trying to create is just too big. Create one up to 20x20\n" << std::endl;
+        std::cout << "\nThe board you're trying to create is just too big. Create one up to 20x20\n\n";
         return false;
     }
-
 
     Board newBoard(std::stoul(vTemp), std::stoul(hTemp));
     if (_name.empty())
@@ -262,11 +262,11 @@ bool commandInterpreter::cmdNewBoard() {
  */
 bool commandInterpreter::cmdImportBoard() {
     if (!_dictOpen) {
-        std::cout << LEFT_PADDING_STR << "Cannot create a new board. You haven't added a dictionary" << std::endl;
+        std::cout << LEFT_PADDING_STR << "Cannot create a new board. You haven't added a dictionary\n\n";
         return false;
     }
     if (_boardOpen) {
-        std::cout << LEFT_PADDING_STR << "Cannot create a new board. You already have one open\n" << std::endl;
+        std::cout << LEFT_PADDING_STR << "Cannot create a new board. You already have one open\n\n";
         return false;
     }
     if (!_modifiers.empty()) {
@@ -284,7 +284,7 @@ bool commandInterpreter::cmdImportBoard() {
     file.open(_modifiers, std::ios::in);
     // Check if file exists
     if (!file.is_open()) {
-        std::cout << LEFT_PADDING_STR << "Cannot open file! Try another\n" << std::endl;
+        std::cout << LEFT_PADDING_STR << "Cannot open file! Try another\n\n";
         return false;
     } else {
         // Close file if it exists
@@ -326,13 +326,14 @@ bool commandInterpreter::cmdAdd(int &statusCode) {
         std::stringstream commandStream(_modifiers);
         commandStream >> tempString;
         newEntry.firstCoord = Board::getIndex(tempString);
-        //tempString.erase(); //orientation
+        tempString.erase(); //space before orientation
         commandStream >> tempChar;
         newEntry.orientation = static_cast<char>(std::toupper(tempChar));
         if (newEntry.orientation != 'H' && newEntry.orientation != 'V') {
             statusCode = -3;
             return false;
         }
+        tempString.erase(); //space before word
         commandStream >> tempString;
         if (!tempString.empty()) {
             newEntry.word = tempString;
@@ -394,7 +395,7 @@ bool commandInterpreter::cmdAdd(int &statusCode) {
 
         if (!std::binary_search(_dict.begin(), _dict.end(), lowerWord)) {
             statusCode = -2;
-            Util::stringWriter("The word you chose isn't in the dictionary\n");
+            Util::stringWriter("The word you chose isn't in the dictionary\n\n");
             return false;
         }
 
@@ -411,7 +412,7 @@ bool commandInterpreter::cmdAdd(int &statusCode) {
 bool commandInterpreter::cmdRemove(int &statusCode) {
     if (!_boardOpen) {
         statusCode = -2;
-        Util::stringWriter("You need to be editing a board to run this command. Import or create a new one!\n");
+        Util::stringWriter("You need to be editing a board to run this command. Import or create a new one!\n\n");
         return false;
     }
 
@@ -432,7 +433,7 @@ bool commandInterpreter::cmdRemove(int &statusCode) {
  */
 bool commandInterpreter::cmdExport() const {
     if (_board.fileExport((_name + ".txt"))) {
-        std::cout << LEFT_PADDING_STR << "Board exported\n" << std::endl;
+        std::cout << LEFT_PADDING_STR << "Board exported\n\n";
         return true;
     }
     return false;
@@ -447,7 +448,7 @@ void commandInterpreter::cmdDelete(int &statusCode) {
     _dictOpen = false;
     _boardOpen = false;
     _name = std::string();
-    std::cout << LEFT_PADDING_STR << "Board deleted\n" << std::endl;
+    std::cout << LEFT_PADDING_STR << "Board deleted\n\n";
     statusCode = -4;
 }
 

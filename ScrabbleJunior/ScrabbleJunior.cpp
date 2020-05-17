@@ -85,7 +85,7 @@ std::string askBoardFileName(const Board &board) {
 		std::vector<std::string> sentences = {
 			"Tip\n",
 			"You can use our companion",
-			"Board Builder program",
+			"Board Builder programme",
 			"to create your own board!"
 		};
 
@@ -334,7 +334,7 @@ int main()
 	int first = askPlayFirst(gameBoard, nPlayers, playerNames, playerColors);
 	Game my_game(gameBoard, playerNames, playerColors, botFlags, first);
 
-	for (;;) {
+	for (;;) { //while game is going on
 		my_game.moveHandler(1);
 		if (my_game.hasFinished()) break;
 		my_game.moveHandler(2);

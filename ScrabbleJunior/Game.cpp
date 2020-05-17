@@ -360,7 +360,7 @@ void Game::showHelp() const{
 
     if (!_compactCardView) {
         for (const auto &sentence : intro) {
-            toWrite << sentence << TOPIC << "\n";
+            toWrite << TOPIC << sentence << "\n";
         }
     }
     for (const auto &sentence : commands) {

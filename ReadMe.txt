@@ -1,7 +1,7 @@
 PROG Project 2
-2019/2020
 Bruno Mendes - up201906166
 José Costa - up201907216
+FEUP, 2020
 ------------------------------------------
 SCRABBLE JUNIOR
 -> All mandatory goals were accomplished, including:
@@ -9,6 +9,8 @@ SCRABBLE JUNIOR
    -> Ask number of players from 2 to 4
    -> Robust in-game input/output: invalid moves of all types are prevented
       -> We considered continuing the same word is possible for all turns - the rules are ambiguous in that regard
+      -> Every aglomeration of 2 letters or more vertically or horizontally is a word - 1 char words are not considered words
+      -> Naturally, you must continue or start words with only the letters with you have on hand
    -> Distinguish played tiles with colors (different for each player)
    -> Exchange and pass behaviours follow the original rules of the game
       -> In-game messages and commands are very explicit in this regard
@@ -20,7 +22,7 @@ SCRABBLE JUNIOR
    -> "Card view" on the side of the board - shows adaptative game info
    -> Flexible command input
       -> The user may check in game help to learn all commands
-      -> Player does not have to worry about extra spaces, upper and lowercase letters - all bloat is not interpreted
+      -> Player does not have to worry about extra spaces, upper and lowercase letters, misclicks on special chars - bloat is not interpreted
       -> We try to help you with some contextual command advice if you input a invalid command
    -> Spy pool - user can take a privileged look at the pool
       -> Note that he still can't control which random letter it's taken for him after each move as supposed
@@ -43,9 +45,10 @@ SCRABBLE JUNIOR
    -> ANSI escape codes were extensively used to allow for a enjoyable interface
       -> This is not supported on Windows versions prior to 2016 (current Windows 10 should be fine)
       -> Unix handles these instructions better than Windows (less screen flickering when clearing etc)
-   -> The Game::moveHandler(int turnNumber) is a very complex method which handles i/o and generates moves to be executed
+   -> Game::moveHandler(int turnNumber) is a very complex method which handles i/o and generates moves to be executed
       -> Modularity could have been used a bit better in this particular area
-      -> Despite this, the flow of the function proved to be robust in extreme situations in our testing
+      -> Despite this, its flow proved to be robust in extreme situations in our testing
+   -> Member initialization lists were used when possible to improve efficiency
    -> The code compiles with no warnings in both CLang -Wextra (Clion) and MSVC -W4 (Visual Studio 2019)
 
 ----------------------------------------------
@@ -54,7 +57,7 @@ BOARD BUILDER
    -> Import board from file
    -> Create a new board with desired dimensions (max 20x20)
    -> Add words horizontally or vertically if in the dictionary
-      -> We considered you cannot append to already created words (eg. you cannot add MAN to POLICE)
+      -> We considered you cannot append to already existing words (eg. you cannot add MAN to POLICE)
       -> You cannot create non-existent words as a side effect (thus the world must be isolated and intersect correctly)
       -> Naturally, you cannot crop words, so all characters of a word must fit inside the board
    -> Export created or edited board to later load on the Scrabble Game
@@ -63,7 +66,7 @@ BOARD BUILDER
    -> Remove a word from the board
       -> A great attention was given to leave letters which belong to other words unchanged
    -> Import your own dictionary
-      -> In the beggining, we ask you to import your list of available words to unveil your full creativity
+      -> In the beggining, we ask you to import your own set of words to unveil your full creativity
    -> Delete current board
       -> You may import, edit and export multiple boards in a single programme execution
    -> Advice to help the user understand the programme functioning
