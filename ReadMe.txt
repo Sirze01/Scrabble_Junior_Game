@@ -1,5 +1,5 @@
 BOARD BUILDER
-(write here)
+Basic functionality done.
 
 -------------------------------------------------
 SCRABBLE JUNIOR
