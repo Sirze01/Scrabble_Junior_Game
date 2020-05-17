@@ -225,12 +225,12 @@ void Board::placeChar(coord c, char character) {
 bool Board::addWord(codedWord word, int& statusCode) {
 	if (!checkIntersection(word)) {
 		statusCode = -2;
-		Util::stringWriter("The word you're trying to add intersects with another in the wrong letter\n");
+		Util::stringWriter("The word you're trying to add intersects with another in the wrong letter\n\n");
 		return false;
 	}
 	else if (!wordIsolation(word)) {
 		statusCode = -2;
-		Util::stringWriter("The word you're trying to add doesn't fit in that space\n");
+		Util::stringWriter("The word you're trying to add doesn't fit in that space\n\n");
 		return false;
 	}
 	else {
@@ -253,11 +253,12 @@ bool Board::addWord(codedWord word, int& statusCode) {
 
 bool Board::wordIsolation(const codedWord& word) const {
 	if (word.orientation == 'V') {
-		for (int cof : {-1, 1}) {
-			if (word.firstCoord.vLine - cof < _vDimension) {
-				if (_letters.at(word.firstCoord.vLine - cof).at(word.firstCoord.hColumn) != SPACE)
-					return false;
-			}
+
+	    if (word.firstCoord.vLine - 1 < _vDimension) {
+	        if (_letters.at(word.firstCoord.vLine - 1).at(word.firstCoord.hColumn) != SPACE)
+	            return false;
+	    }
+        for (int cof : {-1, 1}) {
 			for (size_t i = 0; i < word.word.size(); i++) {
 				if (word.firstCoord.hColumn + cof < _hDimension) {
 					if (_letters.at(word.firstCoord.vLine + i).at(word.firstCoord.hColumn) != word.word.at(i)) {
@@ -267,14 +268,19 @@ bool Board::wordIsolation(const codedWord& word) const {
 				}
 			}
 		}
+        if (word.firstCoord.vLine + 1 < _vDimension) {
+            if (_letters.at(word.firstCoord.vLine+ word.word.size() + 1).at(word.firstCoord.hColumn) != SPACE)
+                return false;
+        }
 	}
 
 	else {
-		for (int cof : {-1, 1}) {
-			if (word.firstCoord.hColumn - cof < _hDimension) {
-				if (_letters.at(word.firstCoord.vLine).at(word.firstCoord.hColumn - cof) != SPACE)
-					return false;
-			}
+
+	    if (word.firstCoord.hColumn - 1 < _hDimension) {
+	        if (_letters.at(word.firstCoord.vLine).at(word.firstCoord.hColumn - 1) != SPACE)
+	            return false;
+	    }
+        for (int cof : {-1, 1}) {
 			for (size_t i = 0; i < word.word.size(); i++) {
 				if (word.firstCoord.vLine + cof < _vDimension) {
 					if (_letters.at(word.firstCoord.vLine).at(word.firstCoord.hColumn + i) != word.word.at(i)) {
@@ -284,6 +290,10 @@ bool Board::wordIsolation(const codedWord& word) const {
 				}
 			}
 		}
+        if (word.firstCoord.hColumn + 1 < _hDimension) {
+            if (_letters.at(word.firstCoord.vLine).at(word.firstCoord.hColumn + word.word.size() + 1) != SPACE)
+                return false;
+        }
 	}
 
 	return true;
