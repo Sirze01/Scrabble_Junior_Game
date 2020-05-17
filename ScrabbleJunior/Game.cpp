@@ -336,7 +336,7 @@ bool Game::allHighlighted() const {
 }
 
 /** Makes the help message the card view. */
-void Game::showHelp() const {
+void Game::showHelp() const{
     std::stringstream toWrite;
     std::vector<std::string> intro =
             {
