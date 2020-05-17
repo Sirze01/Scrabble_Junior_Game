@@ -138,7 +138,7 @@ bool Move::finishOnCol() const {
  */
 bool Move::wordCompletionOnLine(int cof) const {
 	if ((_posToMove.hColumn == 0 && cof == -1) ||
-		(_posToMove.hColumn == _maxLine && cof == 1)) return true;
+		(_posToMove.hColumn == _maxCol && cof == 1)) return true;
 
 	for (size_t i = _posToMove.hColumn + cof; i <= _maxCol; i += cof) {
 		if (!_boardHighlights.at(_posToMove.vLine).at(i)) {
