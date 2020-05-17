@@ -34,17 +34,17 @@
 
 #endif
 
-const char
+constexpr char
 TOPIC = '|',
 SPACE = ' ',
 ARROW = '>';
 
-const size_t
+constexpr size_t
 CARD_LEFT_PADDING = 12,
 BOARD_LEFT_PADDING = 2,
 BOARD_TOP_PADDING = 1,
 BOARD_BOTTOM_PADDING = 2,
-BOARD_MIN_DIM = 7, //this is dependent on card view info cards
+BOARD_MIN_DIM = 7, //make room for card view
 COMPACT_VIEW_MAX = 12,
 MAX_PLAYER_NAME_SIZE = 20,
 MAX_TEXT_WIDTH = 100,
@@ -52,11 +52,11 @@ CARD_TOP_PADDING = 2,
 MAX_BOARD_SIZE = 20;
 
 //unfair game warning
-const int
-MAX_BOARD_LETTERS_WARNING = 4 * 7; //4 players, 7 letters in hand
+constexpr int
+MIN_BOARD_LETTERS_WARNING = 4 * 7; //4 players, 7 letters in hand
 
 //impossible move result
-const size_t
+constexpr size_t
 IMPOSSIBLE_MOVE_COORD = SIZE_MAX;
 
 const std::string

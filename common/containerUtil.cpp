@@ -125,11 +125,12 @@ std::string Util::smartCommandAdvice(const std::string& command) {
 	if (command.size() == 2 && std::isalpha(command.at(0)) && std::isalpha(command.at(1))) {
 		std::stringstream processed;
 		processed << static_cast<char>(std::toupper(command.at(0))) << static_cast<char>(std::tolower(command.at(1)));
-		return "Did you attempt to play a tile on position " + processed.str() +
-			"? Please specify letter as in '<Yx> <letter>'.\n";
+		std::string processedStr = processed.str();
+		return "Did you attempt to play a tile on position " + processedStr +
+			"? Please specify letter: '" + processedStr + " <letter>'.\n";
 	}
 	else if (command.find("exchange") != std::string::npos) {
-		return "Are you trying to exchange one of your tiles? Please specify letter as in 'exchange <letter>'.\n";
+		return "Are you trying to exchange one of your tiles? Please specify letter: 'exchange <letter>'.\n";
 	}
 	else {
 		return "Command not recognized. Please type 'help' to view the available commands.\n";

@@ -62,15 +62,14 @@ void Game::moveHandler(int turnNumber) {
                 coloredMessage << name << " will play " << Board::getPositionString(pos) << SPACE << letter
                                << ".\n";
                 break;
-            } else if (!_currentPlayer->getExchangeCount() && _currentPlayer->getHandSize() &&
-                       _pool.getCurrentSize()) {
+            } else if (!_currentPlayer->getExchangeCount() && _currentPlayer->getHandSize() && _pool.getCurrentSize()) {
                 int handPos = Util::randomBetween(0, _currentPlayer->getHandSize() - 1);
                 char oldLetter = _currentPlayer->getHand().at(handPos);
                 char newLetter = _currentPlayer->exchange(oldLetter, _pool);
                 coloredMessage << name << " exchanged letter " << oldLetter << " from the pool and got letter "
                                << newLetter << ".\n\n";
                 ableToMove = _currentPlayer->mayMove(_board);
-                showPlayerInfo("hands");
+                showPlayerInfo(true);
             } else { //exchange is not possible
                 coloredMessage << name << " cannot move and thus will pass.\n";
                 _currentPlayer->forcePass();
@@ -80,11 +79,13 @@ void Game::moveHandler(int turnNumber) {
     } else {
         if (!ableToMove) { //if player has on hand and haven't passed last time, will have to pass manually
             if (_currentPlayer->getHasPassed()) {
-                coloredMessage << name << ", you still cannot move.\n" <<
+                coloredMessage << "(turn " << turnNumber << ") "
+                               << name << ", you still cannot move.\n" <<
                                "We will skip your turn automatically.\n";
             } else if (!_currentPlayer->getHandSize()) {
                 _currentPlayer->forcePass();
-                coloredMessage << name << ", you have nothing on your hand.\n" <<
+                coloredMessage << "(turn " << turnNumber << ") "
+                               << name << ", you have nothing on your hand.\n" <<
                                "Your turn will be skipped as long as you cannot move.\n";
             }
         }
@@ -143,13 +144,14 @@ void Game::moveHandler(int turnNumber) {
                                        "Your turn will be skipped as long as you cannot move.\n";
                     } else {
                         char newLetter = _currentPlayer->exchange(token, _pool);
-                        showPlayerInfo("hands");
+                        showPlayerInfo(true);
                         regularMessage << "The exchange was successful. You got letter " << newLetter
                                        << " from the pool.\n";
                         ableToMove = _currentPlayer->mayMove(_board);
                     }
-                } else if (command.isCheckHands()) showPlayerInfo("hands");
-                else if (command.isCheckScores()) showPlayerInfo("scores");
+                }
+                else if (command.isCheckHands()) showPlayerInfo(true);
+                else if (command.isCheckScores()) showPlayerInfo(false);
                 else if (command.isCheckPool()) showPool();
                 else if (command.isHelp()) showHelp();
                 else if (command.isHint()) {
@@ -179,13 +181,16 @@ void Game::moveHandler(int turnNumber) {
         if (!Util::isEmpty(regularMessage)) {
             Util::paddingAndTopic(WHITE, true);
             std::cout << regularMessage.str();
-        } else if (!Util::isEmpty(coloredMessage)) {
+        }
+        else if (!Util::isEmpty(coloredMessage)) {
             coloredMessage << "Press enter to continue.\n";
             std::string sentence;
             while (std::getline(coloredMessage, sentence)) {
                 if (!sentence.empty()) {
                     Util::paddingAndTopic(playerColor, true);
-                } else std::cout << "\n";
+                } else {
+                    std::cout << "\n";
+                }
                 std::cout << sentence;
             }
             std::cout << "\n";
@@ -375,7 +380,7 @@ void Game::showPool() const {
     std::vector<char> letters = _pool.getAllLetters();
     int size = letters.size();
 
-    toWrite << TOPIC << size << " letters on the pool";
+    toWrite << TOPIC << size << " letters on the pool\n";
 
     const int MAX_LETTERS_PER_LINE = 10;
     for (int i = 0; i < size; ++i) {

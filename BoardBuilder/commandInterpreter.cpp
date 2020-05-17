@@ -66,7 +66,7 @@ void commandInterpreter::importPath() {
  */
 void commandInterpreter::boardName() {
     std::cout << LEFT_PADDING_STR << "Insert the name of your board." << std::endl;
-    std::cout << std::string(2, ' ') << "Board name: ";
+    std::cout << LEFT_PADDING_STR << "Board name: ";
     std::getline(std::cin, _name);
 }
 
@@ -139,7 +139,7 @@ void commandInterpreter::interpret(int &statusCodes) {
         cmdExit(statusCodes);
     }
 
-    if (_command.empty())
+    else if (_command.empty())
         statusCodes = -3;
 }
 
@@ -149,6 +149,7 @@ void commandInterpreter::interpret(int &statusCodes) {
  */
 void commandInterpreter::cmdHelp(){
     std::vector<std::string> sentences = {
+            " ",
             "### Help Page - List of all available commands",
             "dict(d) 'filename' - Imports a board saved in a text file",
             "new(n) - Creates a new board",
@@ -156,12 +157,12 @@ void commandInterpreter::cmdHelp(){
             "add(a) Xx H(V) 'Word' - Adds a word to the board, only can be used after opening a board",
             "remove {'Word'} - Removes a word to the board, only can be used after opening a board",
             "export(e) - Exports a board to a text file, only can be used after opening a board",
-            "delete - Deletes the current board", "exit - Quit the program"
-
+            "delete - Deletes the current board", "exit - Quit the program",
+            " ",
     };
 
     std::stringstream output;
-    for (auto& sentence : sentences) {
+    for (const auto& sentence : sentences) {
         output << LEFT_PADDING_STR << sentence << std::endl;
     }
     std::cout << output.str();
@@ -174,7 +175,7 @@ void commandInterpreter::cmdHelp(){
  */
 bool commandInterpreter::cmdDict() {
     if (_dictOpen && _boardOpen) {
-        std::cout << std::string(BOARD_LEFT_PADDING, SPACE) << "You can't change your board's dictionary" << std::endl;
+        std::cout << LEFT_PADDING_STR << "You can't change your board's dictionary" << std::endl;
         return false;
     }
 
@@ -197,11 +198,11 @@ bool commandInterpreter::cmdDict() {
         // Close the file and change flags
         file.close();
         _dictOpen = true;
-        std::cout << std::string(BOARD_LEFT_PADDING, SPACE) << "Dictionary loaded\n" << std::endl;
+        std::cout << LEFT_PADDING_STR << "Dictionary loaded\n" << std::endl;
         return true;
     }
     else{
-        std::cout << '\n' << std::string(2, SPACE) << "Cannot open file, try another file\n" << std::endl;
+        std::cout << '\n' << LEFT_PADDING_STR << "Cannot open file, try another file\n" << std::endl;
         return false;
     }
 }
@@ -214,12 +215,12 @@ bool commandInterpreter::cmdDict() {
 bool commandInterpreter::cmdNewBoard() {
     if (_dictOpen) {
         if (_boardOpen) {
-            std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Cannot create a new board. You already have one open" << std::endl;
+            std::cout << LEFT_PADDING_STR << "Cannot create a new board. You already have one open" << std::endl;
             return false;
         }
     }
     else{
-        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Cannot create a new board. You haven't added a dictionary" << std::endl;
+        std::cout << LEFT_PADDING_STR << "Cannot create a new board. You haven't added a dictionary" << std::endl;
         return false;
     }
 
@@ -233,19 +234,19 @@ bool commandInterpreter::cmdNewBoard() {
         std::cout << std::endl;
     }
     else {
-        if (_modifiers.find_first_of(' ') !=_modifiers.find_last_of(' ')) {
+        if (_modifiers.find_first_of(SPACE) !=_modifiers.find_last_of(SPACE)) {
             Util::stringWriter("Input the dimensions in a valid format\n");
             return false;
         }
         hTemp = _modifiers;
-        _modifiers = hTemp.substr(0, hTemp.find_first_of(' '));
-        hTemp.erase(0, hTemp.find_first_of(' ') + 1);
+        _modifiers = hTemp.substr(0, hTemp.find_first_of(SPACE));
+        hTemp.erase(0, hTemp.find_first_of(SPACE) + 1);
         _name = hTemp.substr(0);
     }
 
     std::string tempStr;
     for(const char &character : _modifiers){
-        if (character != ' ')
+        if (character != SPACE)
             tempStr += character;
     }
     _modifiers = tempStr;
@@ -265,7 +266,7 @@ bool commandInterpreter::cmdNewBoard() {
     
     if ( std::stoul(vTemp) > MAX_BOARD_SIZE || std::stoul(hTemp) > MAX_BOARD_SIZE){
         _name = "";
-        std::cout << std::string(1, '\n') << "The board you're trying to create is just too big. Create one up to 20x20" << std::endl;
+        std::cout << "\nThe board you're trying to create is just too big. Create one up to 20x20" << std::endl;
         return false;
     }
 
@@ -286,7 +287,7 @@ bool commandInterpreter::cmdNewBoard() {
  */
 bool commandInterpreter::cmdImportBoard() {
     if (!_dictOpen) {
-        std::cout << std::string(BOARD_LEFT_PADDING, ' ') << "Cannot create a new board. You haven't added a dictionary" << std::endl;
+        std::cout << LEFT_PADDING_STR << "Cannot create a new board. You haven't added a dictionary" << std::endl;
         return false;
     }
     if (_boardOpen){
@@ -297,8 +298,8 @@ bool commandInterpreter::cmdImportBoard() {
     if(!_modifiers.empty()){
         std::string temp;
         temp = _modifiers;
-        _modifiers = _modifiers.substr(0, temp.find_first_of(' '));
-        temp.erase(0, temp.find_first_of(' '));
+        _modifiers = _modifiers.substr(0, temp.find_first_of(SPACE));
+        temp.erase(0, temp.find_first_of(SPACE));
         if (!temp.empty())
             _name = temp.substr(1);
 
@@ -339,7 +340,7 @@ bool commandInterpreter::cmdAdd() {
     }
 
 
-    codedWord newEntry = {{SIZE_MAX, SIZE_MAX}, '\0', ""};
+    codedWord newEntry = {{SIZE_MAX, SIZE_MAX}, '\0', std::string()};
     if(!_modifiers.empty()){
         std::string tempString;
         char tempChar;
@@ -376,7 +377,7 @@ bool commandInterpreter::cmdAdd() {
         std::cout << LEFT_PADDING_STR << "Coordinate: ";
         getline(std::cin, userInput);
         Util::stripSpaces(userInput);
-        if(!(Util::isAlpha(userInput) && _board.boardBounds({Board::getIndex(userInput), '\0', ""}))) {
+        if(!(Util::isAlpha(userInput) && _board.boardBounds({Board::getIndex(userInput), '\0', std::string()}))) {
             return false;
         }
         newEntry.firstCoord = Board::getIndex(userInput);
@@ -455,7 +456,7 @@ bool commandInterpreter::cmdRemove() {
  */
 bool commandInterpreter::cmdExport() const{
     if(_board.fileExport((_name + ".txt"))) {
-        std::cout << std::string(BOARD_LEFT_PADDING, SPACE) << "Board exported\n" << std::endl;
+        std::cout << LEFT_PADDING_STR << "Board exported\n" << std::endl;
         return true;
     }
     return false;
@@ -469,8 +470,8 @@ bool commandInterpreter::cmdExport() const{
 void commandInterpreter::cmdDelete(int &statusCodes) {
     _dictOpen = false;
     _boardOpen = false;
-    _name = "";
-    std::cout << std::string(BOARD_LEFT_PADDING, SPACE) << "Board deleted\n" << std::endl;
+    _name = std::string();
+    std::cout << LEFT_PADDING_STR << "Board deleted\n" << std::endl;
     statusCodes = -4;
 }
 

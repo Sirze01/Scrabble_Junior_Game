@@ -104,12 +104,12 @@ void Util::eraseLineToTheEnd() {
 
 /** Save the current cursor position to later restore. */
 void Util::saveCurrentCursorPosition() {
-	std::cout << "\0337";
+	std::cout << "\033" << "7";
 }
 
 /** Restore previously saved cursor position. */
 void Util::restoreSavedCursorPosition() {
-	std::cout << "\0338";
+	std::cout << "\033" << "8";
 }
 
 /**

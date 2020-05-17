@@ -39,8 +39,11 @@ size_t askPlayFirst(const Board &board, size_t nPlayers,
 		std::string playerName;
 		for (;;) {
 			Util::paddingAndTopic(WHITE, true); std::cout << "Who should go first? ";
-			std::getline(std::cin, playerName); Util::cleanBuffer();
-			Util::stripSpecialChars(playerName); Util::stripSpaces(playerName);
+			std::getline(std::cin, playerName);
+			
+			Util::cleanBuffer();
+			Util::stripSpecialChars(playerName);
+			Util::stripSpaces(playerName);
 
 			if (playerName == "random") {
 				int randomPos = Util::randomBetween(0, static_cast<int>(nPlayers - 1));
@@ -97,7 +100,8 @@ std::string askBoardFileName(const Board &board) {
 		std::string fileName;
 		for (;;) {
 			Util::paddingAndTopic(WHITE, true); std::cout << "Import board from file: ";
-			std::getline(std::cin, fileName); Util::cleanBuffer();
+			std::getline(std::cin, fileName);
+			Util::cleanBuffer();
 
 			if (!exists(fileName)) {
 				Util::paddingAndTopic(RED, true); std::cout << "We could not find that file. Please try again.\n";
@@ -105,9 +109,8 @@ std::string askBoardFileName(const Board &board) {
 			else {
 				Board testBoard(fileName);
 
-				if (testBoard.getNonEmptyChars().size() < MAX_BOARD_LETTERS_WARNING) {
+				if (testBoard.getNonEmptyChars().size() < MIN_BOARD_LETTERS_WARNING) {
 					std::string userAns;
-
 					for (;;) { //exit when user goes back or agrees with the condition
 						Util::paddingAndTopic(RED, true);
 						std::cout << "That board hasn't got enough letters to create a fair 4 player game. Proceed? ";
@@ -121,9 +124,7 @@ std::string askBoardFileName(const Board &board) {
 							std::cout << "Please answer 'yes' or 'no'.\n";
 						}
 					}
-				}
-
-				return fileName; //board ok
+				} else return fileName; //board ok
 			}
 		}
 	}
@@ -160,7 +161,8 @@ PlayerData askPlayer(int position, const Board& board,
 
 		for (;;) {
 			Util::paddingAndTopic(WHITE, true); std::cout << "Player " << position << " name: ";
-			std::getline(std::cin, name); Util::cleanBuffer();
+			std::getline(std::cin, name);
+			Util::cleanBuffer();
 			Util::stripSpaces(name);
 
 			if (name == "random") {
@@ -213,15 +215,18 @@ PlayerData askPlayer(int position, const Board& board,
 
 		for (;;) { //ask color
 			Util::paddingAndTopic(WHITE, true); std::cout << "Player " << position << " color: ";
-			std::getline(std::cin, colorName); Util::cleanBuffer();
-			Util::stripSpecialChars(colorName); Util::stripSpaces(colorName);
-			for (auto& i : colorName) i = static_cast<char>(tolower(i));
+			std::getline(std::cin, colorName);
+			
+			Util::cleanBuffer();
+			Util::stripSpecialChars(colorName);
+			Util::stripSpaces(colorName);
+			Util::lowerCase(colorName);
 
-			if (colorName == "red") color = RED;
-			else if (colorName == "green") color = GREEN;
-			else if (colorName == "blue") color = BLUE;
-			else if (colorName == "pink") color = PINK;
-			else if (colorName == "orange") color = ORANGE;
+			if (colorName == "red" || colorName == "r") color = RED;
+			else if (colorName == "green" || colorName == "g") color = GREEN;
+			else if (colorName == "blue" || colorName == "b") color = BLUE;
+			else if (colorName == "pink" || colorName == "p") color = PINK;
+			else if (colorName == "orange" || colorName == "o") color = ORANGE;
 			else {
 				Util::paddingAndTopic(RED, true); std::cout << "We did not recognize that color. Please try again.\n";
 				continue;
@@ -248,8 +253,10 @@ int askNumberOfPlayers() {
 
 	for (;;) {
 		Util::paddingAndTopic(WHITE, true); std::cout << "Number of players: ";
-		std::getline(std::cin, input); Util::cleanBuffer();
-		Util::stripSpecialChars(input,true); Util::stripSpaces(input);
+		std::getline(std::cin, input);
+		Util::cleanBuffer();
+		Util::stripSpecialChars(input,true);
+		Util::stripSpaces(input);
 
 		if (!Util::isDigit(input)) {
 			errorMessage = "Please input a valid number.";
@@ -281,7 +288,7 @@ void printIntro(const Board& introBoard) {
 	"Press enter to create a new game!",
 	};
 
-	for (auto& sentence : sentences) {
+	for (const auto& sentence : sentences) {
 		Util::paddingAndTopic(BLUE, true); std::cout << sentence;
 	}
 
@@ -296,7 +303,7 @@ int main()
 	Util::setupConsole();
 	Util::initRandom();
 
-	auto clearAndShowBoard = [](Board& board) {
+	auto clearAndShowBoard = [](const Board& board) {
 		Util::clearConsole();
 		board.show();
 	};
