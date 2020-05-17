@@ -1,6 +1,5 @@
 #include "../common/consoleUtil.h"
 #include "../common/containerUtil.h"
-#include <iostream>
 
 /**
  * If on Windows, tries to enable console support for ANSI escape codes. Else does nothing.

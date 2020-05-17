@@ -1,7 +1,5 @@
 #include "../common/containerUtil.h"
 #include "../common/consoleUtil.h"
-#include <string>
-#include <vector>
 #include <algorithm>
 
 static std::mt19937 RANDOM_GENERATOR;
@@ -13,7 +11,6 @@ static std::mt19937 RANDOM_GENERATOR;
 void Util::lowerCase(std::string& str) {
 	for (char& letter : str) letter = static_cast<char>(std::tolower(letter));
 }
-
 
 /**
  * Uppercase all chars.

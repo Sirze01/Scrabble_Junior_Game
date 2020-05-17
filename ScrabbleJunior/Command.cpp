@@ -1,6 +1,4 @@
 #include "Command.h"
-#include <string>
-#include <utility>
 
 /**
  * A command contains a string which defines its action on the game.

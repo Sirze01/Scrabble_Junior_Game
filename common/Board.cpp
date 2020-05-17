@@ -43,7 +43,7 @@ Board::Board(const std::string &filename): _vDimension(BOARD_MIN_DIM), _hDimensi
 
         defaultInit(lineDim, colDim);
 
-        codedWord entry;
+        codedWord entry = { {SIZE_MAX,SIZE_MAX}, '\0', std::string() };
         auto fillEntry = [&](std::string content){
             entry.firstCoord = getIndex(content.substr(0, 2));
             content.erase(0, 2);
@@ -229,16 +229,15 @@ void Board::placeChar(coord inates, char character) {
 
 
 bool Board::addWord(codedWord word) {
-    bool retValue = true;
     if(!checkIntersection(word)){
         Util::stringWriter("The word you're trying to add intersects with another in the wrong letter\n");
-        retValue = false;
+        return false;
     }
-    if(!wordIsolation(word)){
+    else if(!wordIsolation(word)){
         Util::stringWriter("The word you're trying to add doesn't fit in that space\n");
-        retValue = false;
+        return false;
     }
-    if (retValue){
+    else {
         if (word.orientation == 'V'){
             for(size_t i = 0; i < word.word.size(); i++){
                 placeChar({word.firstCoord.vLine + i, word.firstCoord.hColumn}, word.word.at(i));
@@ -252,7 +251,7 @@ bool Board::addWord(codedWord word) {
         _words.push_back(word);
         show();
     }
-    return retValue;
+    return true;
 }
 
 

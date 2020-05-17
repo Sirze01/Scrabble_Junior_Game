@@ -1,10 +1,7 @@
 #pragma once
 
 #include "Command.h"
-#include "Player.h"
-#include <ostream>
-#include <vector>
-#include <string>
+#include "Player.h" //includes "Board.h"
 
 class Move {
 public:

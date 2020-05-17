@@ -1,8 +1,6 @@
 #include "Player.h"
-
-#include <utility>
 #include "Move.h"
-#include "../common/consoleUtil.h"
+#include <utility>
 
 /**
  * A player must have a 7 letter hand with letters from the pool, and other attributes to be used in game.

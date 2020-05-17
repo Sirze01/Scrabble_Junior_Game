@@ -1,14 +1,10 @@
 #pragma once
 
 #include "../common/Board.h"
-#include "../common/consoleUtil.h"
-#include "../common/containerUtil.h"
 #include "Player.h"
 #include "Pool.h"
 #include "Command.h"
 #include "Move.h"
-#include <vector>
-#include <string>
 
 class Game{
 public:

@@ -1,7 +1,4 @@
 #include "commandInterpreter.h"
-#include <algorithm>
-#include <sstream>
-
 
 /**
  * Constructor - Creates a commandInterpreter object, being initializes with params through reference.

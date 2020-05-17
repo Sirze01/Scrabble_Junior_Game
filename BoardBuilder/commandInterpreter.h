@@ -1,8 +1,6 @@
 #pragma once
 #include "../common/Board.h"
 
-
-
 class commandInterpreter {
 public:
     commandInterpreter (std::vector<std::string> &dict, std::string &boardName, Board &board,

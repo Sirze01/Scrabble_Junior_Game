@@ -1,12 +1,9 @@
 #pragma once
 
-#include <vector>
-#include <string>
-#include <fstream>
-#include <iostream>
-#include <algorithm>
-#include "containerUtil.h"
 #include "consoleUtil.h"
+#include "containerUtil.h"
+#include <fstream>
+#include <algorithm>
 
 
 struct coord{
@@ -46,10 +43,7 @@ public:
     bool boardBounds(const codedWord &entry) const;
     static char getAlpha(size_t index, bool uppercase = true);
 
-
 private:
-
-    static std::string _alphabet;
     void defaultInit(size_t nLines = BOARD_MIN_DIM, size_t nColumns = BOARD_MIN_DIM);
     std::vector<std::vector<bool>> _highlights;
     std::vector<std::vector<int>> _highlightColors;

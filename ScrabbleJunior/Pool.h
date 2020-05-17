@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../common/Board.h"
-#include <vector>
 
 class Pool {
 public:

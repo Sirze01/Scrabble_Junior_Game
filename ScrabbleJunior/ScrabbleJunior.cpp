@@ -1,10 +1,4 @@
-#include "../common/consoleUtil.h"
-#include "../common/containerUtil.h"
 #include "Game.h"
-#include "Pool.h"
-#include <iostream>
-#include <string>
-#include <algorithm>
 
 struct PlayerData {
 	std::string name;
