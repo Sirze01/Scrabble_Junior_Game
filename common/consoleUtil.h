@@ -5,6 +5,7 @@
 #include <sstream>
 #include <limits>
 #include <functional>
+#include <random>
 
 //define UNICODE
 #ifndef UNICODE
@@ -35,17 +36,20 @@
 
 const char
 TOPIC = '|',
-SPACE = ' ';
+SPACE = ' ',
+ARROW = '>';
 
-//card view
-const int
+const size_t
 CARD_LEFT_PADDING = 12,
 BOARD_LEFT_PADDING = 2,
 BOARD_TOP_PADDING = 1,
 BOARD_BOTTOM_PADDING = 2,
-BOARD_MIN_DIM = 8,
+BOARD_MIN_DIM = 7, //this is dependent on card view info cards
 COMPACT_VIEW_MAX = 12,
-MAX_PLAYER_NAME_SIZE = 20;
+MAX_PLAYER_NAME_SIZE = 20,
+MAX_TEXT_WIDTH = 100,
+CARD_TOP_PADDING = 2,
+MAX_BOARD_SIZE = 20;
 
 //unfair game warning
 const int
@@ -69,22 +73,22 @@ DARK_GREY = 233,
 WHITE = 15,
 BLACK = 0;
 
-bool setupConsole();
-void clearConsole();
-void cleanBuffer();
-void askEnter();
+namespace Util {
+	bool setupConsole();
+	void clearConsole();
+	void cleanBuffer();
+	void askEnter();
 
-void outputBackColor(std::ostream& toWrite, int backColor, const char c);
-void outputForeColor(std::ostream& toWrite, int foreColor, const char c);
-void outputBackForeColor(std::ostream &toWrite, int foreColor, int backColor, const char c);
+	void outputBackColor(std::ostream& toWrite, int backColor, const char c);
+	void outputForeColor(std::ostream& toWrite, int foreColor, const char c);
 
-bool putCursorOnPos(int line, int col);
-void eraseLineToTheEnd();
-void eraseEntireLine();
-void saveCurrentCursorPosition();
-void restoreSavedCursorPosition();
+	bool putCursorOnPos(size_t line, size_t col);
+	void eraseLineToTheEnd();
+	void saveCurrentCursorPosition();
+	void restoreSavedCursorPosition();
 
-void writeCardView(int boardHeight, int boardWidth, std::stringstream &toWrite);
-void eraseCardView(int boardDimension, int col);
+	void writeCardView(size_t boardHeight, size_t boardWidth, std::stringstream& toWrite);
+	void eraseCardView(size_t boardDimension, size_t col);
 
-void paddingAndTopic(int color, bool newLine = false);
+	void paddingAndTopic(int color, bool newLine = false);
+}

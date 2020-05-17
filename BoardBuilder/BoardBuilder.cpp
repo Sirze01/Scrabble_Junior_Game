@@ -1,7 +1,4 @@
 #include <iostream>
-
-#include "../common/ConsoleSetup.h"
-#include "../common/StringProcess.h"
 #include "commandInterpreter.h"
 
 /*#################################################################*/
@@ -10,17 +7,15 @@
  * Oppening message for the utility
  */
 void openingMessage(){
-
-    const std::string message = "Board Builder v0.0.1";
+    std::stringstream output;
+    const std::string message = "Board Builder v1.0.0";
     const std::string separator(100, '#');
     const std::string filler(((100 - message.size()) / 2), '-');
-    std::cout << LEFT_PADDING_STR << message << " Debug version\n";
-    std::cout << LEFT_PADDING_STR << separator << std::endl << std::endl;
-    std::cout << LEFT_PADDING_STR << filler << message << filler << std::endl << std::endl;
-    std::cout << LEFT_PADDING_STR << separator <<std::endl;
-    std::cout << std::string(2, '\n');
-    std::cout << LEFT_PADDING_STR << stringWriter(100,
-                              "Input the desired operation. Alternatively you can access the available commands with 'help' at anytime.",0);
+
+    std::cout << '\n' << LEFT_PADDING_STR << separator << "\n\n" <<
+    LEFT_PADDING_STR << filler << message << filler << "\n\n  " << separator << "\n\n" << LEFT_PADDING_STR
+    << "Input the desired operation.\n  Alternatively you can access the available commands with 'help' at  anytime.\n";
+
 }
 
 
@@ -28,8 +23,7 @@ void openingMessage(){
  * Message about the need to open a dict when starting to edit a board
  */
 void dictMessage() {
-    std::cout << LEFT_PADDING_STR << stringWriter(100,
-                              "Start by importing a dictionary, so your board knows what words to use",0);
+    Util::stringWriter("Start by importing a dictionary, so your board knows what words to use\n\n");
 }
 
 
@@ -37,8 +31,7 @@ void dictMessage() {
  * Message about the need to create or import a board to edit
  */
 void boardMessage() {
-    std::cout << LEFT_PADDING_STR << stringWriter(100,
-                              "Now you need to start editing a board. Try to create a new one with 'new' or import one already built with 'import'",0);
+    Util::stringWriter("Now you need to start editing a board. Try to create a new one with 'new' or import one already built with 'import'\n\n");
 }
 
 
@@ -49,9 +42,10 @@ void boardMessage() {
  * @return
  */
 int main() {
-    setupConsole();
+    Util::setupConsole();
 
     /*#################################################*/
+
     std::vector<std::string> dict;
     std::string boardName;
     Board board;
@@ -79,7 +73,7 @@ int main() {
                 boardMessage();
             }
             if (statusCodes == -3) {
-                std::cout << LEFT_PADDING_STR << stringWriter(100, "Please choose a valid command. If you need help input 'help'.", 0);
+                Util::stringWriter("Please choose a valid command. If you need help input 'help'.\n\n");
             }
             if(boardName.empty()) {
                 std::cout << LEFT_PADDING_STR << "Your input: ";

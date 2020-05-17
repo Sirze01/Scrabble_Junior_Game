@@ -4,9 +4,10 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include "../common/StringProcess.h"
-#include "ConsoleSetup.h"
 #include <algorithm>
+#include "containerUtil.h"
+#include "consoleUtil.h"
+
 
 struct coord{
     size_t vLine;
@@ -26,22 +27,24 @@ struct codedWord{
 class Board {
 public:
 	Board(size_t nLines = BOARD_MIN_DIM, size_t nColumns = BOARD_MIN_DIM);
-    Board(std::string filename);
+    Board(const std::string &filename);
     void show() const;
-	coord getIndex(const std::string &position) const;
-    std::string getPositionString(coord c) const;
+	static coord getIndex(const std::string &position);
+	static size_t getIndex(char letter);
+    static std::string getPositionString(coord c);
 	bool fileExport(const std::string &filename) const;
-    bool highlight(int color, int vIndex, int hIndex);
-    void highlightFinishedWord(int color, int vIndex, int hIndex);
+    bool highlight(int color, size_t vIndex, size_t hIndex);
+    void highlightWordOnLine(int color, size_t vIndex, size_t hIndex);
+    void highlightWordOnCol(int color, size_t vIndex, size_t hIndex);
     std::vector<std::vector<char>> getLetters() const;
     std::vector<char> getNonEmptyChars() const;
     std::vector<std::vector<bool>> getHighlights() const;
     coord getDimensions() const;
     bool addWord(codedWord word);
     std::vector<codedWord> getWords() const;
-    bool removeWord(std::string wordToRemove);
-    bool boardBounds(const codedWord &entry);
-    std::string getAlphabet() const;
+    bool removeWord(const std::string &wordToRemove);
+    bool boardBounds(const codedWord &entry) const;
+    static char getAlpha(size_t index, bool uppercase = true);
 
 
 private:
@@ -55,11 +58,11 @@ private:
     size_t _vDimension;
     size_t _hDimension;
 
-    bool checkIntersection(codedWord) const;
-    bool wordIsolation(codedWord word) const;
+    bool checkIntersection(const codedWord &word) const;
+    bool wordIsolation(const codedWord &word) const;
     codedWord* findWord (const std::string &word);
-    bool wordExists(std::string word) const;
-    std::vector<coord> getIntersectionsVector(codedWord word) const;
+    bool wordExists(const std::string &word) const;
+    std::vector<coord> getIntersectionsVector(const codedWord &word) const;
     void placeChar(coord inates, char character);
 
 };
