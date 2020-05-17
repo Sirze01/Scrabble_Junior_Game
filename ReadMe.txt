@@ -1,6 +1,6 @@
 PROG Project 2
-Bruno Mendes - up201906166
-José Costa - up201907216
+Bruno Mendes - up201906166 - participation estimative of 50%
+José Costa - up201907216 - participation estimative of 50%
 FEUP, 2020
 ------------------------------------------
 SCRABBLE JUNIOR
