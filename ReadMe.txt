@@ -41,7 +41,8 @@ SCRABBLE JUNIOR
       -> A Command may be a Move, a exchange action, or any other available
       -> Game manipulates all other classes
    -> The Board class was shared between the two solutions to allow for greater consistency
-      -> A common folder was used to avoid copy and pasting code around
+      -> A common folder was used to avoid copy and pasting code: not mentioned in the project specs, but confirmed with teacher it's fine
+      -> We included a .txt file that's used for the game introduction board: without it, a empty board is created with a error message
    -> ANSI escape codes were extensively used to allow for a enjoyable interface
       -> This is not supported on Windows versions prior to 2016 (current Windows 10 should be fine)
       -> Unix handles these instructions better than Windows (less screen flickering when clearing etc)
