@@ -20,7 +20,7 @@ public:
 	int getHandPosition(char letter) const;
 	bool hasOnHand(char letter) const;
 	bool mayMove(const Board& board) const;
-	coord getPossibleMovePos(const Board& board) const;
+	Coord getPossibleMovePos(const Board& board) const;
 	void forcePass();
 	void doNotPass();
 	int getHandSize() const;

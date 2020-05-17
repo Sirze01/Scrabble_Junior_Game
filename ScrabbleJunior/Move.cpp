@@ -8,7 +8,7 @@
  */
 Move::Move(const Command &command, const Board &board):
 	_posToMove{ command.getMovePos() }, _letter{ command.getMoveLetter() },
-	_maxCol{ board.getDimensions().hColumn - 1 }, _maxLine{board.getDimensions().vLine - 1 },
+	_maxCol{ board.getDimensions().col - 1 }, _maxLine{board.getDimensions().line - 1 },
 	_boardLetters{ board.getLetters() }, _boardHighlights{ board.getHighlights() }
 {
 }
@@ -19,9 +19,9 @@ Move::Move(const Command &command, const Board &board):
  * @param letter - letter to play.
  * @param board - to then modify highlights and colors while executing.
  */
-Move::Move(const coord &pos, char letter, const Board &board) :
+Move::Move(const Coord &pos, char letter, const Board &board) :
 	_posToMove{ pos }, _letter{ letter },
-	_maxCol{ board.getDimensions().hColumn - 1 }, _maxLine{ board.getDimensions().vLine - 1 },
+	_maxCol{ board.getDimensions().col - 1 }, _maxLine{ board.getDimensions().line - 1 },
 	_boardLetters{ board.getLetters() }, _boardHighlights{ board.getHighlights() }
 {
 }
@@ -47,7 +47,7 @@ int Move::hasProblems(const Player &player) const {
 	if (!player.hasOnHand(_letter)) {
 		return 3;
 	}
-	if (_boardHighlights.at(_posToMove.vLine).at(_posToMove.hColumn)) {
+	if (_boardHighlights.at(_posToMove.line).at(_posToMove.col)) {
 		return 4;
 	}
 
@@ -65,14 +65,14 @@ int Move::hasProblems(const Player &player) const {
  */
 void Move::execute(Player &player, Board &board, Pool &pool) const {
 	int color = player.getColor();
-	board.highlight(color, _posToMove.vLine, _posToMove.hColumn);
+	board.highlight(color, _posToMove.line, _posToMove.col);
 
 	player.takeRandom(player.getHandPosition(_letter),pool);
 
 	auto scoreAction = [&](bool line) { //add scores and highlight ("territory dominance" feature)
 		player.addScore();
-		if (line) board.highlightWordOnLine(player.getColor(), _posToMove.vLine, _posToMove.hColumn);
-		else board.highlightWordOnCol(player.getColor(), _posToMove.vLine, _posToMove.hColumn);
+		if (line) board.highlightWordOnLine(player.getColor(), _posToMove.line, _posToMove.col);
+		else board.highlightWordOnCol(player.getColor(), _posToMove.line, _posToMove.col);
 	};
 	
 	if (continueOnLine() && finishOnLine() && !singleCharWordOnLine()) scoreAction(true);
@@ -81,13 +81,13 @@ void Move::execute(Player &player, Board &board, Pool &pool) const {
 
 /** Check if a move is outside board bounds. */
 bool Move::inBounds() const {
-	return _posToMove.hColumn <= _maxCol
-		&& _posToMove.vLine <= _maxLine;
+	return _posToMove.col <= _maxCol
+		&& _posToMove.line <= _maxLine;
 }
 
 /** Check if given letter does not match */
 bool Move::letterMatch() const {
-    return _letter != SPACE  && _letter == _boardLetters.at(_posToMove.vLine).at(_posToMove.hColumn);
+    return _letter != SPACE  && _letter == _boardLetters.at(_posToMove.line).at(_posToMove.col);
 }
 
 /** Check if there's no letter immediatly before and after on the line. */
@@ -102,12 +102,12 @@ bool Move::singleCharWordOnCol() const {
 
 /** Check if there's no letter immediatly before on the line.*/
 bool Move::startOnLine() const {
-	return _posToMove.hColumn == 0 || _boardLetters.at(_posToMove.vLine).at(_posToMove.hColumn - 1) == SPACE;
+	return _posToMove.col == 0 || _boardLetters.at(_posToMove.line).at(_posToMove.col - 1) == SPACE;
 }
 
 /** Check if there's no letter immediatly before on the column.*/
 bool Move::startOnCol() const {
-	return _posToMove.vLine == 0 || _boardLetters.at(_posToMove.vLine - 1).at(_posToMove.hColumn) == SPACE;
+	return _posToMove.line == 0 || _boardLetters.at(_posToMove.line - 1).at(_posToMove.col) == SPACE;
 }
 
 /** Check on line if all letters before are highlighted. Breaks if space is found. */
@@ -137,12 +137,12 @@ bool Move::finishOnCol() const {
  * @return false - word is not completed
  */
 bool Move::wordCompletionOnLine(int cof) const {
-	if ((_posToMove.hColumn == 0 && cof == -1) ||
-		(_posToMove.hColumn == _maxCol && cof == 1)) return true;
+	if ((_posToMove.col == 0 && cof == -1) ||
+		(_posToMove.col == _maxCol && cof == 1)) return true;
 
-	for (size_t i = _posToMove.hColumn + cof; i <= _maxCol; i += cof) {
-		if (!_boardHighlights.at(_posToMove.vLine).at(i)) {
-			return _boardLetters.at(_posToMove.vLine).at(i) == SPACE;
+	for (size_t i = _posToMove.col + cof; i <= _maxCol; i += cof) {
+		if (!_boardHighlights.at(_posToMove.line).at(i)) {
+			return _boardLetters.at(_posToMove.line).at(i) == SPACE;
 		}
 	}
 	return true;
@@ -155,12 +155,12 @@ bool Move::wordCompletionOnLine(int cof) const {
  * @return false - word is not completed
  */
 bool Move::wordCompletionOnCol(int cof) const {
-	if ((_posToMove.vLine == 0 && cof == -1) ||
-		(_posToMove.vLine == _maxLine && cof == 1)) return true;
+	if ((_posToMove.line == 0 && cof == -1) ||
+		(_posToMove.line == _maxLine && cof == 1)) return true;
 
-	for (size_t i = _posToMove.vLine + cof; i <= _maxLine; i+=cof) {
-		if (!_boardHighlights.at(i).at(_posToMove.hColumn)) {
-			return _boardLetters.at(i).at(_posToMove.hColumn) == SPACE;
+	for (size_t i = _posToMove.line + cof; i <= _maxLine; i+=cof) {
+		if (!_boardHighlights.at(i).at(_posToMove.col)) {
+			return _boardLetters.at(i).at(_posToMove.col) == SPACE;
 		}
 	}
 	return true;

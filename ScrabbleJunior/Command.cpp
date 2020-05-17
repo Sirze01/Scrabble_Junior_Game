@@ -31,7 +31,7 @@ bool Command::isMove() const {
  * @param board - to extract the index
  * @return coordinates of the move
  */
-coord Command::getMovePos() const {
+Coord Command::getMovePos() const {
 	return Board::getIndex(_str.substr(0, 2));
 }
 

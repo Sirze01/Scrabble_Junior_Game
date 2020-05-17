@@ -6,7 +6,7 @@
 class Move {
 public:
 	Move(const Command &command, const Board &board);
-	Move(const coord &pos, char letter, const Board &board);
+	Move(const Coord &pos, char letter, const Board &board);
 	int hasProblems(const Player &player) const;
 	void execute(Player &player, Board &board, Pool &pool) const;
 private:
@@ -23,7 +23,7 @@ private:
 	bool wordCompletionOnLine(int cof) const;
 	bool wordCompletionOnCol(int cof) const;
 
-	coord _posToMove;
+	Coord _posToMove;
 	char _letter;
 	size_t _maxCol;
 	size_t _maxLine;

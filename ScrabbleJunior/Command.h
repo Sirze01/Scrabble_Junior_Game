@@ -6,7 +6,7 @@ class Command {
 public:
 	explicit Command(std::string &userInput);
 	bool isMove() const;
-    coord getMovePos() const;
+    Coord getMovePos() const;
 	char getMoveLetter() const;
 	bool isExchange(bool forceToken = true) const;
 	char getExchangeLetter() const;

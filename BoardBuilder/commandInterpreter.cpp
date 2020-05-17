@@ -48,7 +48,6 @@ commandInterpreter::commandInterpreter(std::vector<std::string> &dict, std::stri
 
     else if (cmd == "exit")
         _command = "exit";
-
 }
 
 
@@ -242,7 +241,7 @@ bool commandInterpreter::cmdNewBoard() {
 
     if (std::stoul(vTemp) > MAX_BOARD_SIZE || std::stoul(hTemp) > MAX_BOARD_SIZE) {
         _name = std::string(); //prevent input prompt of using the faulty boards name
-        std::cout << "\nThe board you're trying to create is just too big. Create one up to 20x20\n\n";
+        std::cout << LEFT_PADDING_STR << "The board you're trying to create is just too big. Create one up to 20x20\n\n";
         return false;
     }
 
@@ -290,8 +289,8 @@ bool commandInterpreter::cmdImportBoard() {
         // Close file if it exists
         file.close();
     }
-    Board newBoard(_modifiers);
-    _board = newBoard;
+    Board board(_modifiers);
+    _board = board;
     if (_name.empty()) {
         boardName();
     }
@@ -314,7 +313,7 @@ bool commandInterpreter::cmdAdd(int &statusCode) {
     }
 
 
-    codedWord newEntry = {{SIZE_MAX, SIZE_MAX}, '\0', std::string()};
+    Word newEntry = {{SIZE_MAX, SIZE_MAX}, '\0', std::string()};
     if (!_modifiers.empty()) { //one liner command
         if (!Util::isAlpha(_modifiers, true)) {
             statusCode = -3;
@@ -325,7 +324,7 @@ bool commandInterpreter::cmdAdd(int &statusCode) {
         char tempChar;
         std::stringstream commandStream(_modifiers);
         commandStream >> tempString;
-        newEntry.firstCoord = Board::getIndex(tempString);
+        newEntry.firstLetterPos = Board::getIndex(tempString);
         tempString.erase(); //space before orientation
         commandStream >> tempChar;
         newEntry.orientation = static_cast<char>(std::toupper(tempChar));
@@ -336,7 +335,7 @@ bool commandInterpreter::cmdAdd(int &statusCode) {
         tempString.erase(); //space before word
         commandStream >> tempString;
         if (!tempString.empty()) {
-            newEntry.word = tempString;
+            newEntry.str = tempString;
         }
     } else { //assistant
         std::string userInput;
@@ -349,7 +348,7 @@ bool commandInterpreter::cmdAdd(int &statusCode) {
             statusCode = -3;
             return false;
         }
-        newEntry.firstCoord = Board::getIndex(userInput);
+        newEntry.firstLetterPos = Board::getIndex(userInput);
 
         std::cout << LEFT_PADDING_STR << "Input the desired orientation" << std::endl
                   << LEFT_PADDING_STR << "Orientation: ";
@@ -365,32 +364,32 @@ bool commandInterpreter::cmdAdd(int &statusCode) {
 
         std::cout << LEFT_PADDING_STR << "Input the word you want to place" << std::endl
                   << LEFT_PADDING_STR << "Word: ";
-        getline(std::cin, newEntry.word);
-        if (!Util::isAlpha(newEntry.word)) {
+        getline(std::cin, newEntry.str);
+        if (!Util::isAlpha(newEntry.str)) {
             statusCode = -3;
             return false;
         }
     }
 
-    Util::upperCase(newEntry.word);
+    Util::upperCase(newEntry.str);
 
-    const std::vector<codedWord> words = _board.getWords();
+    const std::vector<Word> words = _board.getWords();
     for (const auto &entry : words) {
-        if (entry.word == newEntry.word) {
+        if (entry.str == newEntry.str) {
             statusCode = -2;
             Util::stringWriter("The word you're trying to add is already in the board\n\n");
             return false;
         }
     }
 
-    Util::upperCase(newEntry.word);
+    Util::upperCase(newEntry.str);
 
     if (!_board.boardBounds(newEntry)) {
         statusCode = -2;
         Util::stringWriter("Word is out of range! Try another one.\n\n");
         return false;
     } else {
-        std::string lowerWord = newEntry.word;
+        std::string lowerWord = newEntry.str;
         Util::lowerCase(lowerWord);
 
         if (!std::binary_search(_dict.begin(), _dict.end(), lowerWord)) {

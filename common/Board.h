@@ -6,19 +6,19 @@
 #include <algorithm>
 
 
-struct coord{
-    size_t vLine;
-    size_t hColumn;
+struct Coord{
+    size_t line;
+    size_t col;
 
-    bool operator==(const coord& l) const{
-        return (l.vLine == vLine && l.hColumn == hColumn);
+    bool operator==(const Coord& l) const{
+        return (l.line == line && l.col == col);
     }
 };
 
-struct codedWord{
-    coord firstCoord;
+struct Word{
+    Coord firstLetterPos;
     char orientation;
-    std::string word;
+    std::string str;
 };
 
 class Board {
@@ -26,9 +26,9 @@ public:
 	Board(size_t nLines = BOARD_MIN_DIM, size_t nColumns = BOARD_MIN_DIM);
     Board(const std::string &filename);
     void show() const;
-	static coord getIndex(const std::string &position);
+	static Coord getIndex(const std::string &position);
 	static size_t getIndex(char letter);
-    static std::string getPositionString(coord c);
+    static std::string getPositionString(Coord c);
 	bool fileExport(const std::string &filename) const;
     bool highlight(int color, size_t vIndex, size_t hIndex);
     void highlightWordOnLine(int color, size_t vIndex, size_t hIndex);
@@ -36,11 +36,11 @@ public:
     std::vector<std::vector<char>> getLetters() const;
     std::vector<char> getNonEmptyChars() const;
     std::vector<std::vector<bool>> getHighlights() const;
-    coord getDimensions() const;
-    bool addWord(codedWord word, int &statusCode);
-    std::vector<codedWord> getWords() const;
+    Coord getDimensions() const;
+    bool addWord(Word word, int &statusCode);
+    std::vector<Word> getWords() const;
     bool removeWord(const std::string &wordToRemove, int &statusCode);
-    bool boardBounds(const codedWord &entry) const;
+    bool boardBounds(const Word &entry) const;
     static char getAlpha(size_t index, bool uppercase = true);
 
 private:
@@ -48,16 +48,16 @@ private:
     std::vector<std::vector<bool>> _highlights;
     std::vector<std::vector<int>> _highlightColors;
     std::vector<std::vector<char>> _letters;
-    std::vector<codedWord> _words;
-    size_t _vDimension;
-    size_t _hDimension;
+    std::vector<Word> _words;
+    size_t _nLines;
+    size_t _nCols;
 
-    bool checkIntersection(const codedWord &word) const;
-    bool wordIsolation(const codedWord &word) const;
-    codedWord* findWord (const std::string &word);
+    bool checkIntersection(const Word &word) const;
+    bool wordIsolation(const Word &word) const;
+    Word* findWord (const std::string &word);
     bool wordExists(const std::string &word) const;
-    std::vector<coord> getIntersectionsVector(const codedWord &word) const;
-    void placeChar(coord inates, char character);
+    std::vector<Coord> getIntersectionsVector(const Word &word) const;
+    void placeChar(Coord inates, char character);
 
 };
 

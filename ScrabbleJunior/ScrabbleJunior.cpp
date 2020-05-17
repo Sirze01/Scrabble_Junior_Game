@@ -32,7 +32,7 @@ size_t askPlayFirst(const Board &board, size_t nPlayers,
 			toWrite << ARROW << SPACE << playerNames.at(i) << "\n";
 		}
 
-		Util::writeCardView(board.getDimensions().vLine, board.getDimensions().hColumn, toWrite);
+		Util::writeCardView(board.getDimensions().line, board.getDimensions().col, toWrite);
 	}
 
 	{ //ask for user preference
@@ -93,7 +93,7 @@ std::string askBoardFileName(const Board &board) {
 			toWrite << TOPIC << str << "\n";
 		}
 
-		Util::writeCardView(board.getDimensions().vLine, board.getDimensions().hColumn, toWrite);
+		Util::writeCardView(board.getDimensions().line, board.getDimensions().col, toWrite);
 	}
 
 	{ //ask file name
@@ -151,7 +151,7 @@ PlayerData askPlayer(int position, const Board& board,
 		};
 
 		for (const auto& sentence : sentences) toWrite << TOPIC << sentence << "\n";
-		Util::writeCardView(board.getDimensions().vLine, board.getDimensions().hColumn, toWrite);
+		Util::writeCardView(board.getDimensions().line, board.getDimensions().col, toWrite);
 	}
 
 	{ //ask name
@@ -206,7 +206,7 @@ PlayerData askPlayer(int position, const Board& board,
 			Util::outputForeColor(toWrite, colors.at(i), TOPIC);
 			toWrite << ARROW << SPACE << colorNames.at(i) << "\n";
 		}
-		Util::writeCardView(board.getDimensions().vLine, board.getDimensions().hColumn, toWrite);
+		Util::writeCardView(board.getDimensions().line, board.getDimensions().col, toWrite);
 	}
 
 	{ //ask color

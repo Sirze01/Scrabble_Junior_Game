@@ -22,7 +22,7 @@ Game::Game(Board &board, const std::vector<std::string> &playerNames,
     _currentPlayer = &_players.at(_currentPlayerPos);
 
     //card settings
-    _compactCardView = _board.getDimensions().vLine < COMPACT_VIEW_MAX;
+    _compactCardView = _board.getDimensions().line < COMPACT_VIEW_MAX;
 }
 
 
@@ -55,8 +55,8 @@ void Game::moveHandler(int turnNumber) {
         for (;;) { //exits when move is valid or exchanged once
             coloredMessage << "(turn " << turnNumber << ") ";
             if (ableToMove) {
-                const coord pos = _currentPlayer->getPossibleMovePos(_board);
-                char letter = _board.getLetters().at(pos.vLine).at(pos.hColumn);
+                const Coord pos = _currentPlayer->getPossibleMovePos(_board);
+                char letter = _board.getLetters().at(pos.line).at(pos.col);
                 const Move move(pos, letter, _board);
                 move.execute(*_currentPlayer, _board, _pool);
                 coloredMessage << name << " will play " << Board::getPositionString(pos) << SPACE << letter
@@ -158,7 +158,7 @@ void Game::moveHandler(int turnNumber) {
                     if (!ableToMove) {
                         regularMessage << "Maybe you can't move right now...\n";
                     } else {
-                        const coord pos = _currentPlayer->getPossibleMovePos(_board);
+                        const Coord pos = _currentPlayer->getPossibleMovePos(_board);
                         regularMessage << "Look carefully at the board on position "
                                        << Board::getPositionString(pos) << "...\n";
                     }
@@ -285,7 +285,7 @@ void Game::showPlayerInfo(bool hands, bool turnInfo) const {
         for (size_t j = 0; j < 5 - _nPlayers - _compactCardView; ++j) toWrite << "\n";
     }
 
-    Util::writeCardView(_board.getDimensions().vLine, _board.getDimensions().hColumn, toWrite);
+    Util::writeCardView(_board.getDimensions().line, _board.getDimensions().col, toWrite);
 }
 
 /**
@@ -321,15 +321,14 @@ int Game::getWinner() const {
  * @return false - at least one tile is available to be played.
  */
 bool Game::allHighlighted() const {
-    coord boardDim = _board.getDimensions();
+    Coord boardDim = _board.getDimensions();
     std::vector<std::vector<char>> boardLetters = _board.getLetters();
     std::vector<std::vector<bool>> boardHighlights = _board.getHighlights();
 
-    for (size_t line = 0; line < boardDim.vLine; ++line) {
-        for (size_t col = 0; col < boardDim.hColumn; ++col) {
-            char letter = boardLetters.at(line).at(col);
-            if (letter == SPACE) continue;
-            if (!boardHighlights.at(line).at(col)) return false;
+    for (size_t line = 0; line < boardDim.line; ++line) {
+        for (size_t col = 0; col < boardDim.col; ++col) {
+            if (boardLetters.at(line).at(col) == SPACE) continue;
+            else if (!boardHighlights.at(line).at(col)) return false;
         }
     }
     return true;
@@ -367,7 +366,7 @@ void Game::showHelp() const{
         toWrite << TOPIC << ARROW << SPACE << sentence << "\n";
     }
 
-    Util::writeCardView(_board.getDimensions().vLine, _board.getDimensions().hColumn, toWrite);
+    Util::writeCardView(_board.getDimensions().line, _board.getDimensions().col, toWrite);
 }
 
 /*
@@ -390,5 +389,5 @@ void Game::showPool() const {
         toWrite << letters.at(i) << " ";
     }
 
-    Util::writeCardView(_board.getDimensions().vLine, _board.getDimensions().hColumn, toWrite);
+    Util::writeCardView(_board.getDimensions().line, _board.getDimensions().col, toWrite);
 }

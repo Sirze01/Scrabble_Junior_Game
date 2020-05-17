@@ -154,8 +154,8 @@ bool Player::hasOnHand(char letter) const {
  * @return false - if cannot move at the moment.
  */
 bool Player::mayMove(const Board &board) const{
-    coord pos = getPossibleMovePos(board);
-    return pos.hColumn != IMPOSSIBLE_MOVE_COORD && pos.vLine != IMPOSSIBLE_MOVE_COORD;
+    Coord pos = getPossibleMovePos(board);
+    return pos.col != IMPOSSIBLE_MOVE_COORD && pos.line != IMPOSSIBLE_MOVE_COORD;
 }
 
 /**
@@ -163,13 +163,13 @@ bool Player::mayMove(const Board &board) const{
  * @param board - to evaluate letters.
  * @return board coordinates if a move is possible, else constant to be identified as error.
  */
-coord Player::getPossibleMovePos(const Board& board) const {
-    coord boardDim = board.getDimensions();
+Coord Player::getPossibleMovePos(const Board& board) const {
+    Coord boardDim = board.getDimensions();
     std::vector<std::vector<char>> boardLetters = board.getLetters();
 
-    for (size_t line = 0; line < boardDim.vLine; ++line) {
-        for (size_t col = 0; col < boardDim.hColumn; ++col) {
-            coord testPosition = { line,col };
+    for (size_t line = 0; line < boardDim.line; ++line) {
+        for (size_t col = 0; col < boardDim.col; ++col) {
+            Coord testPosition = { line,col };
             char letter = boardLetters.at(line).at(col);
             const Move moveToTest(testPosition, letter, board);
 
