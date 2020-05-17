@@ -57,7 +57,7 @@ private:
     Word* findWord (const std::string &word);
     bool wordExists(const std::string &word) const;
     std::vector<Coord> getIntersectionsVector(const Word &word) const;
-    void placeChar(Coord inates, char character);
+    void placeChar(Coord coord, char character);
 
 };
 

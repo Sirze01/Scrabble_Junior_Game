@@ -283,17 +283,17 @@ bool Board::boardBounds(const Word& entry) const {
 
 
 /**
- * Method to edit the _letters private vector, changing the tile a given position, defined bu the Coord struct given
+ * Method to edit the _letters private vector, changing the tile a given position, defined by the Coord struct given
  * @param c - Indexes of the tile to alter
  * @param character - New char to place in the index
  */
-void Board::placeChar(Coord c, char character) {
-	_letters.at(c.line).at(c.col) = character;
+void Board::placeChar(Coord coord, char character) {
+	_letters.at(coord.line).at(coord.col) = character;
 }
 
 
 /**
- * Method to add words to an open board, verifying intersections and word Isolation
+ * Method to add words to an open board, verifying intersections and word isolation
  * @param word - codedWord to add to the board
  * @param statusCode - Variable to control the external loop in case of fail
  * @return False if there's any bad intersection, if the word is not isolated from others, true otherwise
@@ -447,7 +447,6 @@ Word* Board::findWord(const std::string& word) {
 	}
 	return nullptr;
 }
-
 
 /**
  * Method to verify if a word belongs to the private vector codedWords _words, used to prevent a call of findWord, with no correspondant
