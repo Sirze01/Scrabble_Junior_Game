@@ -14,7 +14,7 @@ void openingMessage(){
 
     std::cout << '\n' << LEFT_PADDING_STR << separator << "\n\n" <<
     LEFT_PADDING_STR << filler << message << filler << "\n\n  " << separator << "\n\n" << LEFT_PADDING_STR
-    << "Input the desired operation.\n  Alternatively you can access the available commands with 'help' at  anytime.\n";
+    << "Input the desired operation.\n  Alternatively you can access the available commands with 'help' at anytime.\n";
 
 }
 
@@ -59,7 +59,7 @@ int main() {
     * -3 invalid
     * -4 delete
     * */
-    int statusCodes = 0;
+    int statusCode = 0;
 
     openingMessage();
     //Counter to define what help message to show
@@ -72,8 +72,8 @@ int main() {
             else if (count == 2) {
                 boardMessage();
             }
-            if (statusCodes == -3) {
-                Util::stringWriter("Please choose a valid command. If you need help input 'help'.\n\n");
+            if (statusCode == -3) {
+                Util::stringWriter("Invalid command. Please check your spelling or type 'help' to view available commands.\n\n");
             }
             if(boardName.empty()) {
                 std::cout << LEFT_PADDING_STR << "Your input: ";
@@ -83,15 +83,16 @@ int main() {
             }
             std::getline(std::cin, userInput);
             commandInterpreter command(dict, boardName, board, dictOpen, boardOpen, userInput);
-            command.interpret(statusCodes);
-            if (count == 0)
+            command.interpret(statusCode);
+
+            if (count == 0 || (dictOpen && count == 1))
                 count++;
-            if (dictOpen && count == 1)
-                count ++;
-            if (count == 2)
+            else if (count == 2)
                 count++;
-        }while(!(statusCodes == -1 || statusCodes == -4));
+
+        }while(!(statusCode == -1 || statusCode == -4));
+
         count = 0;
-    }while(statusCodes == -4);
+    }while(statusCode == -4);
     return 0;
 }

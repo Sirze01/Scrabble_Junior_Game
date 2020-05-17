@@ -37,9 +37,9 @@ public:
     std::vector<char> getNonEmptyChars() const;
     std::vector<std::vector<bool>> getHighlights() const;
     coord getDimensions() const;
-    bool addWord(codedWord word);
+    bool addWord(codedWord word, int &statusCode);
     std::vector<codedWord> getWords() const;
-    bool removeWord(const std::string &wordToRemove);
+    bool removeWord(const std::string &wordToRemove, int &statusCode);
     bool boardBounds(const codedWord &entry) const;
     static char getAlpha(size_t index, bool uppercase = true);
 

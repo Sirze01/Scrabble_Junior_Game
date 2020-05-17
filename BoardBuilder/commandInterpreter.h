@@ -3,9 +3,9 @@
 
 class commandInterpreter {
 public:
-    commandInterpreter (std::vector<std::string> &dict, std::string &boardName, Board &board,
-                        bool &dictOpen, bool &boardOpen, std::string command);
-    void interpret(int &statusCodes);
+    commandInterpreter(std::vector<std::string>& dict, std::string& boardName, Board& board,
+        bool& dictOpen, bool& boardOpen, std::string& command);
+    void interpret(int &statusCode);
 
 private:
     std::string _command;
@@ -22,11 +22,11 @@ private:
     static void cmdHelp();
     bool cmdNewBoard();
     bool cmdImportBoard();
-    bool cmdAdd();
-    bool cmdRemove();
+    bool cmdAdd(int &statusCode);
+    bool cmdRemove(int &statusCode);
     bool cmdExport() const;
-    void cmdDelete(int &statusCodes);
-    static void cmdExit(int &statusCodes);
+    void cmdDelete(int &statusCode);
+    static void cmdExit(int &statusCode);
 
 };
 
