@@ -198,6 +198,7 @@ bool commandInterpreter::cmdNewBoard() {
         return false;
     }
 
+    std::string errMsg = "Please check you syntax!";
 
     auto inputPrompt = [&](){ // Assistant
 
@@ -216,7 +217,7 @@ bool commandInterpreter::cmdNewBoard() {
     }
     else{
         if(_modifiers.find(SPACE) == std::string::npos){
-            Util::stringWriter("Check your syntax!\n\n");
+            Util::stringWriter(errMsg + "\n\n");
             return false;
         }
         _name = _modifiers.substr(_modifiers.find_last_of(SPACE) + 1); // Ignore the space and extract board name
@@ -236,7 +237,7 @@ bool commandInterpreter::cmdNewBoard() {
     }
     else{
         _name = std::string(); //prevent input prompt of using the faulty boards name
-        Util::stringWriter("Please check your syntax!\n\n");
+        Util::stringWriter(errMsg + "\n\n");
         return false;
     }
 
@@ -246,7 +247,7 @@ bool commandInterpreter::cmdNewBoard() {
     size_t lines, columns;
     if(!Util::isDigit(linesStr) || !Util::isDigit(columnsStr)){
         _name = std::string(); //prevent input prompt of using the faulty boards name
-        Util::stringWriter("Please check your syntax!\n\n");
+        Util::stringWriter(errMsg + "\n\n");
         return false;
     }
     lines = std::stoul(linesStr);

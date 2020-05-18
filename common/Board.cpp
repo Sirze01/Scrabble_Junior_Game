@@ -431,7 +431,9 @@ bool Board::removeWord(const std::string& wordToRemove, int& statusCode) {
 
 		//remove word from board data
 		for (size_t i = 0; i < _words.size(); ++i){
-			_words.erase(_words.begin() + i);
+			if(_words.at(i).str != entryToRemove.str)
+			    continue;
+		    _words.erase(_words.begin() + i);
 		}
 
 		show(); //update board
