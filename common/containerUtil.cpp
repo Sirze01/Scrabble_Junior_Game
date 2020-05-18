@@ -22,22 +22,36 @@ void Util::upperCase(std::string &str) {
 
 /**
  * Remove unnecessary spaces of a string (at the end, the beginning, or more than once in between)
- * @param name - string to be treated.
+ * @param str - string to be treated.
  */
-void Util::stripSpaces(std::string& name) {
-	for (size_t i = 0; i < name.length(); i++) {
-		if (SPACE == name.at(i)) {
-			if (name.length() - 1 == i) {
-				name.erase(i, 1);
+void Util::stripUnnecessarySpaces(std::string& str) {
+	for (size_t i = 0; i < str.length(); i++) {
+		if (SPACE == str.at(i)) {
+			if (str.length() - 1 == i) {
+				str.erase(i, 1);
 				break;
 			}
-			else if (0 == i || SPACE == name.at(i + 1)) {
-				name.erase(i, 1);
+			else if (0 == i || SPACE == str.at(i + 1)) {
+				str.erase(i, 1);
 				i--;
 			}
 		}
 	}
 }
+
+/**
+ * Remove all the spoaces from a string
+ * @param str - String passed through reference to remove
+ */
+void Util::stripAllSpaces(std::string &str) {
+    std::string output;
+    for(const char &character : str){
+        if (character != SPACE)
+            output += character;
+    }
+    str = output;
+}
+
 
 /**
  * Uppercase word initials (a space marks a new word).

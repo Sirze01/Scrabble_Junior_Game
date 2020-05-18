@@ -43,7 +43,7 @@ size_t askPlayFirst(const Board &board, size_t nPlayers,
 			
 			Util::cleanBuffer();
 			Util::stripSpecialChars(playerName);
-			Util::stripSpaces(playerName);
+			Util::stripUnnecessarySpaces(playerName);
 
 			if (playerName == "random") {
 				int randomPos = Util::randomBetween(0, static_cast<int>(nPlayers - 1));
@@ -115,7 +115,7 @@ std::string askBoardFileName(const Board &board) {
 						Util::paddingAndTopic(RED, true);
 						std::cout << "That board hasn't got enough letters to create a fair 4 player game. Proceed? ";
 						std::getline(std::cin, userAns); Util::cleanBuffer();
-						Util::stripSpaces(userAns); Util::lowerCase(userAns);
+						Util::stripUnnecessarySpaces(userAns); Util::lowerCase(userAns);
 
 						if (userAns == "yes" || userAns == "y") return fileName;
 						if (userAns == "no" || userAns == "n") break; //ask file again
@@ -163,7 +163,7 @@ PlayerData askPlayer(int position, const Board& board,
 			Util::paddingAndTopic(WHITE, true); std::cout << "Player " << position << " name: ";
 			std::getline(std::cin, name);
 			Util::cleanBuffer();
-			Util::stripSpaces(name);
+			Util::stripUnnecessarySpaces(name);
 
 			if (name == "random") {
 				Util::paddingAndTopic(RED, true); std::cout << "That'll be a reserved keyword. Please choose a different name.\n";
@@ -219,7 +219,7 @@ PlayerData askPlayer(int position, const Board& board,
 			
 			Util::cleanBuffer();
 			Util::stripSpecialChars(colorName);
-			Util::stripSpaces(colorName);
+			Util::stripUnnecessarySpaces(colorName);
 			Util::lowerCase(colorName);
 
 			if (colorName == "red" || colorName == "r") color = RED;
@@ -256,7 +256,7 @@ int askNumberOfPlayers() {
 		std::getline(std::cin, input);
 		Util::cleanBuffer();
 		Util::stripSpecialChars(input,true);
-		Util::stripSpaces(input);
+		Util::stripUnnecessarySpaces(input);
 
 		if (!Util::isDigit(input)) {
 			errorMessage = "Please input a valid number.";

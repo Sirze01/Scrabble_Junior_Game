@@ -10,7 +10,7 @@ Command::Command(std::string &userInput) : _str{std::move( userInput )} {
 	Util::stripSpecialChars(_str);
 	Util::lowerCase(_str);
 	Util::stripCommandBloat(_str);
-	Util::stripSpaces(_str);
+	Util::stripUnnecessarySpaces(_str);
 }
 
 /**

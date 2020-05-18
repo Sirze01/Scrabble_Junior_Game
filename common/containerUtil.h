@@ -7,7 +7,8 @@
 namespace Util {
 	void lowerCase(std::string& str);
 	void upperCase(std::string& str);
-	void stripSpaces(std::string& name);
+	void stripUnnecessarySpaces(std::string& str);
+	void stripAllSpaces(std::string& str);
 	void upperNameInitials(std::string& name);
 	void stripSpecialChars(std::string& name, bool acceptDigits = false);
 	void stripCommandBloat(std::string& name);

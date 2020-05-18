@@ -14,13 +14,13 @@ commandInterpreter::commandInterpreter(std::vector<std::string> &dict, std::stri
         : _command(), _modifiers(), _dictOpen(dictOpen),
           _boardOpen(boardOpen), _dict(dict), _name(boardName), _board(board) {
 
-    Util::stripSpaces(command);
+    Util::stripUnnecessarySpaces(command);
 
     std::stringstream commandStream(command);
     std::string cmd;
     commandStream >> cmd;
     _modifiers = command.substr(cmd.size());
-    Util::stripSpaces(_modifiers);
+    Util::stripUnnecessarySpaces(_modifiers);
 
     if ((cmd == "dict") or (cmd == "d"))
         _command = "dict";
@@ -60,15 +60,14 @@ void commandInterpreter::importPath() {
     std::getline(std::cin, _modifiers);
 }
 
-/**
- * Method to read user input to get a board Name, saves it in the _name variable
- */
 void commandInterpreter::boardName() {
-    std::cout << LEFT_PADDING_STR << "Insert the name of your board." << std::endl
-              << LEFT_PADDING_STR << "Board name: ";
-    std::getline(std::cin, _name);
+    do {
+        std::cout << LEFT_PADDING_STR << "Insert the name of your board." << std::endl
+                  << LEFT_PADDING_STR << "Board name: ";
+        std::getline(std::cin, _name);
+        Util::stripAllSpaces(_name);
+    }while(_name.empty());
 }
-
 
 /**
  * Method to control the loop in the main function, to decide what messages to show
@@ -199,54 +198,60 @@ bool commandInterpreter::cmdNewBoard() {
         return false;
     }
 
-    std::string hTemp, vTemp;
 
-    if (_modifiers.empty()) { //assistant
-        std::string userInput;
+    auto inputPrompt = [&](){ // Assistant
+
         Util::stringWriter("\nWhat dimensions should the board be? (HxW)\n");
-        std::cout << LEFT_PADDING_STR << "Dimensions: ";
+        Util::stringWriter("Dimensions: ");
         std::getline(std::cin, _modifiers);
-        std::cout << std::endl;
-    } else { // one liner
-        if (_modifiers.find_first_of(SPACE) != _modifiers.find_last_of(SPACE)) {
-            Util::stringWriter("Input the dimensions in a valid format!\n\n");
+
+        Util::stripAllSpaces(_modifiers);
+
+        boardName();
+
+    };
+
+    if (_modifiers.empty()){
+        inputPrompt();
+    }
+    else{
+        if(_modifiers.find(SPACE) == std::string::npos){
+            Util::stringWriter("No board name submitted, check your syntax!\n\n");
             return false;
         }
-        hTemp = _modifiers;
-        _modifiers = hTemp.substr(0, hTemp.find_first_of(SPACE));
-        hTemp.erase(0, hTemp.find_first_of(SPACE) + 1);
-        _name = hTemp.substr(0);
+        _name = _modifiers.substr(_modifiers.find_last_of(SPACE) + 1); // Ignore the space and extract board name
+        _modifiers.erase(_modifiers.find_last_of((SPACE)));
+
     }
 
-    std::string tempStr;
-    for (const char &character : _modifiers) {
-        if (character != SPACE)
-            tempStr += character;
+    Util::stripAllSpaces(_modifiers);
+
+
+    size_t xIndex;
+    if(std::string::npos != _modifiers.find('x')){
+        xIndex = _modifiers.find('x');
     }
-    _modifiers = tempStr;
-    Util::stripSpaces(_name);
-
-    for (char &atIndex : _modifiers) {
-        if (!(((isalpha(atIndex) && std::toupper(atIndex) == 'X') || isdigit(atIndex)))) {
-            Util::stringWriter("Input the dimensions in a valid format!\n\n");
-            return false;
-        }
-        if (isalpha(atIndex) && std::toupper(atIndex) == 'X')
-            atIndex = static_cast<char>(std::toupper(atIndex));
+    else if (std::string::npos != _modifiers.find('X')){
+        xIndex = _modifiers.find('X');
     }
-
-    vTemp = _modifiers.substr(0, _modifiers.find('X'));
-    hTemp = _modifiers.substr(_modifiers.find('X') + 1);
-
-    if (std::stoul(vTemp) > MAX_BOARD_SIZE || std::stoul(hTemp) > MAX_BOARD_SIZE) {
-        _name = std::string(); //prevent input prompt of using the faulty boards name
-        std::cout << LEFT_PADDING_STR << "The board you're trying to create is just too big. Create one up to 20x20\n\n";
+    else{
+        Util::stringWriter("The x wasn't found, please check your syntax\n\n");
         return false;
     }
 
-    Board newBoard(std::stoul(vTemp), std::stoul(hTemp));
-    if (_name.empty())
-        boardName();
+    std::string linesStr, columnsStr;
+    linesStr = _modifiers.substr(0, xIndex);
+    columnsStr = _modifiers.substr(xIndex + 1);
+    size_t lines, columns;
+    lines = std::stoul(linesStr); columns = std::stoul(columnsStr);
+
+    if (lines > MAX_BOARD_SIZE || columns > MAX_BOARD_SIZE) {
+        _name = std::string(); //prevent input prompt of using the faulty boards name
+        Util::stringWriter("The board you're trying to create is just too big. Create one up to 20x20\n\n");
+        return false;
+    }
+
+    Board newBoard(lines, columns);
     _board = newBoard;
     _boardOpen = true;
     _board.show();
@@ -341,7 +346,7 @@ bool commandInterpreter::cmdAdd(int &statusCode) {
         std::cout << LEFT_PADDING_STR << "Input the coordinates to the first letter of the word. " << std::endl
                   << LEFT_PADDING_STR << "Coordinate: ";
         getline(std::cin, userInput);
-        Util::stripSpaces(userInput);
+        Util::stripUnnecessarySpaces(userInput);
 
         if (!Util::isAlpha(userInput)) {
             statusCode = -3;
@@ -352,7 +357,7 @@ bool commandInterpreter::cmdAdd(int &statusCode) {
         std::cout << LEFT_PADDING_STR << "Input the desired orientation" << std::endl
                   << LEFT_PADDING_STR << "Orientation: ";
         getline(std::cin, userInput);
-        Util::stripSpaces(userInput);
+        Util::stripUnnecessarySpaces(userInput);
         Util::upperCase(userInput);
 
         if (userInput.at(0) != 'H' && userInput.at(0) != 'V') {

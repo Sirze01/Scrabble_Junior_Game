@@ -1,5 +1,4 @@
 #include "Move.h"
-#include <utility>
 
 /**
  * A move must contain board coordinates and a letter to play.
