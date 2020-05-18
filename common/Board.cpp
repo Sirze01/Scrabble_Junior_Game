@@ -340,15 +340,15 @@ bool Board::wordIsolation(const Word& word) const {
 		if (initialLine + word.str.size() + 1 < _nLines &&
 			_letters.at(initialLine + word.str.size() + 1).at(initialCol) != SPACE) return false;
 
-			for (int colDiff : {-1, 1}) { //check left and right on the column
-				for (size_t lineInc = 0; lineInc < word.str.size(); lineInc++) {
+		for (int colDiff : {-1, 1}) { //check left and right on the column
+		    for (size_t lineInc = 0; lineInc < word.str.size(); lineInc++) {
 
 					if (initialLine + lineInc >= _nLines || initialCol + colDiff >= _nCols) continue;
 
 					if (_letters.at(initialLine + lineInc).at(initialCol) != word.str.at(lineInc) &&
 						_letters.at(initialLine + lineInc).at(initialCol + colDiff) != SPACE) return false;
 				}
-			}
+		}
 	}
 
 	else {
@@ -356,7 +356,7 @@ bool Board::wordIsolation(const Word& word) const {
 		if (initialCol + word.str.size() + 1 < _nCols
 			&& _letters.at(initialLine).at(initialCol + word.str.size() + 1) != SPACE) return false;
 
-			for (int lineDiff : {-1, 1}) { //check above and below across the line
+		for (int lineDiff : {-1, 1}) { //check above and below across the line
 				for (size_t i = 0; i < word.str.size(); i++) {
 
 					if (initialLine + lineDiff >= _nLines || initialCol + i >= _nCols) continue;
@@ -364,7 +364,7 @@ bool Board::wordIsolation(const Word& word) const {
 					if (_letters.at(initialLine).at(initialCol + i) != word.str.at(i) &&
 						_letters.at(initialLine + lineDiff).at(initialCol + i) != SPACE) return false;
 				}
-			}
+		}
 	}
 
 	return true;

@@ -190,12 +190,11 @@ bool commandInterpreter::cmdDict() {
  * @return Returns true if the board object is edited correctly, false otherwise
  */
 bool commandInterpreter::cmdNewBoard() {
-    if (_dictOpen) {
-        if (_boardOpen) {
-            std::cout << LEFT_PADDING_STR << "Cannot create a new board. You already have one open\n\n";
-            return false;
-        }
-    } else {
+    if (_dictOpen && _boardOpen) {
+        std::cout << LEFT_PADDING_STR << "Cannot create a new board. You already have one open\n\n";
+        return false;
+    }
+    else if (!_dictOpen) {
         std::cout << LEFT_PADDING_STR << "Cannot create a new board. You haven't added a dictionary\n\n";
         return false;
     }
