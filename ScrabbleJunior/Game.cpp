@@ -184,12 +184,12 @@ void Game::moveHandler(int turnNumber) {
 	}
 
 	showBoardAndCardView();
-	std::stringstream coloredMessage;
+	std::stringstream coloredMessage; //when colored message is shown, user has no access to commands
 	int playerColor = _currentPlayer->getColor();
 	std::string name = _currentPlayer->getName();
 
 	if (bot){
-		coloredMessage << "(turn " << turnNumber << ") "; //colored message makes 
+		coloredMessage << "(turn " << turnNumber << ") ";
 		botMove(coloredMessage, ableToMove, name);
 
 	}
@@ -213,7 +213,7 @@ void Game::moveHandler(int turnNumber) {
 		std::stringstream regularMessage;
 		bool passOrMove = false;
 
-		if (!bot) { //user has access to commands
+		if (!bot && Util::isEmpty(coloredMessage)) { //no access to commands if bot or special message shown
 			std::string commandPrompt, input;
 			commandPrompt = "(turn " + std::to_string(turnNumber) + ") " + name + ": ";
 
