@@ -6,7 +6,7 @@
  * The actions of the command are handled by Game.
  * @param userInput - command string.
  */
-Command::Command(std::string &userInput) : _str{std::move( userInput )} {
+Command::Command(const std::string &userInput) : _str{userInput} {
 	Util::stripSpecialChars(_str);
 	Util::lowerCase(_str);
 	Util::stripCommandBloat(_str);
