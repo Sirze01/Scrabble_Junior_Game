@@ -4,7 +4,7 @@
 
 class Command {
 public:
-	explicit Command(std::string &userInput);
+	explicit Command(const std::string &userInput);
 	bool isMove() const;
     Coord getMovePos() const;
 	char getMoveLetter() const;

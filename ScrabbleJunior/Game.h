@@ -15,6 +15,9 @@ public:
 	bool hasFinished() const;
 	void showEndMessage() const;
 private:
+	bool processHumanCommand(const std::string &input,
+		std::stringstream& regularMessage, std::stringstream& coloredMessage, bool &ableToMove);
+	void botMove(std::stringstream &coloredMessage, bool ableToMove, const std::string& botName);
 	void showBoardAndCardView(bool hands = true, bool turnInfo = true) const;
 	void showPlayerInfo(bool hands = true, bool turnInfo = true) const;
 	bool hasWinner() const;
