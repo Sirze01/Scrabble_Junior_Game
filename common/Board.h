@@ -13,6 +13,13 @@ struct Coord{
     bool operator==(const Coord& l) const{
         return (l.line == line && l.col == col);
     }
+
+    bool neighbour(const Coord c) const{
+        for (auto diff: {-1,1}){
+            if (line + diff == c.line || col + diff == c.col) return true;
+        }
+        return false;
+    }
 };
 
 struct Word{
@@ -55,7 +62,7 @@ private:
     bool checkIntersection(const Word &word) const;
     bool wordIsolation(const Word &word) const;
     Word* findWord (const std::string &word);
-    bool wordExists(const std::string &word) const;
+    bool wordExists(const std::string& word);
     std::vector<Coord> getIntersectionsVector(const Word &word) const;
     void placeChar(Coord coord, char character);
 

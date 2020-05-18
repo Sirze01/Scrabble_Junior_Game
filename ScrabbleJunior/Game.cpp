@@ -96,7 +96,7 @@ void Game::moveHandler(int turnNumber) {
     for (;;) { //breaks when command is a valid move, or player passes
         std::stringstream regularMessage;
 
-        if (Util::isEmpty(coloredMessage)) {
+        if (Util::isEmpty(coloredMessage)) { //if colored message has content, it means user has no access to commands
             commandPrompt = "(turn " + std::to_string(turnNumber) + ") " + name + ": ";
 
             Util::paddingAndTopic(playerColor, true);
@@ -173,9 +173,9 @@ void Game::moveHandler(int turnNumber) {
                     }
                 } else if (command.isClear()) showBoardAndCardView();
                 else regularMessage << Util::smartCommandAdvice(command.getCommandStr());
+
             } else
-                regularMessage
-                        << "We found overlapping command keywords in your input. Type 'help' to learn why.\n";
+                regularMessage << "We found overlapping command keywords in your input. Type 'help' to learn why.\n";
         }
 
         if (!Util::isEmpty(regularMessage)) {

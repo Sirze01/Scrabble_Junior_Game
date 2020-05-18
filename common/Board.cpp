@@ -39,11 +39,11 @@ Board::Board(size_t nLines, size_t nColumns) : _nLines(BOARD_MIN_DIM), _nCols(BO
  * Constructor of boards from files, importing the tiles and words (codedWords)
  * @param filename - Text file to read from, encoded according to the project specification
  */
-Board::Board(const std::string& filename) : _nLines(BOARD_MIN_DIM), _nCols(BOARD_MIN_DIM) {
+Board::Board(const std::string& fileName) : _nLines(BOARD_MIN_DIM), _nCols(BOARD_MIN_DIM) {
 	int lineDim, colDim;
 	std::string content;
 	std::ifstream file;
-	file.open(filename, std::ios::in);
+	file.open(fileName, std::ios::in);
 
 	if (file.is_open()) {
 		getline(file, content);
@@ -67,10 +67,10 @@ Board::Board(const std::string& filename) : _nLines(BOARD_MIN_DIM), _nCols(BOARD
 		};
 
 		auto checkCoordCases = [](std::string letterCoords) {
-			return (isupper(letterCoords.at(0)) && islower(letterCoords.at(1)));
+			return (std::isupper(letterCoords.at(0)) && std::islower(letterCoords.at(1)));
 		};
 
-		while (getline(file, content)) {
+		while (std::getline(file, content)) {
 			if (content.size() > 2 && (checkCoordCases(content.substr(0, 2)) && boardBounds(fillEntry(content)))) {
 				_words.push_back(entry);
 				Coord index = entry.firstLetterPos;
@@ -92,7 +92,7 @@ Board::Board(const std::string& filename) : _nLines(BOARD_MIN_DIM), _nCols(BOARD
 	}
 	else {
 		defaultInit();
-		std::cerr << LEFT_PADDING_STR << "Cannot open file! Created default board.\n";
+		std::cerr << LEFT_PADDING_STR << "Could not open " << fileName << "! Created default board.\n";
 	}
 }
 
@@ -159,9 +159,9 @@ size_t Board::getIndex(char letter) {
  */
 char Board::getAlpha(size_t index, bool uppercase) {
 	if (uppercase)
-		return  static_cast<char>('A' + index);
+		return static_cast<char>('A' + index);
 	else
-		return  static_cast<char>('a' + index);
+		return static_cast<char>('a' + index);
 }
 
 /**
@@ -200,10 +200,10 @@ bool Board::highlight(int color, size_t vIndex, size_t hIndex) {
  */
 void Board::highlightWordOnLine(int color, size_t vIndex, size_t hIndex) {
 	Coord dim = getDimensions();
-	for (int cof : {-1, 1}) {
-		for (size_t i = hIndex + cof; i < dim.col; i += cof) {
-			if (_letters.at(vIndex).at(i) == SPACE) break;
-			else _highlightColors.at(vIndex).at(i) = color;
+	for (int direction : {-1, 1}) {
+		for (size_t colDiff = hIndex + direction; colDiff < dim.col; colDiff += direction) {
+			if (_letters.at(vIndex).at(colDiff) == SPACE) break;
+			else _highlightColors.at(vIndex).at(colDiff) = color;
 		}
 	}
 }
@@ -216,10 +216,10 @@ void Board::highlightWordOnLine(int color, size_t vIndex, size_t hIndex) {
  */
 void Board::highlightWordOnCol(int color, size_t vIndex, size_t hIndex) {
 	Coord dim = getDimensions();
-	for (int cof : {-1, 1}) {
-		for (size_t i = vIndex + cof; i < dim.line; i += cof) {
-			if (_letters.at(i).at(hIndex) == SPACE) break;
-			else _highlightColors.at(i).at(hIndex) = color;
+	for (int direction : {-1, 1}) {
+		for (size_t lineDiff = vIndex + direction; lineDiff < dim.line; lineDiff += direction) {
+			if (_letters.at(lineDiff).at(hIndex) == SPACE) break;
+			else _highlightColors.at(lineDiff).at(hIndex) = color;
 		}
 	}
 }
@@ -269,16 +269,9 @@ Coord Board::getDimensions() const {
  * @return - False if the word falls out of the board's boundaries, true otherwise
  */
 bool Board::boardBounds(const Word& entry) const {
-	if (entry.firstLetterPos.line >= _nLines || entry.firstLetterPos.col >= _nCols)
-		return false;
-
-	if (entry.orientation == 'V' && entry.firstLetterPos.line + entry.str.size() > _nLines)
-		return false;
-
-	if (entry.orientation == 'H' && entry.firstLetterPos.col + entry.str.size() > _nCols)
-		return false;
-
-	return true;
+	return entry.firstLetterPos.line < _nLines&& entry.firstLetterPos.col < _nCols &&
+		((entry.orientation == 'V' && entry.firstLetterPos.line + entry.str.size() <= _nLines)
+			|| (entry.orientation == 'H' && entry.firstLetterPos.col + entry.str.size() <= _nCols));
 }
 
 
@@ -310,16 +303,15 @@ bool Board::addWord(Word word, int& statusCode) {
 		return false;
 	}
 	else {
-		if (word.orientation == 'V') {
-			for (size_t i = 0; i < word.str.size(); i++) {
+		bool vertical = word.orientation == 'V';
+
+		for (size_t i = 0; i < word.str.size(); i++) {
+			if (vertical)
 				placeChar({ word.firstLetterPos.line + i, word.firstLetterPos.col }, word.str.at(i));
-			}
-		}
-		else {
-			for (size_t i = 0; i < word.str.size(); i++) {
+			else
 				placeChar({ word.firstLetterPos.line, word.firstLetterPos.col + i }, word.str[i]);
-			}
 		}
+
 		_words.push_back(word);
 		show();
 	}
@@ -334,36 +326,44 @@ bool Board::addWord(Word word, int& statusCode) {
  */
 bool Board::wordIsolation(const Word& word) const {
 	size_t initialLine = word.firstLetterPos.line, initialCol = word.firstLetterPos.col;
+	bool vertical = word.orientation == 'V';
+	Coord letterBeforePos, letterAfterPos;
 
-	if (word.orientation == 'V') {
-		if (initialLine > 0 && _letters.at(initialLine - 1).at(initialCol) != SPACE) return false;
-		if (initialLine + word.str.size() + 1 < _nLines &&
-			_letters.at(initialLine + word.str.size() + 1).at(initialCol) != SPACE) return false;
-
-		for (int colDiff : {-1, 1}) { //check left and right on the column
-		    for (size_t lineInc = 0; lineInc < word.str.size(); lineInc++) {
-
-					if (initialLine + lineInc >= _nLines || initialCol + colDiff >= _nCols) continue;
-
-					if (_letters.at(initialLine + lineInc).at(initialCol) != word.str.at(lineInc) &&
-						_letters.at(initialLine + lineInc).at(initialCol + colDiff) != SPACE) return false;
-				}
-		}
+	if (vertical) {
+		letterBeforePos = { initialLine - 1 , initialCol };
+		letterAfterPos = { initialLine + word.str.size() + 1 , initialCol };
+	}
+	else {
+		letterBeforePos = { initialLine , initialCol - 1 };
+		letterAfterPos = { initialLine, initialCol + word.str.size() + 1 };
 	}
 
-	else {
-		if (initialCol > 0 && _letters.at(initialLine).at(initialCol - 1) != SPACE) return false;
-		if (initialCol + word.str.size() + 1 < _nCols
-			&& _letters.at(initialLine).at(initialCol + word.str.size() + 1) != SPACE) return false;
+	//before and after must be spaces
+	for (auto outside : { letterBeforePos, letterAfterPos }) {
+		if (outside.line < _nLines && outside.col < _nCols)
+			if (_letters.at(outside.line).at(outside.col) != SPACE)
+				return false;
+	}
 
-		for (int lineDiff : {-1, 1}) { //check above and below across the line
-				for (size_t i = 0; i < word.str.size(); i++) {
+	//on the sides must be spaces
+	Coord current, neighbour;
+	for (size_t letterInc = 0; letterInc < word.str.size(); letterInc++) {
+		for (auto diff : { -1,1 }) {
+			if (vertical) {
+				current = { initialLine + letterInc, initialCol};
+				neighbour = { current.line, current.col + diff };
+			}
+			else {
+				current = { initialLine, initialCol + letterInc};
+				neighbour = { current.line + diff, current.col};
+			}
 
-					if (initialLine + lineDiff >= _nLines || initialCol + i >= _nCols) continue;
-
-					if (_letters.at(initialLine).at(initialCol + i) != word.str.at(i) &&
-						_letters.at(initialLine + lineDiff).at(initialCol + i) != SPACE) return false;
-				}
+			if (neighbour.line < _nLines && neighbour.col < _nCols) {
+				if (_letters.at(current.line).at(current.col) == word.str.at(letterInc))
+					continue; //same letters belonging to other words may have neighbours
+				if (_letters.at(neighbour.line).at(neighbour.col) != SPACE)
+					return false;
+			}
 		}
 	}
 
@@ -387,58 +387,63 @@ std::vector<Word> Board::getWords() const {
  * @return - False if the WordToRTemove doensn't belong to the board, true otherwise
  */
 bool Board::removeWord(const std::string& wordToRemove, int& statusCode) {
-	if (wordExists(wordToRemove)) {
-		Word entryToRemove = *findWord(wordToRemove);
-		std::vector<Coord> intersections = getIntersectionsVector(entryToRemove);
-		if (entryToRemove.orientation == 'V') {
-			for (size_t i = 0; i < entryToRemove.str.size(); i++) {
-				Coord current = { entryToRemove.firstLetterPos.line + i, entryToRemove.firstLetterPos.col };
-				if (intersections.empty()) {
-					placeChar(current, SPACE);
-				}
 
-				else {
-					if (std::find(intersections.begin(), intersections.end(), current) == intersections.end())
-						placeChar(current, SPACE);
-				}
+	auto hasNeighbourIntersections = [&](const Word& word) {
+		std::vector<Coord> intersections = getIntersectionsVector(word);
+		for (const auto& i : intersections) {
+			for (const auto& j : intersections) {
+				if (i == j) continue;
+				if (i.neighbour(j)) return true;
 			}
 		}
+		return false;
+	};
 
-		else {
-			for (size_t i = 0; i < entryToRemove.str.size(); i++) {
-				Coord current = { entryToRemove.firstLetterPos.line, entryToRemove.firstLetterPos.col + i };
-				if (intersections.empty()) {
-					placeChar(current, SPACE);
-				}
-
-				else {
-					if (std::find(intersections.begin(), intersections.end(), current) == intersections.end())
-						placeChar(current, SPACE);
-				}
-			}
-		}
-
-		for (size_t i = 0; i < _words.size(); i++) {
-			if (_words.at(i).str == entryToRemove.str) {
-				_words.erase(_words.begin() + i);
-				break;
-			}
-		}
-		show();
-		return true;
-	}
-	else {
+	if (!wordExists(wordToRemove)){
 		statusCode = -2;
 		std::cout << LEFT_PADDING_STR << "The word you trying to remove doesn't exist, try again\n\n";
 		return false;
+	}
+	else {
+		Word entryToRemove = *findWord(wordToRemove);
+
+		if (hasNeighbourIntersections(entryToRemove)){
+			statusCode = -2;
+			std::cout << LEFT_PADDING_STR << "Removing that word would create other words as a side effect. Try another!\n\n";
+			return false;
+		}
+
+		std::vector<Coord> intersections = getIntersectionsVector(entryToRemove);
+		bool vertical = entryToRemove.orientation == 'V';
+
+		//remove letters
+		Coord current;
+		for (size_t letterInc = 0; letterInc < entryToRemove.str.size(); letterInc++) {
+			if (vertical)
+				current = { entryToRemove.firstLetterPos.line + letterInc, entryToRemove.firstLetterPos.col };
+			else
+				current = { entryToRemove.firstLetterPos.line, entryToRemove.firstLetterPos.col + letterInc };
+
+			if (std::find(intersections.begin(), intersections.end(), current) == intersections.end()) {
+				placeChar(current, SPACE); //remove non-intersected letter
+			}
+		}
+
+		//remove word from board data
+		for (size_t i = 0; i < _words.size(); ++i){
+			_words.erase(_words.begin() + i);
+		}
+
+		show(); //update board
+		return true;
 	}
 }
 
 
 /**
- * Method to get a pointer to the 'word' in the private vector of codedWords _words
+ * Method to get a pointer to the word stored in board
  * @param word - Word to find in the vector _words
- * @return - Pointer to the element of _words (element altered by other functions)
+ * @return - Pointer to the element of _words (element changed by other functions)
  */
 Word* Board::findWord(const std::string& word) {
 	for (auto& boardWord : _words) {
@@ -448,17 +453,12 @@ Word* Board::findWord(const std::string& word) {
 }
 
 /**
- * Method to verify if a word belongs to the private vector codedWords _words, used to prevent a call of findWord, with no correspondant
+ * Method to verify if a word is already stored in board
  * @param word - Word to find in teh vector _words
  * @return True if the word exists, false otherwise
  */
-bool Board::wordExists(const std::string& word) const {
-	for (const auto& inBoard : _words) {
-		if (inBoard.str == word) {
-			return true;
-		}
-	}
-	return false;
+bool Board::wordExists(const std::string& word) {
+	return findWord(word) != nullptr;
 }
 
 
@@ -469,22 +469,21 @@ bool Board::wordExists(const std::string& word) const {
  */
 bool Board::checkIntersection(const Word& word) const {
 	size_t initialLine = word.firstLetterPos.line, initialCol = word.firstLetterPos.col;
-	char current;
+	char current; bool vertical = word.orientation == 'V';
 
-	if (word.orientation == 'V') {
-		for (size_t i = 0; i < word.str.size(); i++) {
+	for (size_t i = 0; i < word.str.size(); i++) {
+		if (vertical){
 			if (initialLine + i >= _nLines) continue;
 			current = _letters.at(initialLine + i).at(initialCol);
-			if (current != SPACE && current != word.str.at(i)) return false;
 		}
-	}
-	else {
-		for (size_t i = 0; i < word.str.size(); i++) {
+		else{
 			if (initialCol + i >= _nCols) continue;
 			current = _letters.at(initialLine).at(initialCol + i);
-			if (current != SPACE && current != word.str.at(i)) return false;
 		}
+
+		if (current != SPACE && current != word.str.at(i)) return false;
 	}
+
 	return true;
 }
 
@@ -497,28 +496,25 @@ bool Board::checkIntersection(const Word& word) const {
 std::vector<Coord> Board::getIntersectionsVector(const Word& word) const {
 	std::vector<Coord> intersections;
 	size_t initialLine = word.firstLetterPos.line, initialCol = word.firstLetterPos.col;
+	bool vertical = word.orientation == 'V';
 
-	if (word.orientation == 'V') {
-		for (size_t lineInc = 0; lineInc < word.str.size(); lineInc++) {
-			for (int cof : {-1, 1}) { //check on the left and the right
-				if (initialLine + lineInc >= _nLines || initialCol + cof >= _nCols)
+	for (size_t i = 0; i < word.str.size(); i++) {
+		for (int cof : {-1, 1}) {
+			if (vertical){
+				if (initialLine + i >= _nLines || initialCol + cof >= _nCols)
 					continue;
-				if (_letters.at(initialLine + lineInc).at(initialCol + cof) != SPACE)
-					intersections.push_back({ initialLine + lineInc, initialCol });
+				if (_letters.at(initialLine + i).at(initialCol + cof) != SPACE)
+					intersections.push_back({ initialLine + i, initialCol });
+			}
+			else{
+				if (initialLine + cof >= _nLines || word.firstLetterPos.col + i >= _nCols)
+					continue;
+				if (_letters.at(initialLine + cof).at(initialCol + i) != SPACE)
+					intersections.push_back({ initialLine, initialCol + i });
 			}
 		}
 	}
 
-	else if (word.orientation == 'H') {
-		for (size_t colInc = 0; colInc < word.str.size(); colInc++) {
-			for (int cof : {-1, 1}) { //check above and below
-				if (initialLine + cof >= _nLines || word.firstLetterPos.col + colInc >= _nCols)
-					continue;
-				if (_letters.at(initialLine + cof).at(initialCol + colInc) != SPACE)
-					intersections.push_back({ initialLine, initialCol + colInc });
-			}
-		}
-	}
 	return intersections;
 }
 
@@ -536,9 +532,7 @@ bool Board::fileExport(const std::string& filename) const {
 			file << Board::getPositionString(line.firstLetterPos) << SPACE << line.orientation << SPACE << line.str << '\n';
 		}
 
-		file << std::string(2, '\n');
-		file << std::string(BOARD_TOP_PADDING, '\n') << LEFT_PADDING_STR;
-		file << SPACE;
+		file << "\n\n" <<  std::string(BOARD_TOP_PADDING, '\n') << LEFT_PADDING_STR << SPACE;
 		for (size_t i = 0; i < _nCols; i++) {
 			file << SPACE << getAlpha(i, false);
 		}
@@ -554,7 +548,7 @@ bool Board::fileExport(const std::string& filename) const {
 	}
 
 	else {
-		std::cerr << "Could not write to file." << std::endl;
+		std::cerr << LEFT_PADDING_STR << "Could not write to file.\n\n";
 		return false;
 	}
 }

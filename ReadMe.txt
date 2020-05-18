@@ -66,6 +66,7 @@ BOARD BUILDER
 -> Some extra features were added:
    -> Remove a word from the board
       -> A great attention was given to leave letters which belong to other words unchanged
+      -> You cannot create other words as a side effect of the removal
    -> Import your own dictionary
       -> In the beggining, we ask you to import your own set of words to unveil your full creativity
    -> Delete current board
