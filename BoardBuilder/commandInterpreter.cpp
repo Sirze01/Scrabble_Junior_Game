@@ -128,7 +128,7 @@ void commandInterpreter::cmdHelp() {
             " ",
             "### Help Page - available commands (first letter of keyword may be used)",
             "'dict <filename>' - Imports a board saved in a text file",
-            "'new' - Creates a new board",
+            "'new <nrOfLinesXnrOfColumns> <board name>' - Creates a new board",
             "'import <filename>' - Imports a board saved in a text file",
             "'add <Xx> <H/V> <word>' - Adds on position Xx horizontally/vertically a word", 
             "'remove <word>' - Removes a word to the board, only can be used after opening a board",
@@ -235,6 +235,7 @@ bool commandInterpreter::cmdNewBoard() {
         xIndex = _modifiers.find('X');
     }
     else{
+        _name = std::string(); //prevent input prompt of using the faulty boards name
         Util::stringWriter("The x wasn't found, please check your syntax\n\n");
         return false;
     }
@@ -243,7 +244,13 @@ bool commandInterpreter::cmdNewBoard() {
     linesStr = _modifiers.substr(0, xIndex);
     columnsStr = _modifiers.substr(xIndex + 1);
     size_t lines, columns;
-    lines = std::stoul(linesStr); columns = std::stoul(columnsStr);
+    if(!Util::isDigit(linesStr) || !Util::isDigit(columnsStr)){
+        _name = std::string(); //prevent input prompt of using the faulty boards name
+        Util::stringWriter("Please check your syntax\n\n");
+        return false;
+    }
+    lines = std::stoul(linesStr);
+    columns = std::stoul(columnsStr);
 
     if (lines > MAX_BOARD_SIZE || columns > MAX_BOARD_SIZE) {
         _name = std::string(); //prevent input prompt of using the faulty boards name
