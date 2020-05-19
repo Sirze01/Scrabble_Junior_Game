@@ -128,7 +128,7 @@ void commandInterpreter::cmdHelp() {
             " ",
             "### Help Page - available commands (first letter of keyword may be used)",
             "'dict <filename>' - Imports a board saved in a text file",
-            "'new <nrOfLinesXnrOfColumns> <board name>' - Creates a new board",
+            "'new <LINESxCOLS> <board name>' - Creates a new board",
             "'import <filename>' - Imports a board saved in a text file",
             "'add <Xx> <H/V> <word>' - Adds on position Xx horizontally/vertically a word", 
             "'remove <word>' - Removes a word to the board, only can be used after opening a board",
@@ -198,18 +198,15 @@ bool commandInterpreter::cmdNewBoard() {
         return false;
     }
 
-    std::string errMsg = "Please check you syntax!";
+    std::string errorMessage = "Please check your syntax!";
 
     auto inputPrompt = [&](){ // Assistant
 
-        Util::stringWriter("\nWhat dimensions should the board be? (HxW)\n");
+        Util::stringWriter("\nWhat dimensions should the board be? (LINESxCOLS)\n");
         Util::stringWriter("Dimensions: ");
         std::getline(std::cin, _modifiers);
-
         Util::stripAllSpaces(_modifiers);
-
         boardName();
-
     };
 
     if (_modifiers.empty()){
@@ -217,7 +214,7 @@ bool commandInterpreter::cmdNewBoard() {
     }
     else{
         if(_modifiers.find(SPACE) == std::string::npos){
-            Util::stringWriter(errMsg + "\n\n");
+            Util::stringWriter(errorMessage + "\n\n");
             return false;
         }
         _name = _modifiers.substr(_modifiers.find_last_of(SPACE) + 1); // Ignore the space and extract board name
@@ -226,7 +223,6 @@ bool commandInterpreter::cmdNewBoard() {
     }
 
     Util::stripAllSpaces(_modifiers);
-
 
     size_t xIndex;
     if(std::string::npos != _modifiers.find('x')){
@@ -237,7 +233,7 @@ bool commandInterpreter::cmdNewBoard() {
     }
     else{
         _name = std::string(); //prevent input prompt of using the faulty boards name
-        Util::stringWriter(errMsg + "\n\n");
+        Util::stringWriter(errorMessage + "\n\n");
         return false;
     }
 
@@ -245,9 +241,10 @@ bool commandInterpreter::cmdNewBoard() {
     linesStr = _modifiers.substr(0, xIndex);
     columnsStr = _modifiers.substr(xIndex + 1);
     size_t lines, columns;
+
     if(!Util::isDigit(linesStr) || !Util::isDigit(columnsStr)){
         _name = std::string(); //prevent input prompt of using the faulty boards name
-        Util::stringWriter(errMsg + "\n\n");
+        Util::stringWriter(errorMessage + "\n\n");
         return false;
     }
     lines = std::stoul(linesStr);
@@ -255,7 +252,7 @@ bool commandInterpreter::cmdNewBoard() {
 
     if (lines > MAX_BOARD_SIZE || columns > MAX_BOARD_SIZE) {
         _name = std::string(); //prevent input prompt of using the faulty boards name
-        Util::stringWriter("The board you're trying to create is just too big. Create one up to 20x20\n\n");
+        Util::stringWriter("The board you're trying to create is too big. Create one up to 20x20\n\n");
         return false;
     }
 
