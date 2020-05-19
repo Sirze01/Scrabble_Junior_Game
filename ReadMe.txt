@@ -46,10 +46,6 @@ SCRABBLE JUNIOR
    -> ANSI escape codes were extensively used to allow for a enjoyable interface
       -> This is not supported on Windows versions prior to 2016 (current Windows 10 should be fine)
       -> Unix handles these instructions better than Windows (less screen flickering when clearing etc)
-   -> Game::moveHandler(int turnNumber) is a very complex method which handles i/o and generates moves to be executed
-      -> Modularity could have been used a bit better in this particular area
-      -> Despite this, its flow proved to be robust in extreme situations in our testing
-   -> Member initialization lists were used when possible to improve efficiency
    -> The code compiles with no warnings in both CLang -Wextra (Clion) and MSVC -W4 (Visual Studio 2019)
 
 ----------------------------------------------
