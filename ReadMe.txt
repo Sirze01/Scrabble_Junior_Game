@@ -59,8 +59,8 @@ BOARD BUILDER
    -> Create a new board with desired dimensions (max 20x20)
    -> Add words horizontally or vertically if in the dictionary
       -> We considered you cannot append to already existing words (eg. you cannot add MAN to POLICE)
-      -> You cannot override already existing words (eg. add HURTING on top of HURT)
-      -> You cannot create non-existent words as a side effect (thus the world must be isolated and intersect correctly)
+      -> You cannot override already existing words (eg. you cannot add HURTING on top of HURT)
+      -> You cannot create extra words as a side effect (thus the world must be isolated on non-intersected tiles)
       -> Naturally, you cannot crop words, so all characters of a word must fit inside the board
    -> Export created or edited board to later load on the Scrabble Game
 
