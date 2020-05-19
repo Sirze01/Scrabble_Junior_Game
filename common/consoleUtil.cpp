@@ -52,7 +52,7 @@ void Util::clearConsole() {
 
 /** In case of input fail, the fail flag is cleared and all characters in buffers are ignored. */
 void Util::cleanBuffer() {
-	if (std::cin.fail()) {
+	if (std::cin.fail() || std::cin.eof()) { //eof will require a extra input, but program won't loop infinitely
 		std::cin.clear();
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}

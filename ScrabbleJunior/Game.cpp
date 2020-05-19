@@ -53,7 +53,7 @@ bool Game::processHumanCommand(const std::string& input, std::stringstream& regu
 				regularMessage << "You do not have the letter " << command.getMoveLetter() << " on hand.\n";
 			}
 			else if (problemLevel == 4) {
-				regularMessage << "That position already has a tile.\n";
+				regularMessage << "That position was already played before.\n";
 			}
 			else if (problemLevel == 5) {
 				regularMessage << "You are not starting or continuing a word.\n";
