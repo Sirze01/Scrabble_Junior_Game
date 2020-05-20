@@ -69,7 +69,7 @@ bool Game::processHumanCommand(const std::string& input, std::stringstream& regu
 		if (command.isExchange()) {
 			char token = command.getExchangeLetter();
 			if (ableToMove) {
-				regularMessage << "You can not exchange when you have possible moves. Pay attention!\n";
+				regularMessage << "You cannot exchange when you have possible moves. Pay attention!\n";
 			}
 			else if (!_currentPlayer->hasOnHand(token)) {
 				regularMessage << "Could not exchange! You do not have the letter " << token

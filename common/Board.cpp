@@ -61,12 +61,15 @@ Board::Board(const std::string& fileName) : _nLines(BOARD_MIN_DIM), _nCols(BOARD
 			if (!content.empty())
 				entry.orientation = content.at(1);
 			content.erase(0, 2);
-			if (!content.empty())
+			if (!content.empty()) {
 				entry.str = content.substr(1);
+				Util::stripSpecialChars(entry.str); //deal with line feed and carriage return
+			}
+
 			return entry;
 		};
 
-		auto checkCoordCases = [](std::string letterCoords) {
+		auto checkCoordCases = [](const std::string &letterCoords) {
 			return (std::isupper(letterCoords.at(0)) && std::islower(letterCoords.at(1)));
 		};
 
