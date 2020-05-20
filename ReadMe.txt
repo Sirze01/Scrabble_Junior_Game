@@ -23,7 +23,7 @@ SCRABBLE JUNIOR
          -> If the same situation of the last turn happens again, you won't have to do it manually again
          -> If the pool is empty, you must try to exchange (which we'll be denied) and then we'll pass for you
          -> You cannot exchange when you have nothing on your hand, so we'll pass automatically for you
-   -> The game ends when all tiles are highlighted or all players have pass their moves (extreme situation)
+   -> The game ends when all tiles are highlighted or all players pass their moves (extreme situation)
 
 -> Some nice and fun features were added to the game experience:
    -> "Card view" on the side of the board - shows adaptative game info
