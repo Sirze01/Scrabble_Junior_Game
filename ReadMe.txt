@@ -12,11 +12,18 @@ SCRABBLE JUNIOR
       -> Every aglomeration of 2 letters or more vertically or horizontally is a word - 1 char words are not considered words
       -> Naturally, you must continue or start words with only the letters with you have on hand
    -> Distinguish played tiles with colors (different for each player)
-   -> Exchange and pass behaviours follow the original rules of the game
-      -> In-game messages and commands are very explicit in this regard
-      -> We considered you can only pass when you can't move and have exchanged at least once from the pool and still can't move
-      -> Naturally, if you have nothing on hand or the pool is empty and you can't move you may pass directly
-   -> The game ends when all tiles are highlighted or all players have passed their moves (extreme situation)
+   -> Exchange and pass behaviours:
+      -> You can only pass when you cannot move and have tried to exchanged once
+      -> We prohibited more than one exchange in the same turn
+         -> You can only exchange when you cannot move
+         -> If you exchanged once and still cannot move, you must pass
+         -> You have two turns, so you can exchange a second time in the second turn if the exchanged letter in the first turn gave you a playable tile
+      -> Automatic and manual passes:
+         -> Most situations are manual so that the player learns the game mechanics
+         -> If the same situation of the last turn happens again, you won't have to do it manually again
+         -> If the pool is empty, you must try to exchange (which we'll be denied) and then we'll pass for you
+         -> You cannot exchange when you have nothing on your hand, so we'll pass automatically for you
+   -> The game ends when all tiles are highlighted or all players have pass their moves (extreme situation)
 
 -> Some nice and fun features were added to the game experience:
    -> "Card view" on the side of the board - shows adaptative game info
@@ -56,7 +63,7 @@ BOARD BUILDER
    -> Add words horizontally or vertically if in the dictionary
       -> We considered you cannot append to already existing words (eg. you cannot add MAN to POLICE)
       -> You cannot override already existing words (eg. you cannot add HURTING on top of HURT)
-      -> You cannot create extra words as a side effect (thus the world must be isolated on non-intersected tiles)
+      -> You cannot create extra words as a side effect (thus the word must be isolated on non-intersected tiles)
       -> Naturally, you cannot crop words, so all characters of a word must fit inside the board
    -> Export created or edited board to later load on the Scrabble Game
 
